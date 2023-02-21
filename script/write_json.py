@@ -2,13 +2,13 @@ import xlrd
 import json
 
 # 预加载
-work_book = xlrd.open_workbook(r'database.xls') #打开工作表
-ch_data = work_book.sheet_by_index(0) #角色表
+work_book = xlrd.open_workbook('data/database.xls') #打开工作表
 ga_data = work_book.sheet_by_index(1) #卡牌表
 de_data = work_book.sheet_by_index(2) #牌堆表
 sk_data = work_book.sheet_by_index(3) #技能表
+ch_data = work_book.sheet_by_index(4) #角色表
 
-# ga_data行值：0id，1名称，2类型，3延时，4装备类型，5范围，6描述，7图像
+# ga_data行值：0id，1名称，2类型，3延时，4装备类型，5范围，6描述
 
 gamecards = {}
 i = 1
@@ -34,12 +34,12 @@ while i < ga_data.nrows:
     i += 1
     gamecards[gamecard_id] = gamecard_data
 
-with open(r'gamecards.json', 'w', encoding='utf-8') as file:
+with open('json/gamecards.json', 'w', encoding='utf-8') as file:
     json.dump(gamecards, file, ensure_ascii=False)
 
 
 
-# de_data行值：0id，1颜色，2花色，3点数，4卡id，5显示名称，6额外值，7显示的图像
+# de_data行值：0id，1颜色，2花色，3点数，4卡id，5显示名称，6额外值
 gamecard_decks = {}
 i = 1
 while i < de_data.nrows:
@@ -63,7 +63,7 @@ while i < de_data.nrows:
     i += 1
     gamecard_decks[card_deck_id] = card_info
 
-with open(r'gamecard_decks.json', 'w', encoding='utf-8') as file:
+with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
     json.dump(gamecard_decks, file, ensure_ascii=False)
 
 
@@ -99,13 +99,13 @@ while i < sk_data.nrows:
     else:
         skill_name[skill_data['name']] = skill_id
 
-with open(r'skills.json', 'w', encoding='utf-8') as file:
+with open('json/skills.json', 'w', encoding='utf-8') as file:
     json.dump(skills, file, ensure_ascii=False)
 
 
 
 # ch_data行值：0id，1称号，2名称，3性别，4元素，5国家，6技能设计师，
-# 7初始体力值，最8大体力值，9初始护甲值，10图像，11~14技能1~4名称
+# 7初始体力值，最8大体力值，9初始护甲值，10~13技能1~4名称
 
 characters = {}
 i = 1
@@ -141,6 +141,6 @@ while i < ch_data.nrows:
     i += 1
     characters[character_id] = character_data
 
-with open(r'characters.json', 'w', encoding='utf-8') as file:
+with open('json/characters.json', 'w', encoding='utf-8') as file:
     json.dump(characters, file, ensure_ascii=False)
 
