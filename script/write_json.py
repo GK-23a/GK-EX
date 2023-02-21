@@ -3,10 +3,10 @@ import json
 
 # 预加载
 work_book = xlrd.open_workbook('data/database.xls') #打开工作表
-ga_data = work_book.sheet_by_index(1) #卡牌表
-de_data = work_book.sheet_by_index(2) #牌堆表
-sk_data = work_book.sheet_by_index(3) #技能表
-ch_data = work_book.sheet_by_index(4) #角色表
+ga_data = work_book.sheet_by_index(0) #卡牌表
+de_data = work_book.sheet_by_index(1) #牌堆表
+sk_data = work_book.sheet_by_index(2) #技能表
+ch_data = work_book.sheet_by_index(3) #角色表
 
 # ga_data行值：0id，1名称，2类型，3延时，4装备类型，5范围，6描述
 
@@ -19,7 +19,6 @@ while i < ga_data.nrows:
     gamecard_id = data[0]
     gamecard_data['name'] = data[1]
     gamecard_data['description'] = data[6]
-    gamecard_data['image'] = data[7]
 
     gamecard_data['category'] = data[2]
     if gamecard_data['category'] == 'equipment':
@@ -51,7 +50,6 @@ while i < de_data.nrows:
     card_info['suit'] = data[2]
     card_info['id'] = data[4]
     card_info['show_name'] = data[5]
-    card_info['show_image'] = data[7]
 
     if data[6]: card_info['extra_value'] = data[6]
 
@@ -71,9 +69,7 @@ with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
 # sk_data行值：0id，1名称，2源角色，3锁定4限定5转换6觉醒7使命，8描述
 
 skills = {}
-skill_name = {}
-skill_repeat = []
-skill_repeat_name = []
+skill_list = []
 i = 1
 while i < sk_data.nrows:
     data = sk_data.row_values(i)
@@ -81,6 +77,7 @@ while i < sk_data.nrows:
     
     skill_id = data[0]
     skill_data['name'] = data[1]
+    skill_data['character'] = data[2]
     skill_data['description'] = data[8]
     skill_data['category'] = []
     if data[3]: skill_data['category'].append('locked')
@@ -91,13 +88,9 @@ while i < sk_data.nrows:
 
     i += 1
     skills[skill_id] = skill_data
-
-    # characters.json生成时的技能对照关联同中文修正
-    if skill_data['name'] in skill_name:
-        skill_repeat.append({skill_data['name'] : skill_id, 'character_id' : data[2]})
-        skill_repeat_name.append(skill_data['name'])
-    else:
-        skill_name[skill_data['name']] = skill_id
+    skill_list.append(
+        {'name': skill_data['name'],'id': skill_id,'character': skill_data['character']}
+    )
 
 with open('json/skills.json', 'w', encoding='utf-8') as file:
     json.dump(skills, file, ensure_ascii=False)
@@ -123,23 +116,36 @@ while i < ch_data.nrows:
     character_data['health_point'] = int(data[7])
     character_data['max_health_point'] = int(data[8])
     character_data['armor_point'] = int(data[9])
-    character_data['image'] = data[10]
 
     character_data['skills'] = []
-    j = 11
+    j = 10
+    character_skills = []
     while data[j] != '' :
-        skill_id = skill_name[data[j]]
-        if data[j] in skill_repeat_name:
-            for k in skill_repeat:
-                repeat_info_1 = data[j] in k.keys()
-                repeat_info_2 = character_id == k['character_id']
-                if repeat_info_1 and repeat_info_2:
-                    skill_id = k[data[j]]
+        for k in skill_list:
+            if k['name'] == data[j]:
+                if k['character'] == data[0]:
+                    character_data['skills'].append({
+                            'name' : k['name'],
+                            'id' : k['id'],
+                            'category' : skills[k['id']]['category'],
+                            'origin' : True
+                        })
+                    character_skills.append(k['id'])
                     break
-        character_data['skills'].append(skill_id)
         j += 1
-    i += 1
+
+    for k in skill_list:
+        if k['character'] == data[0]:
+            if k['id'] not in character_skills:
+                    character_data['skills'].append({
+                            'name' : k['name'],
+                            'id' : k['id'],
+                            'category' : skills[k['id']]['category'],
+                            'origin' : False
+                        })
+
     characters[character_id] = character_data
+    i += 1
 
 with open('json/characters.json', 'w', encoding='utf-8') as file:
     json.dump(characters, file, ensure_ascii=False)
