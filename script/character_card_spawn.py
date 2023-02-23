@@ -17,12 +17,13 @@ with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
 
 # 字体预加载
 font = {}
-font['title'] = ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=94) # 角色称号
-font['name'] =  ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=300) # 角色名字
-font['topic'] = ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=120) # 技能标题
-font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=72) # 技能类型
-font['text'] =  ImageFont.truetype('font/MiSans-Regular.ttf',     encoding='UTF-8', size=72) # 技能内容
-font['sign'] =  ImageFont.truetype('font/MiSans-Light.ttf',       encoding='UTF-8', size=56) # 卡底标记
+font['title'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=94  ) # 角色称号
+font['name'] =     ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=300 ) # 角色名字
+font['topic'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=120 ) # 技能标题
+font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=72  ) # 技能类型
+font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=100  ) # 特殊血条
+font['text'] =     ImageFont.truetype('font/MiSans-Regular.ttf',  encoding='UTF-8', size=72  ) # 技能内容
+font['sign'] =     ImageFont.truetype('font/MiSans-Light.ttf',    encoding='UTF-8', size=56  ) # 卡底标记
 
 # 颜色预定义
 element_color = {}
@@ -102,8 +103,6 @@ with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
 # --------------------
 
 for ch_id in character_data:
-        
-    # 图层顺序：空白卡底、角色立绘、技能说明、元素外框、神之眼（底座和图案）、血条、初始护盾、名字、称号
     
     # 空白卡底
     cardimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
@@ -194,38 +193,56 @@ for ch_id in character_data:
                 log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(szy), error_character: '+ch_id+' .\n')
             else:
                 log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: FileNotFoundError(szy), but '+ch_id+' lol\n')
+    
 
-    # 血条、初始护盾
-    if character_data[ch_id]['max_health_point'] <= 8:
-        HP_height = 3100
-        HP_value = character_data[ch_id]['health_point']
-        while HP_value != 0:
-            with Image.open('img/icon/HPyes.png') as HP:
-                cardimg.alpha_composite(HP, (160, HP_height))
-                HP_height -= 200
-                HP_value -= 1
-        empty_HP_value =  character_data[ch_id]['max_health_point'] - character_data[ch_id]['health_point']
-        while empty_HP_value != 0:
-            with Image.open('img/icon/HPno.png') as HP_empty:
-                cardimg.alpha_composite(HP_empty, (160, HP_height))
-                HP_height -= 200
-                empty_HP_value -= 1
-        armor_value = character_data[ch_id]['armor_point']
+    # 名字、称号
+    infoimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
+    imgdraw(infoimg, (245, 490), character_data[ch_id]['name'], 'white', 'name', 8, 'black', 'mt')
+    namehigh = ImageDraw.Draw(infoimg).textbbox((245, 490), character_data[ch_id]['name'], font['name'], direction='ttb', language='zh-Hans', anchor='mt')[3]
+    imgdraw(infoimg, (245, namehigh), character_data[ch_id]['title'], (255,192,0,255), 'title', 4, 'black', 'mt')
+    cardimg.alpha_composite(infoimg)
+
+    # 体力值、初始护甲
+    HPimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
+    HP_height = 3100
+    HP_value = character_data[ch_id]['health_point']
+    while HP_value != 0:
+        with Image.open('img/icon/HPyes.png') as HP:
+            HPimg.alpha_composite(HP, (160, HP_height))
+            HP_height -= 200
+            HP_value -= 1
+    empty_HP_value =  character_data[ch_id]['max_health_point'] - character_data[ch_id]['health_point']
+    while empty_HP_value != 0:
+        with Image.open('img/icon/HPno.png') as HP_empty:
+            HPimg.alpha_composite(HP_empty, (160, HP_height))
+            HP_height -= 200
+            empty_HP_value -= 1
+    armor_value = character_data[ch_id]['armor_point']
+    if armor_value != 0:
+        with Image.open('img/icon/Armor.png') as AP:
+            HPimg.alpha_composite(AP, (160, HP_height))
+            imgdraw(HPimg, (225, HP_height+40), str(armor_value), 'black')
+    # 体力值区域后续结算：与称号和名字的防冲突（简单）
+    textheight = ImageDraw.Draw(infoimg).textbbox((245, namehigh), character_data[ch_id]['title'], font['title'], stroke_width=4, direction='ttb', language='zh-Hans', anchor='mt')[3]
+    if HP_height <= textheight:
+        HPimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
+        with Image.open('img/icon/HPyes.png') as HP:
+            HPimg.alpha_composite(HP, (160, 2700))
+        ImageDraw.Draw(HPimg).text(
+            (215,2900),
+            str(character_data[ch_id]['health_point'])+'\n/\n'+str(character_data[ch_id]['max_health_point']),
+            fill=(30,140,30),
+            spacing=4,
+            font=font['HP'],
+            language='zh-Hans',
+            stroke_width=8,
+            stroke_fill=(0,115,0))
         if armor_value != 0:
             with Image.open('img/icon/Armor.png') as AP:
-                cardimg.alpha_composite(AP, (160, HP_height))
-                imgdraw(cardimg, (220, HP_height+40), str(armor_value), 'black')
-    else:
-        with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
-            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: HP/Armor error, error_character: '+ch_id+' .\n')
-    
-    # 名字、称号
-    text2_img = Image.new('RGBA', (2480,3480), (255,255,255,0))
-    imgdraw(text2_img, (245, 490), character_data[ch_id]['name'], 'white', 'name', 8, 'black', 'mt')
-    namehigh = ImageDraw.Draw(text2_img).textbbox((245, 490), character_data[ch_id]['name'], font['name'], direction='ttb', language='zh-Hans', anchor='mt')[3]
-    imgdraw(text2_img, (245, namehigh), character_data[ch_id]['title'], (255,192,0,255), 'title', 4, 'black', 'mt')
-    cardimg.alpha_composite(text2_img)
-    
+                HPimg.alpha_composite(AP, (160, 2500))
+                imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
+    cardimg.alpha_composite(HPimg)
+
     # --------------------
     # 文件保存
     # --------------------
