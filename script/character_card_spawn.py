@@ -129,12 +129,18 @@ for skill_data in character_data[ch_id]['skills']:
     height = ImageDraw.Draw(skillimg).multiline_textbbox((50, height+85), skilltext, font['text'], align='left', direction='ltr', language='zh-Hans')[3] + 35
 imgdraw(skillimg, (50, height+10), 'GenshinKill 2023ver. Alpha | Designer: ' + character_data[ch_id]['developer'] + ' , Artist: miHoYo', 'black', 'sign')
 skillimg = skillimg.crop((0,0,2000,height+100))
-# DEBUG
-skillimg.show()
-# skillimg.show()
-
-
-
+cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
+# 元素外框
+with Image.open('img/frame/' + character_data[ch_id]['element'] + '.png') as frame:
+    cardimg.alpha_composite(frame)
+# 神之眼
+with Image.open('img/szy/' + character_data[ch_id]['country'] + '.png') as dizuo:
+    cardimg.alpha_composite(dizuo)
+tuanimg = character_data[ch_id]['element']
+if character_data[ch_id]['country'] == 'liyue':
+    tuanimg += '_'
+with Image.open('img/szy/' + tuanimg  + '.png') as tuan:
+    cardimg.alpha_composite(tuan)
 
 # 技能循环处
 # 
@@ -157,5 +163,5 @@ skillimg.show()
 # 技能层大小2000宽
 
 # DEBUG
-# cardimg.show()
+cardimg.show()
 
