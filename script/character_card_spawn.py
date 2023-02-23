@@ -7,8 +7,8 @@ import json
 
 # 字体预加载
 font = {}
-font['title'] = ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=74) # 角色称号
-font['name'] =  ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=74) # 角色名字
+font['title'] = ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=84) # 角色称号
+font['name'] =  ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=300) # 角色名字
 font['topic'] = ImageFont.truetype('font/SIMLI.TTF',              encoding='UTF-8', size=120) # 技能标题
 font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=72) # 技能类型
 font['text'] =  ImageFont.truetype('font/MiSans-Regular.ttf',     encoding='UTF-8', size=72) # 技能内容
@@ -30,7 +30,7 @@ left_punctuation  = ['，','。','；','：','？','！','、','（','【','“'
 right_punctuation = ['）','】','”']
 
 # 预定义简化ImageDraw函数
-def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_color=None):
+def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_color=None,md='lt'):
     """简化的ImageDraw函数，对text和topic有其他优化。"""
     img= ImageDraw.Draw(bg)
     way = 'ltr'
@@ -42,7 +42,7 @@ def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_colo
             text,
             fill=topicyy_color,
             font=font[font_style],
-            anchor='lt',
+            anchor=md,
             direction=way,
             language='zh-Hans',
             stroke_width=side_width,
@@ -63,7 +63,7 @@ def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_colo
             text,
             fill=fill_color,
             font=font[font_style],
-            anchor='lt',
+            anchor=md,
             direction=way,
             language='zh-Hans',
             stroke_width=side_width,
@@ -81,7 +81,7 @@ with open('json/characters.json', encoding='UTF-8') as jsonfile:
 ch_id = 'xingqiu'
 # for ch_id in character_data:
     
-# 图层顺序：空白卡底、角色立绘、技能说明、元素外框、神之眼（底座和图案）、称号、名称、血条、初始护盾   
+# 图层顺序：空白卡底、角色立绘、技能说明、元素外框、神之眼（底座和图案）、名字、称号、血条、初始护盾   
 
 # 空白卡底
 cardimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
@@ -130,9 +130,11 @@ for skill_data in character_data[ch_id]['skills']:
 imgdraw(skillimg, (50, height+10), 'GenshinKill 2023ver. Alpha | Designer: ' + character_data[ch_id]['developer'] + ' , Artist: miHoYo', 'black', 'sign')
 skillimg = skillimg.crop((0,0,2000,height+100))
 cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
+
 # 元素外框
 with Image.open('img/frame/' + character_data[ch_id]['element'] + '.png') as frame:
     cardimg.alpha_composite(frame)
+
 # 神之眼
 with Image.open('img/szy/' + character_data[ch_id]['country'] + '.png') as dizuo:
     cardimg.alpha_composite(dizuo)
@@ -142,25 +144,16 @@ if character_data[ch_id]['country'] == 'liyue':
 with Image.open('img/szy/' + tuanimg  + '.png') as tuan:
     cardimg.alpha_composite(tuan)
 
-# 技能循环处
-# 
-# 写标题
-#     字符串切片
-#     计算字符串字体长度
-#     如果小于最大长度，进入中文标点修正
-#         最后一个为左括号，放到下一行
-#         最后一个是右标点，忽略
-#         下一行第一个是右标点，放到上一行
-#     字符串传递
-#     原字符串切片
-#     确认行高，计算行高
-#     循环
-# 尾部增加行高
-# 写底附字
-# 
-# 角色立绘为2000宽
-# 卡牌大小2480*3480
-# 技能层大小2000宽
+# 名字
+imgdraw(cardimg, (245, 490), character_data[ch_id]['name'], 'white', 'name', 8, 'black', 'mt')
+# 称号
+namehigh = ImageDraw.Draw(cardimg).textbbox((245, 490), character_data[ch_id]['name'], font['name'], direction='ttb', language='zh-Hans', anchor='mt')[3]
+imgdraw(cardimg, (245, namehigh), character_data[ch_id]['title'], (255,192,0,255), 'title', 4, 'black', 'mt')
+
+
+
+
+
 
 # DEBUG
 cardimg.show()
