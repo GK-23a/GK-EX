@@ -14,7 +14,6 @@ if not os.path.exists('out/character_img'):
 with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
     log.write('--------------------\n['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: character_card_spawn.py Working...'+'\n')
 
-
 # 字体预加载
 font = {}
 font['title'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=94  ) # 角色称号
@@ -36,10 +35,18 @@ element_color['anemo']   = [(137,232,217),(51,204,179)]
 element_color['geo']     = [(234,209,128),(207,167,38)]
 topicyy_color = (126,126,126,192)
 
-# 中文标点修正预定义量
-punctuation = ['，','。','；','：','？','！','、']
-left_punctuation  = ['（','【','“']
-right_punctuation = ['）','】','”']
+# 预定义中文标点习惯修复
+def punctuation_fix(text, length):
+    punctuation = ['，','。','；','：','？','！','、']
+    left_punctuation  = ['（','【','“']
+    right_punctuation = ['）','】','”']
+    if text[:length-1] in left_punctuation:
+        length -= 1
+    elif text[length:length+1] in right_punctuation + punctuation:
+        length += 1
+        if text[length:length+1] in right_punctuation + punctuation:
+            length -= 2
+    return [text, length]
 
 # 预定义简化ImageDraw函数
 def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_color=None,md='lt'):
@@ -139,11 +146,10 @@ for ch_id in character_data:
                     if linelen[2] > 1940:
                         length -= 1
                     else:
-                        # 中文标点修正
-                        if textline[-1:] in left_punctuation:
-                            length -= 1
-                        elif linelen[length+1:length+1] in right_punctuation or linelen[length+1:length+1] in punctuation:
-                            length += 1
+                        # 中文标点修正【有严重bug】
+                        fixer = punctuation_fix(skilltext_origin, length)
+                        skilltext_origin = fixer[0]
+                        length = fixer[1]
                         textline = skilltext_origin[:length]
                         break
                 skilltext += textline + '\n'
