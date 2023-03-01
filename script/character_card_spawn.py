@@ -8,7 +8,6 @@ import os
 # --------------------
 
 # 日志系统
-no_design_list = ['aloy','paimon', 'traveler', 'traveler_anemo', 'traveler_geo', 'traveler_electro', 'traveler_dendro']
 if not os.path.exists('out/character_img'):
     os.makedirs('out/character_img')
 with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
@@ -110,6 +109,11 @@ with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
 # --------------------
 
 for ch_id in character_data:
+
+    if not character_data[ch_id]['developer']:
+        with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
+            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: ' + ch_id + ' not exist developer. Already stop spawn.\n')
+        break
     
     # 空白卡底
     cardimg = Image.new('RGBA', (2480,3480), (255,255,255,0))
@@ -120,10 +124,8 @@ for ch_id in character_data:
             cardimg.paste(character_image, (380,120))
     except FileNotFoundError:
         with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
-            if ch_id not in no_design_list:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(character_image), error_character: '+ch_id+' .\n')
-            else:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: FileNotFoundError(character_image), but '+ch_id+' lol\n')
+            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(character_image), error_character: '+ch_id+' .\n')
+
     # 技能说明
     try:
         skillimg = Image.new('RGBA', (2000,3240), (253,253,253,138))
@@ -168,10 +170,8 @@ for ch_id in character_data:
         cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
     except KeyError:
         with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
-            if ch_id not in no_design_list:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: KeyError(skillimg), error_character: '+ch_id+' .\n')
-            else:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: KeyError(skillimg), but '+ch_id+' lol\n')
+            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: KeyError(skillimg), error_character: '+ch_id+' .\n')
+
 
     # 元素外框
     try:
@@ -179,10 +179,7 @@ for ch_id in character_data:
             cardimg.alpha_composite(frame)
     except FileNotFoundError:
         with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
-            if ch_id not in no_design_list:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(frame), error_character: '+ch_id+' .\n')
-            else:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: FileNotFoundError(frame), but '+ch_id+' lol\n')
+            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(frame), error_character: '+ch_id+' .\n')
 
     # 神之眼
     try:
@@ -195,10 +192,8 @@ for ch_id in character_data:
             cardimg.alpha_composite(tuan)
     except FileNotFoundError:
         with open('out/character_card_spawn.log', 'a', encoding='UTF-8') as log:
-            if ch_id not in no_design_list:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(szy), error_character: '+ch_id+' .\n')
-            else:
-                log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Info: FileNotFoundError(szy), but '+ch_id+' lol\n')
+            log.write('['+time.asctime(time.localtime(time.time()))[4:19]+'] Error: FileNotFoundError(szy), error_character: '+ch_id+' .\n')
+
     
 
     # 名字、称号
