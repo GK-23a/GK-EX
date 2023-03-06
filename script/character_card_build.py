@@ -165,7 +165,7 @@ for ch_id in character_data:
                         length = 45
                 imgdraw(skillimg, (50, height+85), skilltext, 'black')
                 height = ImageDraw.Draw(skillimg).multiline_textbbox((50, height+85), skilltext, font['text'], align='left', direction='ltr', language='zh-Hans')[3] + 35
-            with open('json/version.json') as config:
+            with open('json/info.json') as config:
                 version = json.loads(config.read())
                 imgdraw(skillimg, (50, height+10), 'GenshinKill ' + version['version'] + ' | Designer: ' + character_data[ch_id]['designer'] + ' , Artist: miHoYo', 'black', font_style='sign')
             skillimg = skillimg.crop((0,0,2000,height+100))
