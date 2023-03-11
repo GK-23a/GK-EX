@@ -16,9 +16,9 @@ import json
 #         if os.path.getsize('data/database.xls') == gk_info:
 #             raise xlsxNotChanged
 #     
-#     wlog('out/debug.log', 'database.xlsx 可能发生更改。')
+#     wlog(__file__, 'out/debug.log', 'database.xlsx 可能发生更改。')
 
-wlog('out/debug.log', 'json 构建开始。')
+wlog(__file__, 'out/debug.log', 'json 构建开始。')
 
 # 预加载
 work_book = xlrd.open_workbook('data/database.xlsx') #打开工作表
@@ -27,12 +27,12 @@ de_data = work_book.sheet_by_index(1) #牌堆表
 sk_data = work_book.sheet_by_index(2) #技能表
 ch_data = work_book.sheet_by_index(3) #角色表
 
-wlog('out/debug.log', '已加载"database.xlsx"。')
+wlog(__file__, 'out/debug.log', '已加载"database.xlsx"。')
 
 
 
 # ga_data行值：0id，1名称，2类型，3延时，4装备类型，5范围，6描述
-wlog('out/debug.log', '开始构建卡牌(gamecards)。')
+wlog(__file__, 'out/debug.log', '开始构建卡牌(gamecards)。')
 gamecards = {}
 i = 1
 while i < ga_data.nrows:
@@ -56,15 +56,15 @@ while i < ga_data.nrows:
     i += 1
     gamecards[gamecard_id] = gamecard_data
 
-wlog('out/debug.log', '构建卡牌(gamecards)已结束。')
+wlog(__file__, 'out/debug.log', '构建卡牌(gamecards)已结束。')
 with open('json/gamecards.json', 'w', encoding='utf-8') as file:
     json.dump(gamecards, file, ensure_ascii=False)
-    wlog('out/debug.log', '"gamecards.json"已成功保存。')
+    wlog(__file__, 'out/debug.log', '"gamecards.json"已成功保存。')
 
 
 
 # de_data行值：0id，1颜色，2花色，3点数，4卡id，5显示名称，6额外值
-wlog('out/debug.log', '开始构建牌堆(gamecard_decks)。')
+wlog(__file__, 'out/debug.log', '开始构建牌堆(gamecard_decks)。')
 gamecard_decks = {}
 i = 1
 while i < de_data.nrows:
@@ -87,15 +87,15 @@ while i < de_data.nrows:
     i += 1
     gamecard_decks[card_deck_id] = card_info
 
-wlog('out/debug.log', '构建牌堆(gamecard_decks)已结束。')
+wlog(__file__, 'out/debug.log', '构建牌堆(gamecard_decks)已结束。')
 with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
     json.dump(gamecard_decks, file, ensure_ascii=False)
-    wlog('out/debug.log', '"gamecard_decks.json"已成功保存。')
+    wlog(__file__, 'out/debug.log', '"gamecard_decks.json"已成功保存。')
 
 
 
 # sk_data行值：0id，1名称，2源角色，3锁定4限定5转换6觉醒7使命，8描述
-wlog('out/debug.log', '开始构建技能(skills)。')
+wlog(__file__, 'out/debug.log', '开始构建技能(skills)。')
 skills = {}
 skill_list = []
 i = 1
@@ -120,16 +120,16 @@ while i < sk_data.nrows:
         {'name': skill_data['name'],'id': skill_id,'character': skill_data['character']}
     )
 
-wlog('out/debug.log', '构建技能(skills)已结束。')
+wlog(__file__, 'out/debug.log', '构建技能(skills)已结束。')
 with open('json/skills.json', 'w', encoding='utf-8') as file:
     json.dump(skills, file, ensure_ascii=False)
-    wlog('out/debug.log', '"skills.json"已成功保存。')
+    wlog(__file__, 'out/debug.log', '"skills.json"已成功保存。')
 
 
 
-# ch_data行值：0id，1称号，2名称，3性别，4元素，5国家，6完成状态，7技能设计师
-# 8初始体力值，9最大体力值，10初始护甲值，11+技能名称
-wlog('out/debug.log', '开始构建角色信息(characters)。')
+# ch_data行值：0id，1称号，2名称，3性别，4元素，5国家，6星级
+# 7完成状态，8技能设计师，9初始体力值，10最大体力值，11初始护甲值，12+技能名称
+wlog(__file__, 'out/debug.log', '开始构建角色信息(characters)。')
 characters = {}
 i = 1
 while i < ch_data.nrows:
@@ -142,14 +142,15 @@ while i < ch_data.nrows:
     character_data['sex'] = data[3]
     character_data['element'] = data[4]
     character_data['country'] = data[5]
-    character_data['design_info'] = data[6]
-    character_data['designer'] = data[7]
-    character_data['health_point'] = int(data[8])
-    character_data['max_health_point'] = int(data[9])
-    character_data['armor_point'] = int(data[10])
+    character_data['level'] = data[6]
+    character_data['design_info'] = data[7]
+    character_data['designer'] = data[8]
+    character_data['health_point'] = int(data[9])
+    character_data['max_health_point'] = int(data[10])
+    character_data['armor_point'] = int(data[11])
 
     character_data['skills'] = []
-    j = 11
+    j = 12
     character_skills = []
     try:
         while data[j] != '' :
@@ -181,12 +182,12 @@ while i < ch_data.nrows:
                         })
 
     characters[character_id] = character_data
-    wlog('out/debug.log', '已成功构建角色 ' + character_id + ' 的全部信息。')
+    wlog(__file__, 'out/debug.log', '已成功构建角色 ' + character_id + ' 的全部信息。')
     i += 1
 
-wlog('out/debug.log', '构建角色信息(characters)已结束。')
+wlog(__file__, 'out/debug.log', '构建角色信息(characters)已结束。')
 with open('json/characters.json', 'w', encoding='utf-8') as file:
     json.dump(characters, file, ensure_ascii=False)
-    wlog('out/debug.log', '"characters.json"已成功保存。')
+    wlog(__file__, 'out/debug.log', '"characters.json"已成功保存。')
 
-wlog('out/debug.log', 'json 构建结束。\n')
+wlog(__file__, 'out/debug.log', 'json 构建结束。\n')

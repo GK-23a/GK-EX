@@ -3,15 +3,9 @@ from os import path as os_path, makedirs as os_makedirs
 from customlog import wlog
 import json
 
-# --------------------
-# 预加载
-# --------------------
-wlog('out/debug.log', '角色图像构建开始。')
-wlog('out/debug.log', '进行初始化预加载。')
 
 if not os_path.exists('out/character_img'):
     os_makedirs('out/character_img')
-    wlog('out/debug.log', '未检测到 out/character_img 文件夹，已创建。')
 
 # 字体预加载
 font = {}
@@ -22,7 +16,6 @@ font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-
 font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=100  ) # 特殊血条
 font['text'] =     ImageFont.truetype('font/MiSans-Regular.ttf',  encoding='UTF-8', size=72  ) # 技能内容
 font['sign'] =     ImageFont.truetype('font/MiSans-Light.ttf',    encoding='UTF-8', size=56  ) # 卡底标记
-wlog('out/debug.log', '字体预加载完成。')
 
 # 颜色预定义
 topicyy_color = (126,126,126,192)
@@ -35,21 +28,11 @@ element_color = {
     'anemo'   : [ ( 137, 232, 217 ) , (  51, 204, 179 ) ],
     'geo'     : [ ( 234, 209, 128 ) , ( 207, 167,  38 ) ],
 }
-wlog('out/debug.log', '元素颜色预加载完成。')
 
 # 预定义中文标点习惯修复
-def punctuation_fix(text, length):
-    punctuation = ['，','。','；','：','？','！','、']
-    left_punctuation  = ['（','【','“']
-    right_punctuation = ['）','】','”']
-    if text[:length-1] in left_punctuation:
-        length -= 1
-    elif text[length:length+1] in right_punctuation + punctuation:
-        length += 1
-        if text[length:length+1] in right_punctuation + punctuation:
-            length -= 2
-    return [text, length]
-wlog('out/debug.log', '中文标点习惯修复函数预加载完成。')
+punctuation = ['，','。','；','：','？','！','、']
+left_punctuation  = ['（','【','“']
+right_punctuation = ['）','】','”']
 
 # 预定义简化ImageDraw函数
 def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_color=None,md='lt'):
@@ -100,22 +83,9 @@ def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_colo
             language='zh-Hans',
             stroke_width=side_width,
             stroke_fill=side_color)
-wlog('out/debug.log', 'ImageDraw 简化函数 imgdraw() 预加载完成。')
 
-# json读取
-with open('json/characters.json', encoding='UTF-8') as jsonfile:
-    character_data = json.loads(jsonfile.read())
-
-wlog('out/debug.log', '"characters.json"读取完成。')
-wlog('out/debug.log', '预加载内容全部完成。')
-
-# --------------------
-# 图层叠加
-# --------------------
-
-
-for ch_id in character_data:
-
+# 图像生成函数
+def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/info.json'):
     if character_data[ch_id]['design_info'] == 1:
         
         # 空白卡底
@@ -126,7 +96,7 @@ for ch_id in character_data:
             with Image.open('img/character/' + ch_id + '.png') as character_image:
                 cardimg.paste(character_image, (380,120))
         except Exception as errorinfo:
-            wlog('out/debug.log', ch_id + '在角色立绘阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在角色立绘阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
     
         # 技能说明
         try:
@@ -151,9 +121,12 @@ for ch_id in character_data:
                             length -= 1
                         else:
                             # 中文标点修正【有严重bug】
-                            fixer = punctuation_fix(skilltext_origin, length)
-                            skilltext_origin = fixer[0]
-                            length = fixer[1]
+                            if skilltext_origin[:length-1] in left_punctuation:
+                                length -= 1
+                            elif skilltext_origin[length:length+1] in right_punctuation + punctuation:
+                                length += 1
+                                if skilltext_origin[length:length+1] in right_punctuation + punctuation:
+                                    length -= 2
                             textline = skilltext_origin[:length]
                             break
                     skilltext += textline + '\n'
@@ -165,13 +138,13 @@ for ch_id in character_data:
                         length = 45
                 imgdraw(skillimg, (50, height+85), skilltext, 'black')
                 height = ImageDraw.Draw(skillimg).multiline_textbbox((50, height+85), skilltext, font['text'], align='left', direction='ltr', language='zh-Hans')[3] + 35
-            with open('json/info.json') as config:
+            with open(info_path) as config:
                 version = json.loads(config.read())
                 imgdraw(skillimg, (50, height+10), 'GenshinKill ' + version['version'] + ' | Designer: ' + character_data[ch_id]['designer'] + ' , Artist: miHoYo', 'black', font_style='sign')
             skillimg = skillimg.crop((0,0,2000,height+100))
             cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
         except Exception as errorinfo:
-            wlog('out/debug.log', ch_id + '在技能生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在技能生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
     
     
         # 元素外框
@@ -179,7 +152,7 @@ for ch_id in character_data:
             with Image.open('img/frame/' + character_data[ch_id]['element'] + '.png') as frame:
                 cardimg.alpha_composite(frame)
         except Exception as errorinfo:
-            wlog('out/debug.log', ch_id + '在元素外框生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在元素外框生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
     
         # 神之眼
         try:
@@ -191,7 +164,7 @@ for ch_id in character_data:
             with Image.open('img/szy/' + tuanimg  + '.png') as tuan:
                 cardimg.alpha_composite(tuan)
         except Exception as errorinfo:
-            wlog('out/debug.log', ch_id + '在神之眼生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在神之眼生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
     
         # 名字、称号
         try:
@@ -242,17 +215,10 @@ for ch_id in character_data:
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
         except Exception as errorinfo:
-            wlog('out/debug.log', ch_id + '在名字、称号、及初始体力与护甲计算阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
-    
-        # --------------------
-        # 文件保存
-        # --------------------
-    
-        cardimg.save('out/character_img/'+ch_id+'.png')
-    
-        wlog('out/debug.log', character_data[ch_id]['name'] + ' ( ' + ch_id + ' )' + '已成功完成生成，并保存为 "' + ch_id + '.png" 。')
+            wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+        message = character_data[ch_id]['name'] + ' ( ' + ch_id + ' )' + '已成功完成生成。'
+        wlog(__file__, wlog_path, message)
+        return cardimg
     else:
-        wlog('out/debug.log', ch_id + ' 未设计完成，已跳过生成。')
-
-wlog('out/debug.log', '角色图像生成已完成全部构建与保存。\n')
-
+        wlog(__file__, 'out/debug.log', ch_id + ' 未设计完成，已跳过生成。')
+        return False
