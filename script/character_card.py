@@ -216,7 +216,7 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
             cardimg.alpha_composite(HPimg)
         except Exception as errorinfo:
             wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
-        message = character_data[ch_id]['name'] + ' ( ' + ch_id + ' )' + '已成功完成生成。'
+        message = character_data[ch_id]['name'] + ' (' + ch_id + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
         return cardimg
     else:

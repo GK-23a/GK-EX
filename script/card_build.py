@@ -1,6 +1,26 @@
 from customlog import wlog
 import character_card
 import json
+import os
+
+wlog(__file__, 'out/debug.log', '卡面构建开始。')
+
+# xlsx检测
+with open('json/info.json') as jsonfile:
+    info = json.loads(jsonfile.read())
+    try:  
+        xlsx_size = info['xlsx_size']
+    except:
+        xlsx_size = 0
+    xlsx_size_now = os.path.getsize('data/database.xlsx')
+if xlsx_size_now != xlsx_size:
+    wlog(__file__, 'out/debug.log', 'database.xlsx 可能发生更改。重新生成json数据文件。')
+    os.system('{} {}'.format('python', 'script/json_build.py'))
+    info['xlsx_size'] = xlsx_size_now
+    with open('json/info.json', 'w') as jsonfile:
+        json.dump(info, jsonfile, ensure_ascii=False)
+    wlog(__file__, 'out/debug.log', 'json数据文件已成功生成。')
+        
 
 wlog(__file__, 'out/debug.log', '角色图像构建开始。')
 
@@ -18,3 +38,4 @@ for ch_id in character_data:
 
 wlog(__file__, 'out/debug.log', '角色图像生成已完成全部构建与保存。\n')
 
+wlog(__file__, 'out/debug.log', '卡面构建结束。\n')

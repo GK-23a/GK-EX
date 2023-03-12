@@ -2,22 +2,6 @@ from customlog import wlog
 import xlrd3 as xlrd
 import json
 
-# 重构部分。等待迁移。
-# 
-# class xlsxNotChanged(Exception):
-#     pass
-# 
-# try:
-#     with open('json/info.json') as jsonfile:
-#         try:
-#             gk_info = json.loads(jsonfile.read())
-#         except FileNotFoundError:
-#             gk_info = 0
-#         if os.path.getsize('data/database.xls') == gk_info:
-#             raise xlsxNotChanged
-#     
-#     wlog(__file__, 'out/debug.log', 'database.xlsx 可能发生更改。')
-
 wlog(__file__, 'out/debug.log', 'json 构建开始。')
 
 # 预加载
