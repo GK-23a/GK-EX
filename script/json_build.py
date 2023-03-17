@@ -78,7 +78,7 @@ with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
 
 
 
-# sk_data行值：0id，1名称，2源角色，3锁定4限定5转换6觉醒7使命，8描述
+# sk_data行值：0id，1名称，2源角色，3描述
 wlog(__file__, 'out/debug.log', '开始构建技能(skills)。')
 skills = {}
 skill_list = []
@@ -90,13 +90,7 @@ while i < sk_data.nrows:
     skill_id = data[0]
     skill_data['name'] = data[1]
     skill_data['character'] = data[2]
-    skill_data['description'] = data[8]
-    skill_data['category'] = []
-    if data[3]: skill_data['category'].append('locked')
-    if data[4]: skill_data['category'].append('limited')
-    if data[5]: skill_data['category'].append('change')
-    if data[6]: skill_data['category'].append('wake')
-    if data[7]: skill_data['category'].append('mission')
+    skill_data['description'] = data[3]
 
     i += 1
     skills[skill_id] = skill_data
@@ -161,7 +155,6 @@ while i < ch_data.nrows:
                             'name' : k['name'],
                             'id' : k['id'],
                             'description' : skills[k['id']]['description'],
-                            'category' : skills[k['id']]['category'],
                             'origin' : False
                         })
 

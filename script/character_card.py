@@ -13,7 +13,7 @@ font['title'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-
 font['name'] =     ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=300 ) # 角色名字
 font['topic'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=120 ) # 技能标题
 font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=72  ) # 技能类型
-font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=100  ) # 特殊血条
+font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=100 ) # 特殊血条
 font['text'] =     ImageFont.truetype('font/MiSans-Regular.ttf',  encoding='UTF-8', size=72  ) # 技能内容
 font['sign'] =     ImageFont.truetype('font/MiSans-Light.ttf',    encoding='UTF-8', size=56  ) # 卡底标记
 
@@ -84,7 +84,38 @@ def imgdraw(bg,position,text,fill_color,font_style='text',side_width=0,side_colo
             stroke_width=side_width,
             stroke_fill=side_color)
 
-# 图像生成函数
+# 预定义文本换行函数
+def howtoline(img, origin_text, height=50, length=45):
+    text = ''
+    while True:
+        while True:
+            textline = origin_text[:length]
+            linelen = ImageDraw.Draw(img).multiline_textbbox((50, height+85), textline, font['text'], align='left', direction='ltr', language='zh-Hans')
+            if linelen[2] > 1940:
+                length -= 1
+            else:
+                # 中文标点修正
+                if origin_text[length:length+1] in punctuation:
+                    length += 1
+                elif origin_text[length:length+1] in right_punctuation:
+                    if origin_text[length+1:length+2] in punctuation:
+                        length -= 2
+                    else:
+                        length += 1
+                elif origin_text[length-1:length] in left_punctuation:
+                    length -= 1
+                textline = origin_text[:length]
+                break
+        text += textline + '\n'
+        origin_text = origin_text[length:]
+        if text[-2:] == '\n\n':
+            text = text[:-2]
+            break
+        else:
+            length = 45
+    return text
+
+# 预定义图像生成函数
 def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/info.json'):
     if character_data[ch_id]['design_info'] == 1:
         
@@ -99,48 +130,30 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
             wlog(__file__, wlog_path, ch_id + '在角色立绘阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
     
         # 技能说明
+        # 即将重构：不再使用multiline，每行一次手动绘制
         try:
             skillimg = Image.new('RGBA', (2000,3240), (253,253,253,138))
             # 技能文本
             # INFO：未包含【技能类别粗体】【花色显示优化】
             height = 50
-            length = 45
             color = element_color[character_data[ch_id]['element']]
             for skill_data in character_data[ch_id]['skills']:
                 fill_color = color[0]
                 if not skill_data['origin']:
                     fill_color = 'black'
                 imgdraw(skillimg, (50, height), skill_data['name'], fill_color, 'topic', 7, color[1])
-                skilltext = ''
                 skilltext_origin = skill_data['description']
-                while True:
-                    while True:
-                        textline = skilltext_origin[:length]
-                        linelen = ImageDraw.Draw(skillimg).multiline_textbbox((50, height+85), textline, font['text'], align='left', direction='ltr', language='zh-Hans')
-                        if linelen[2] > 1940:
-                            length -= 1
-                        else:
-                            # 中文标点修正【有严重bug】
-                            if skilltext_origin[:length-1] in left_punctuation:
-                                length -= 1
-                            elif skilltext_origin[length:length+1] in right_punctuation + punctuation:
-                                length += 1
-                                if skilltext_origin[length:length+1] in right_punctuation + punctuation:
-                                    length -= 2
-                            textline = skilltext_origin[:length]
-                            break
-                    skilltext += textline + '\n'
-                    skilltext_origin = skilltext_origin[length:]
-                    if skilltext[-2:] == '\n\n':
-                        skilltext = skilltext[:-2]
-                        break
-                    else:
-                        length = 45
+                # 换行计算
+                skilltext = howtoline(skillimg, skilltext_origin)
+                wlog(__file__, wlog_path, skilltext, 'Debug')
                 imgdraw(skillimg, (50, height+85), skilltext, 'black')
+                # 技能类别粗体覆盖
+
                 height = ImageDraw.Draw(skillimg).multiline_textbbox((50, height+85), skilltext, font['text'], align='left', direction='ltr', language='zh-Hans')[3] + 35
             with open(info_path) as config:
                 version = json.loads(config.read())
                 imgdraw(skillimg, (50, height+10), 'GenshinKill ' + version['version'] + ' | Designer: ' + character_data[ch_id]['designer'] + ' , Artist: miHoYo', 'black', font_style='sign')
+            # 技能图层剪切
             skillimg = skillimg.crop((0,0,2000,height+100))
             cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
         except Exception as errorinfo:
