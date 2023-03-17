@@ -139,7 +139,6 @@ while i < ch_data.nrows:
                                 'name' : k['name'],
                                 'id' : k['id'],
                                 'description' : skills[k['id']]['description'],
-                                'category' : skills[k['id']]['category'],
                                 'origin' : True
                             })
                         character_skills.append(k['id'])
