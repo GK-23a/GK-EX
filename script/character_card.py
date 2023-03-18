@@ -9,13 +9,14 @@ if not os_path.exists('out/character_img'):
 
 # 字体预加载
 font = {}
-font['title'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=94  ) # 角色称号
-font['name'] =     ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=300 ) # 角色名字
-font['topic'] =    ImageFont.truetype('font/SIMLI.TTF',           encoding='UTF-8', size=120 ) # 技能标题
-font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=72  ) # 技能类型
-font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf', encoding='UTF-8', size=100 ) # 特殊血条
-font['text'] =     ImageFont.truetype('font/MiSans-Regular.ttf',  encoding='UTF-8', size=72  ) # 技能内容
-font['sign'] =     ImageFont.truetype('font/MiSans-Light.ttf',    encoding='UTF-8', size=56  ) # 卡底标记
+font['sign'] =     ImageFont.truetype('font/MiSans-Light.ttf',      encoding='UTF-8', size=56  ) # 卡底标记
+font['category'] = ImageFont.truetype('font/MiSans-Semibold.ttf',   encoding='UTF-8', size=72  ) # 技能类型
+font['text'] =     ImageFont.truetype('font/MiSans-Regular.ttf',    encoding='UTF-8', size=72  ) # 技能内容
+font['suit'] =     ImageFont.truetype('font/有爱新黑CN-Regular.ttf', encoding='UTF-8', size=72  ) # 花色图标
+font['title'] =    ImageFont.truetype('font/SIMLI.TTF',             encoding='UTF-8', size=94  ) # 角色称号
+font['HP'] =       ImageFont.truetype('font/MiSans-Semibold.ttf',   encoding='UTF-8', size=100 ) # 特殊血条
+font['topic'] =    ImageFont.truetype('font/SIMLI.TTF',             encoding='UTF-8', size=120 ) # 技能标题
+font['name'] =     ImageFont.truetype('font/SIMLI.TTF',             encoding='UTF-8', size=300 ) # 角色名字
 
 # 颜色预定义
 topicyy_color = (126,126,126,192)
@@ -88,7 +89,7 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
             with Image.open('img/character/' + ch_id + '.png') as character_image:
                 cardimg.paste(character_image, (380,120))
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在角色立绘阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在角色立绘阶段发生错误：' + str(errorinfo), 'Error')
     
         # 技能说明
         try:
@@ -104,9 +105,33 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                     fill_color = 'black'
                 imgdraw(skillimg, (50, height), skill_data['name'], fill_color, 'topic', 7, color[1])
                 skilltext_origin = skill_data['description']
+                # 花色标记
+                suit_sign = []
+                point_sign = []
+                if 'suit' in skilltext_origin:
+                    suit_exist = True
+                    point = 0   
+                    while True:
+                        if skilltext_origin[point:point+12] == '<suit:heart>':
+                            skilltext_origin = skilltext_origin.replace('<suit:heart>', '　', 1)
+                            suit_sign.append('heart')
+                        elif skilltext_origin[point:point+12] == '<suit:spade>':
+                            skilltext_origin = skilltext_origin.replace('<suit:spade>', '　', 1)
+                            suit_sign.append('spade')
+                        elif skilltext_origin[point:point+14] == '<suit:diamond>':
+                            skilltext_origin = skilltext_origin.replace('<suit:diamond>', '　', 1)
+                            suit_sign.append('diamond')
+                        elif skilltext_origin[point:point+11] == '<suit:club>':
+                            skilltext_origin = skilltext_origin.replace('<suit:club>', '　', 1)
+                            suit_sign.append('club')
+                        elif skilltext_origin[point:point+14] == '':
+                            break
+                        point += 1
+                else:
+                    suit_exist = False
+                # 换行计算
                 body_height = height
                 body_skilltext_origin = skilltext_origin
-                # 换行计算
                 while True:
                     while True:
                         textline = skilltext_origin[:length]
@@ -127,7 +152,12 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                             textline = skilltext_origin[:length]
                             break
                     imgdraw(skillimg, (50, height+95), textline, 'black')
-                    print(ImageDraw.Draw(skillimg).textbbox((50, height+85), textline, font['text'], align='left', direction='ltr', language='zh-Hans'))
+                    if suit_exist:
+                        point = 0
+                        while point <= len(textline):
+                            if textline[:point][-1:] == '　':
+                                point_sign.append(ImageDraw.Draw(skillimg).textbbox((50, height+95), textline[:point-1], font['text'], align='left', direction='ltr', language='zh-Hans'))
+                            point += 1
                     skilltext_origin = skilltext_origin[length:]
                     height += 77
                     if skilltext_origin == '':
@@ -135,6 +165,27 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                         break
                     else:
                         length = 45
+                # 花色覆盖绘制
+                if suit_exist:
+                    suit_height = body_height
+                    point = 0
+                    suit_color = ''
+                    suit_text = ''
+                    while point < len(suit_sign):
+                        if suit_sign[point] == 'heart':
+                            suit_color = 'red'
+                            suit_text = '♥'
+                        elif suit_sign[point] == 'spade':
+                            suit_color = 'black'
+                            suit_text = '♠'
+                        elif suit_sign[point] == 'diamond':
+                            suit_color = 'red'
+                            suit_text = '♦'
+                        elif suit_sign[point] == 'club':
+                            suit_color = 'black'
+                            suit_text = '♣'    
+                        imgdraw(skillimg, (point_sign[point][2], point_sign[point][3]-84), suit_text, suit_color, 'suit')
+                        point += 1
                 # 技能类别粗体覆盖
                 boldtext = ''
                 while True:
@@ -162,7 +213,6 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                             textline = boldtext[:length]
                             break
                     imgdraw(skillimg, (50, body_height+95), textline, 'black', 'category')
-                    print(ImageDraw.Draw(skillimg).textbbox((50, body_height+85), textline, font['text'], align='left', direction='ltr', language='zh-Hans'))
                     boldtext = boldtext[length:]
                     body_height += 77
                     if boldtext == '':
@@ -175,18 +225,16 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                 imgdraw(skillimg, (50, height+10), 'GenshinKill ' + version['version'] + ' | Designer: ' + character_data[ch_id]['designer'] + ' , Artist: miHoYo', 'black', font_style='sign')
             # 技能图层剪切
             skillimg = skillimg.crop((0,0,2000,height+100))
-            skillimg.show() # DEBUG
             cardimg.alpha_composite(skillimg, (380,3260-height)) # 技能层叠加
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在技能生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
-    
+            wlog(__file__, wlog_path, ch_id + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
     
         # 元素外框
         try:
             with Image.open('img/frame/' + character_data[ch_id]['element'] + '.png') as frame:
                 cardimg.alpha_composite(frame)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在元素外框生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
     
         # 神之眼
         try:
@@ -198,7 +246,7 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
             with Image.open('img/szy/' + tuanimg  + '.png') as tuan:
                 cardimg.alpha_composite(tuan)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在神之眼生成阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
     
         # 名字、称号
         try:
@@ -227,7 +275,7 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
             if armor_value != 0:
                 with Image.open('img/icon/Armor.png') as AP:
                     HPimg.alpha_composite(AP, (160, HP_height))
-                    imgdraw(HPimg, (225, HP_height+40), str(armor_value), 'black')
+                    imgdraw(HPimg, (225, HP_height+55), str(armor_value), 'black')
             # 体力值区域后续结算：与称号和名字的防冲突（简单）
             textheight = ImageDraw.Draw(infoimg).textbbox((245, namehigh), character_data[ch_id]['title'], font['title'], stroke_width=4, direction='ttb', language='zh-Hans', anchor='mt')[3]
             if HP_height <= textheight:
@@ -249,7 +297,7 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生 ' + str(errorinfo) + ' 错误。', 'Error')
+            wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
         message = character_data[ch_id]['name'] + ' (' + ch_id + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
         return cardimg
