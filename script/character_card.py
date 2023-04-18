@@ -95,7 +95,6 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
         try:
             skillimg = Image.new('RGBA', (2000,3240), (253,253,253,138))
             # 技能文本
-            # INFO：未包含【花色显示优化】
             height = 50
             length = 45
             color = element_color[character_data[ch_id]['element']]
@@ -167,7 +166,6 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
                         length = 45
                 # 花色覆盖绘制
                 if suit_exist:
-                    suit_height = body_height
                     point = 0
                     suit_color = ''
                     suit_text = ''
@@ -304,3 +302,24 @@ def cardbuild(ch_id, character_data, wlog_path='out/debug.log', info_path='json/
     else:
         wlog(__file__, 'out/debug.log', ch_id + ' 未设计完成，已跳过生成。')
         return False
+
+# 预定义打印张生成函数
+printpoint = [
+    (0,0),(2520,0),(5040,0),
+    (0,3520),(2520,3520),(5040,3520),
+    (0,7040),(2520,7040),(5040,7040)
+    ]
+def print_build(nine_cards_list):
+    a4page = Image.new('RGBA', (8168, 11552), (256, 256, 256, 256))
+    try:
+        i = 0
+        while i < 9:
+            characterimg = Image.new('RGBA', (2520, 3520), (0, 0, 0, 256))
+            characterimg.paste(nine_cards_list[i], (20,20))
+            a4page.paste(characterimg, printpoint[i])
+            i += 1
+    except IndexError:
+        pass
+    # a4page.thumbnail((0,0))
+    return a4page
+        
