@@ -14,7 +14,7 @@ cards = []
 # xlsx检测
 with open('json/info.json') as jsonfile:
     info = json.loads(jsonfile.read())
-    try:  
+    try:
         xlsx_size = info['xlsx_size']
     except:
         xlsx_size = 0
@@ -26,7 +26,6 @@ if xlsx_size_now != xlsx_size:
     with open('json/info.json', 'w') as jsonfile:
         json.dump(info, jsonfile, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', 'json数据文件已成功生成。')
-        
 
 wlog(__file__, 'out/debug.log', '角色图像构建开始。')
 
@@ -39,19 +38,22 @@ wlog(__file__, 'out/debug.log', '"characters.json"读取完成。')
 for ch_id in character_data:
     ch_img = character_card.cardbuild(ch_id, character_data)
     if ch_img:
-        ch_img.save('out/character_img/'+ch_id+'.png')
-        wlog(__file__, 'out/debug.log', character_data[ch_id]['name'] + ' (' + ch_id + ')已保存为 "' + ch_id + '.png" 。')
+        ch_img.save('out/character_img/' + ch_id + '.png')
+        wlog(
+            __file__, 'out/debug.log', character_data[ch_id]['name'] + ' (' +
+            ch_id + ')已保存为 "' + ch_id + '.png" 。')
         cards.append(ch_img)
-            
+
 wlog(__file__, 'out/debug.log', '角色图像生成已完成全部构建与保存。\n')
 
 # 打印张生成
 if printbuild:
     wlog(__file__, 'out/debug.log', '打印张生成开始。')
-    cardss = [cards[i:i+9] for i in range(0, len(cards), 9)]
+    cardss = [cards[i:i + 9] for i in range(0, len(cards), 9)]
     i = 1
     for cards_ in cardss:
-        character_card.print_build(cards_).save('out/print/page-' + str(i) + '.png')
+        character_card.print_build(cards_).save('out/print/page-' + str(i) +
+                                                '.png')
         wlog(__file__, 'out/debug.log', '打印张' + str(i) + '生成、保存完成。')
         i += 1
     wlog(__file__, 'out/debug.log', '打印张生成结束。')

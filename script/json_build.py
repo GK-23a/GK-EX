@@ -5,15 +5,13 @@ import json
 wlog(__file__, 'out/debug.log', 'json 构建开始。')
 
 # 预加载
-work_book = xlrd.open_workbook('data/database.xlsx') #打开工作表
-ga_data = work_book.sheet_by_index(0) #卡牌表
-de_data = work_book.sheet_by_index(1) #牌堆表
-sk_data = work_book.sheet_by_index(2) #技能表
-ch_data = work_book.sheet_by_index(3) #角色表
+work_book = xlrd.open_workbook('data/database.xlsx')  #打开工作表
+ga_data = work_book.sheet_by_index(0)  #卡牌表
+de_data = work_book.sheet_by_index(1)  #牌堆表
+sk_data = work_book.sheet_by_index(2)  #技能表
+ch_data = work_book.sheet_by_index(3)  #角色表
 
 wlog(__file__, 'out/debug.log', '已加载"database.xlsx"。')
-
-
 
 # ga_data行值：0id，1名称，2类型，3延时，4装备类型，5范围，6描述
 wlog(__file__, 'out/debug.log', '开始构建卡牌(gamecards)。')
@@ -30,7 +28,9 @@ while i < ga_data.nrows:
     gamecard_data['category'] = data[2]
     if gamecard_data['category'] == 'equipment':
         gamecard_data['equipment_category'] = data[4]
-        if (gamecard_data['equipment_category'] == 'weapon') or (gamecard_data['equipment_category'][4:] == 'horse'):
+        if (gamecard_data['equipment_category']
+                == 'weapon') or (gamecard_data['equipment_category'][4:]
+                                 == 'horse'):
             gamecard_data['range'] = int(data[5])
     elif gamecard_data['category'] == 'trick':
         if data[3]:
@@ -44,8 +44,6 @@ wlog(__file__, 'out/debug.log', '构建卡牌(gamecards)已结束。')
 with open('json/gamecards.json', 'w', encoding='utf-8') as file:
     json.dump(gamecards, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"gamecards.json"已成功保存。')
-
-
 
 # de_data行值：0id，1颜色，2花色，3点数，4卡id，5显示名称，6额外值
 wlog(__file__, 'out/debug.log', '开始构建牌堆(gamecard_decks)。')
@@ -76,8 +74,6 @@ with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
     json.dump(gamecard_decks, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"gamecard_decks.json"已成功保存。')
 
-
-
 # sk_data行值：0id，1名称，2源角色，3描述
 wlog(__file__, 'out/debug.log', '开始构建技能(skills)。')
 skills = {}
@@ -86,7 +82,7 @@ i = 1
 while i < sk_data.nrows:
     data = sk_data.row_values(i)
     skill_data = {}
-    
+
     skill_id = data[0]
     skill_data['name'] = data[1]
     skill_data['character'] = data[2]
@@ -94,16 +90,16 @@ while i < sk_data.nrows:
 
     i += 1
     skills[skill_id] = skill_data
-    skill_list.append(
-        {'name': skill_data['name'],'id': skill_id,'character': skill_data['character']}
-    )
+    skill_list.append({
+        'name': skill_data['name'],
+        'id': skill_id,
+        'character': skill_data['character']
+    })
 
 wlog(__file__, 'out/debug.log', '构建技能(skills)已结束。')
 with open('json/skills.json', 'w', encoding='utf-8') as file:
     json.dump(skills, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"skills.json"已成功保存。')
-
-
 
 # ch_data行值：0id，1称号，2名称，3性别，4元素，5国家，6星级
 # 7完成状态，8技能设计师，9初始体力值，10最大体力值，11初始护甲值，12+技能名称
@@ -131,31 +127,39 @@ while i < ch_data.nrows:
     j = 12
     character_skills = []
     try:
-        while data[j] != '' :
+        while data[j] != '':
             for k in skill_list:
                 if k['name'] == data[j]:
                     if k['character'] == data[0]:
                         character_data['skills'].append({
-                                'name' : k['name'],
-                                'id' : k['id'],
-                                'description' : skills[k['id']]['description'],
-                                'origin' : True
-                            })
+                            'name':
+                            k['name'],
+                            'id':
+                            k['id'],
+                            'description':
+                            skills[k['id']]['description'],
+                            'origin':
+                            True
+                        })
                         character_skills.append(k['id'])
                         break
             j += 1
     except:
         pass
-    
+
     for k in skill_list:
         if k['character'] == data[0]:
             if k['id'] not in character_skills:
-                    character_data['skills'].append({
-                            'name' : k['name'],
-                            'id' : k['id'],
-                            'description' : skills[k['id']]['description'],
-                            'origin' : False
-                        })
+                character_data['skills'].append({
+                    'name':
+                    k['name'],
+                    'id':
+                    k['id'],
+                    'description':
+                    skills[k['id']]['description'],
+                    'origin':
+                    False
+                })
 
     characters[character_id] = character_data
     wlog(__file__, 'out/debug.log', '已成功构建角色 ' + character_id + ' 的全部信息。')
