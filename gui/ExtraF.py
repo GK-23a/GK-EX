@@ -1,8 +1,13 @@
-sex_list = {'male': 0, 'female': 1}
+sex_list = {
+    'male': 0, 'female': 1
+    }
 
 
 def sex(body: str) -> int:
-    return sex_list[body]
+    try:
+        return sex_list[body]
+    except:
+        return 2
 
 
 country_list = {

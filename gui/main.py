@@ -66,7 +66,6 @@ class MainWindow(QMainWindow):
         except KeyError:
             data = character_datas[cdict_id_to_number[cdict_name_to_id[id]]]
             
-        # character_datas[2]
         Allname = '「' + data['title'] + '·' + data['name'] + '」'
         self.ui.label_Text_AllName.setText(Allname)
         color_code = ef.color(data['element'])
