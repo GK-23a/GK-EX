@@ -104,24 +104,23 @@ with open('json/skills.json', 'w', encoding='utf-8') as file:
 # ch_data行值：0id，1称号，2名称，3性别，4元素，5国家，6星级
 # 7完成状态，8技能设计师，9初始体力值，10最大体力值，11初始护甲值，12+技能名称
 wlog(__file__, 'out/debug.log', '开始构建角色信息(characters)。')
-characters = {}
-i = 1
-while i < ch_data.nrows:
+characters = []
+for i in range(1, ch_data.nrows):
     data = ch_data.row_values(i)
-    character_data = {}
-
-    character_id = data[0]
-    character_data['title'] = data[1]
-    character_data['name'] = data[2]
-    character_data['sex'] = data[3]
-    character_data['element'] = data[4]
-    character_data['country'] = data[5]
-    character_data['level'] = data[6]
-    character_data['design_info'] = data[7]
-    character_data['designer'] = data[8]
-    character_data['health_point'] = int(data[9])
-    character_data['max_health_point'] = int(data[10])
-    character_data['armor_point'] = int(data[11])
+    character_data = {
+        'id': data[0],
+        'title': data[1],
+        'name': data[2],
+        'sex': data[3],
+        'element': data[4],
+        'country': data[5],
+        'level': int(data[6]),
+        'design_info': data[7],
+        'designer': data[8],
+        'health_point': int(data[9]),
+        'max_health_point': int(data[10]),
+        'armor_point': int(data[11])
+    }
 
     character_data['skills'] = []
     j = 12
@@ -161,9 +160,8 @@ while i < ch_data.nrows:
                     False
                 })
 
-    characters[character_id] = character_data
-    wlog(__file__, 'out/debug.log', '已成功构建角色 ' + character_id + ' 的全部信息。')
-    i += 1
+    characters.append(character_data)
+    wlog(__file__, 'out/debug.log', '已成功构建角色 ' + character_data['id'] + ' 的全部信息。')
 
 wlog(__file__, 'out/debug.log', '构建角色信息(characters)已结束。')
 with open('json/characters.json', 'w', encoding='utf-8') as file:
