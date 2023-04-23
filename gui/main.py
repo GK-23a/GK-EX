@@ -1,8 +1,11 @@
 import sys
 import json
-from PySide6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QButtonGroup
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtCore import QSize
+from PySide6.QtWidgets import (QApplication, QCheckBox, 
+    QLineEdit, QListWidgetItem, QMainWindow, QTextEdit,
+    QWidget, QButtonGroup)
+
 from CharacterWindow import Ui_MainWindow
 import ExtraF as ef
 
@@ -35,7 +38,7 @@ class MainWindow(QMainWindow):
         self.filter_button_group = QButtonGroup()
         self.filter_button_group.addButton(self.ui.radioButton_FliterID)
         self.filter_button_group.addButton(self.ui.radioButton_FliterName)
-        # 信号连接槽函数
+        # 连接槽函数
         self.filter_button_group.buttonClicked.connect(self.on_fliter_button_clicked)
         # 初始化
         self.ui.radioButton_FliterName.setChecked(True)
@@ -53,7 +56,7 @@ class MainWindow(QMainWindow):
         for character in ef.get_fliter_list(character_datas, None, return_body = self.return_body):
             item = QListWidgetItem(character)
             item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
-            self.ui.listWidget_List.addItem(item)    
+            self.ui.listWidget_List.addItem(item)
     
         # 连接pushButton和槽函数
         # self.ui.pushButton_Save.clicked.connect(self.on_pushButton_clicked)
@@ -85,6 +88,41 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_Element.setCurrentIndex(ef.element(data['element']))
         self.ui.checkBox_Finish.setChecked(bool(data['design_info']))
         self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data['level']))
+
+        num_tabs = len(data['skills'])
+    
+        # 清空所有tab页的内容
+        for i in range(1, 9):
+            tab = self.ui.tabWidget_Skill.findChild(QWidget, f'tab_Skill{i}')
+            if tab is not None:
+                lineEdit_Name = tab.findChild(QLineEdit, f'lineEdit_Skill{i}_Name') #type: ignore
+                if lineEdit_Name is not None:
+                    lineEdit_Name.setText('')
+    
+                textEdit_Description = tab.findChild(QTextEdit, f'textEdit_Skill{i}_Description') #type: ignore
+                if textEdit_Description is not None:
+                    textEdit_Description.setText('')
+    
+                checkBox_Enable = tab.findChild(QCheckBox, f'checkBox_Skill{i}_Enable') #type: ignore
+                if checkBox_Enable is not None:
+                    checkBox_Enable.setChecked(False)
+                    
+        # 在每个tab页中显示对应的技能信息
+        for i in range(num_tabs):
+            tab = self.ui.tabWidget_Skill.findChild(QWidget, f'tab_Skill{i+1}')
+            if tab is not None:
+                lineEdit_Name = tab.findChild(QLineEdit, f'lineEdit_Skill{i+1}_Name') #type: ignore
+                if lineEdit_Name is not None:
+                    lineEdit_Name.setText(data['skills'][i]['name'])
+    
+                textEdit_Description = tab.findChild(QTextEdit, f'textEdit_Skill{i+1}_Description') #type: ignore
+                if textEdit_Description is not None:
+                    textEdit_Description.setText(data['skills'][i]['description'])
+    
+                checkBox_Enable = tab.findChild(QCheckBox, f'checkBox_Skill{i+1}_Enable') #type: ignore
+                if checkBox_Enable is not None:
+                    checkBox_Enable.setChecked(data['skills'][i]['origin'])
+
         # ... 将其他小部件的内容设置为相应的字典条目
     
     # def on_pushButton_clicked(self):
