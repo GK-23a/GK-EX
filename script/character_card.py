@@ -1,4 +1,5 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageQt
+from PySide6.QtGui import QPixmap
 from os import path as os_path, makedirs as os_makedirs
 from customlog import wlog
 import json
@@ -385,3 +386,9 @@ def print_build(nine_cards_list):
         pass
     # a4page.thumbnail((0,0))
     return a4page
+
+# Qt图像转化
+def qtshow(pillow_img):
+    qimage = ImageQt.ImageQt(pillow_img)
+    pixmap = QPixmap.fromImage(qimage)
+    return pixmap
