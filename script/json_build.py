@@ -165,7 +165,11 @@ for i in range(1, ch_data.nrows):
 
 wlog(__file__, 'out/debug.log', '构建角色信息(characters)已结束。')
 with open('json/characters.json', 'w', encoding='utf-8') as file:
-    json.dump(characters, file, ensure_ascii=False)
+    output = {
+        'character_data': characters,
+        'verions': 'Beta-0318'
+    }
+    json.dump(output, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"characters.json"已成功保存。')
 
 wlog(__file__, 'out/debug.log', 'json 构建结束。\n')

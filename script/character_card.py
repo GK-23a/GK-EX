@@ -87,10 +87,13 @@ def imgdraw(bg,
 
 
 # 预定义图像生成函数
-def cardbuild(ch_id,
-              character_data,
+def cardbuild(ch_id: str,
+              character_data: dict,
               wlog_path='out/debug.log',
-              info_path='json/info.json'):
+              info_path='json/info.json',
+              img_path='img/character/',
+              Qt = False):
+    """返回完整的卡牌图片的Image对象。"""
     if character_data[ch_id]['design_info'] == 1:
 
         # 空白卡底
@@ -98,7 +101,7 @@ def cardbuild(ch_id,
 
         # 角色立绘
         try:
-            with Image.open('img/character/' + ch_id +
+            with Image.open(img_path + ch_id +
                             '.png') as character_image:
                 cardimg.paste(character_image, (380, 120))
         except Exception as errorinfo:
@@ -121,27 +124,29 @@ def cardbuild(ch_id,
                 # 花色标记
                 suit_sign = []
                 point_sign = []
-                if 'suit' in skilltext_origin:
-                    suit_exist = True
-                    point = 0
-                    while True:
-                        if skilltext_origin[point:point + 12] == '<suit:heart>':
-                            skilltext_origin = skilltext_origin.replace('<suit:heart>', '　', 1)
-                            suit_sign.append('heart')
-                        elif skilltext_origin[point:point + 12] == '<suit:spade>':
-                            skilltext_origin = skilltext_origin.replace('<suit:spade>', '　', 1)
-                            suit_sign.append('spade')
-                        elif skilltext_origin[point:point + 14] == '<suit:diamond>':
-                            skilltext_origin = skilltext_origin.replace('<suit:diamond>', '　', 1)
-                            suit_sign.append('diamond')
-                        elif skilltext_origin[point:point + 11] == '<suit:club>':
-                            skilltext_origin = skilltext_origin.replace('<suit:club>', '　', 1)
-                            suit_sign.append('club')
-                        elif skilltext_origin[point:point + 14] == '':
-                            break
-                        point += 1
-                else:
-                    suit_exist = False
+                suit_exist = False
+                point = 0
+                while True:
+                    if skilltext_origin[point:point] == '♥':
+                        skilltext_origin = skilltext_origin.replace('♥', '　', 1)
+                        suit_sign.append('heart')
+                        suit_exist = True
+                    elif skilltext_origin[point:point] == '♠':
+                        skilltext_origin = skilltext_origin.replace('♠', '　', 1)
+                        suit_sign.append('spade')
+                        suit_exist = True
+                    elif skilltext_origin[point:point] == '♦':
+                        skilltext_origin = skilltext_origin.replace('♦', '　', 1)
+                        suit_sign.append('diamond')
+                        suit_exist = True
+                    elif skilltext_origin[point:point] == '♣':
+                        skilltext_origin = skilltext_origin.replace('♣', '　', 1)
+                        suit_sign.append('club')
+                        suit_exist = True
+                    elif skilltext_origin[point:point] == '':
+                        break
+                    point += 1
+
                 # 换行计算
                 body_height = height
                 body_skilltext_origin = skilltext_origin
@@ -364,7 +369,10 @@ def cardbuild(ch_id,
             wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
         message = character_data[ch_id]['name'] + ' (' + ch_id + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
-        return cardimg
+        if Qt:
+            return QPixmap.fromImage(ImageQt.ImageQt(cardimg))
+        else:
+            return cardimg
     else:
         wlog(__file__, 'out/debug.log', ch_id + ' 未设计完成，已跳过生成。')
         return False
@@ -386,9 +394,3 @@ def print_build(nine_cards_list):
         pass
     # a4page.thumbnail((0,0))
     return a4page
-
-# Qt图像转化
-def qtshow(pillow_img):
-    qimage = ImageQt.ImageQt(pillow_img)
-    pixmap = QPixmap.fromImage(qimage)
-    return pixmap

@@ -158,10 +158,18 @@ class Ui_MainWindow(object):
         self.label_Text_AllName.setOpenExternalLinks(False)
         
         ## 额外内容
+        # DLC筛选
+        self.comboBox_DLC = QComboBox(self.centralwidget)
+        self.comboBox_DLC.addItem('原神-标准包')
+        self.comboBox_DLC.addItem('原神-诸神包')
+        self.comboBox_DLC.addItem('原神-创作包')
+        self.comboBox_DLC.setObjectName('comboBox_DLC')
+        self.comboBox_DLC.setGeometry(QRect(477, 140, 91, 24))
         # 版本号
         self.label_Text_Verions = QLabel(self.centralwidget)
         self.label_Text_Verions.setObjectName('label_Text_Verions')
         self.label_Text_Verions.setGeometry(QRect(596, 380, 51, 16))
+        self.label_Text_Verions.setText('Verions.')
         self.label_Text_VerionsInfo = QLabel(self.centralwidget)
         self.label_Text_VerionsInfo.setObjectName('label_Text_VerionsInfo')
         self.label_Text_VerionsInfo.setGeometry(QRect(650, 380, 141, 16))
@@ -175,7 +183,7 @@ class Ui_MainWindow(object):
         self.label_Image = QLabel(self.centralwidget)
         self.label_Image.setObjectName('label_Image')
         self.label_Image.setGeometry(QRect(590, 50, 200, 320))
-        self.label_Image.setStyleSheet('border: 2px solid rgb(0,0,0)')
+        self.label_Image.setStyleSheet('border: 1px solid #999999')
         self.label_Image.setFrameShape(QFrame.NoFrame) #type: ignore
         self.label_Image.setFrameShadow(QFrame.Plain) #type: ignore
         self.label_Image.setLineWidth(10)
@@ -186,37 +194,31 @@ class Ui_MainWindow(object):
         self.pushButton_ImageBuild = QPushButton(self.centralwidget)
         self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
         self.pushButton_ImageBuild.setGeometry(QRect(590, 20, 61, 24))
+        self.pushButton_ImageBuild.setText('生成图片')
         self.pushButton_Save = QPushButton(self.centralwidget)
         self.pushButton_Save.setObjectName('pushButton_Save')
         self.pushButton_Save.setGeometry(QRect(660, 20, 61, 24))
+        self.pushButton_Save.setText('保存')
         self.pushButton_Output = QPushButton(self.centralwidget)
         self.pushButton_Output.setObjectName('pushButton_Output')
         self.pushButton_Output.setGeometry(QRect(730, 20, 61, 24))
-        # 新增技能
-        self.pushButton_SkillAdd = QPushButton(self.centralwidget)
-        self.pushButton_SkillAdd.setObjectName('pushButton_SkillAdd')
-        self.pushButton_SkillAdd.setGeometry(QRect(510, 140, 61, 24))
-        # 新增角色
+        self.pushButton_Output.setText('导出文件')
         self.pushButton_NewCharacter = QPushButton(self.centralwidget)
         self.pushButton_NewCharacter.setObjectName('pushButton_NewCharacter')
         self.pushButton_NewCharacter.setGeometry(QRect(520, 20, 61, 24))
+        self.pushButton_NewCharacter.setText('添加角色')
         # 左侧筛选框
         self.label_Text_FliterS = QLabel(self.centralwidget)
         self.label_Text_FliterS.setObjectName('label_Text_FliterS')
         self.label_Text_FliterS.setGeometry(QRect(20, 24, 71, 16))     
-        self.label_Text_FliterS.setText('通过元素筛选')   
+        self.label_Text_FliterS.setText('DLC筛选')   
         self.comboBox_Filter = QComboBox(self.centralwidget)
         self.comboBox_Filter.addItem('全部')
-        self.comboBox_Filter.addItem('火元素')
-        self.comboBox_Filter.addItem('水元素')
-        self.comboBox_Filter.addItem('风元素')
-        self.comboBox_Filter.addItem('雷元素')
-        self.comboBox_Filter.addItem('草元素')
-        self.comboBox_Filter.addItem('冰元素')
-        self.comboBox_Filter.addItem('岩元素')
-        self.comboBox_Filter.addItem('其他')
+        self.comboBox_Filter.addItem('原神-标准包')
+        self.comboBox_Filter.addItem('原神-诸神包')
+        self.comboBox_Filter.addItem('原神-创作包')
         self.comboBox_Filter.setObjectName('comboBox_Filter')
-        self.comboBox_Filter.setGeometry(QRect(100, 21, 68, 22))
+        self.comboBox_Filter.setGeometry(QRect(77, 21, 91, 22))
         # 左侧显示处
         self.listWidget_List = QListWidget(self.centralwidget)
         self.listWidget_List.setObjectName('listWidget_List')
@@ -266,13 +268,12 @@ class Ui_MainWindow(object):
             
             setattr(self, label_Text_Description, QLabel(getattr(self, tab_name)))
             getattr(self, label_Text_Description).setObjectName(label_Text_Description)
-            getattr(self, label_Text_Description).setGeometry(QRect(10, 70, 51, 16))
+            getattr(self, label_Text_Description).setGeometry(QRect(10, 40, 51, 16))
             getattr(self, label_Text_Description).setText('技能描述')
             
             setattr(self, textEdit_Description, QTextEdit(getattr(self, tab_name)))
             getattr(self, textEdit_Description).setObjectName(textEdit_Description)
-            getattr(self, textEdit_Description).setGeometry(QRect(70, 70, 301, 121))
-
+            getattr(self, textEdit_Description).setGeometry(QRect(70, 40, 301, 150))
             
             setattr(self, checkBox_Visibled, QCheckBox(getattr(self, tab_name)))
             getattr(self, checkBox_Visibled).setObjectName(checkBox_Visibled)

@@ -1,16 +1,18 @@
 import sys
 import json
-from PySide6.QtGui import QColor, QPalette
+from PySide6.QtGui import QColor, QPalette, QPixmap
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (QApplication, QCheckBox, 
     QLineEdit, QListWidgetItem, QMainWindow, QTextEdit,
     QWidget, QButtonGroup)
 
 from CharacterWindow import Ui_MainWindow
+import character_card
 import ExtraF as ef
 
-with open('json/characters.json', encoding='UTF-8') as jsonfile:
-    character_datas = json.loads(jsonfile.read())
+with open('json/data.json', encoding='UTF-8') as jsonfile:
+    gk_data = json.loads(jsonfile.read())
+    character_datas = gk_data['character_data']
 
 # 提前生成完整列表
 clist_cid = ef.get_fliter_list(character_datas, None)
@@ -30,6 +32,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
+        self.ui.label_Text_VerionsInfo.setText(gk_data['verions'])
 
 
         # 左侧筛选
@@ -61,6 +64,8 @@ class MainWindow(QMainWindow):
         # 连接pushButton和槽函数
         # self.ui.pushButton_Save.clicked.connect(self.on_pushButton_clicked)
         
+        self.ui.pushButton_ImageBuild.clicked.connect(self.on_pushButton_ImageBuild_clicked)
+        
         
     def on_listWidget_List_itemClicked(self, item):
         id = item.text()
@@ -88,6 +93,9 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_Element.setCurrentIndex(ef.element(data['element']))
         self.ui.checkBox_Finish.setChecked(bool(data['design_info']))
         self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data['level']))
+        
+        img = QPixmap('img/character/' + data['id'] + '.png')
+        self.ui.label_Image.setPixmap(img.scaledToWidth(200))
         
         for i in range(1, 9):
             lineEdit_name = f"lineEdit_Skill{i}_Name"
@@ -118,7 +126,9 @@ class MainWindow(QMainWindow):
     #         "field4": self.ui.comboBox.currentIndex()
     #         # ... 将其他小部件的内容保存到相应的字典条目
     #     }
-
+    
+    def on_pushButton_ImageBuild_clicked(self):
+        print(self.ui.lineEdit_ID.text())
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
