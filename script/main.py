@@ -81,18 +81,21 @@ class MainWindow(QMainWindow):
         palelle.setColor(QPalette.WindowText, QColor(color_code)) #type: ignore
         self.ui.label_Text_AllName.setPalette(palelle)
         
-        self.ui.lineEdit_ID.setText(data['id'])
-        self.ui.lineEdit_Title.setText(data['title'])
-        self.ui.lineEdit_Name.setText(data['name'])
-        self.ui.lineEdit_Designer.setText(data['designer'])
-        self.ui.spinBox_HP.setValue(data['health_point'])
-        self.ui.spinBox_HPMax.setValue(data['max_health_point'])
-        self.ui.spinBox_Armor.setValue(data['armor_point'])
-        self.ui.comboBox_Sex.setCurrentIndex(ef.sex(data['sex']))
-        self.ui.comboBox_Country.setCurrentIndex(ef.country(data['country']))
-        self.ui.comboBox_Element.setCurrentIndex(ef.element(data['element']))
-        self.ui.checkBox_Finish.setChecked(bool(data['design_info']))
-        self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data['level']))
+        if data['id']:
+            self.ui.lineEdit_ID.setText(data['id'])
+        else:
+            raise
+        if data['title']: self.ui.lineEdit_Title.setText(data['title'])
+        if data['name']: self.ui.lineEdit_Name.setText(data['name'])
+        if data['designer']: self.ui.lineEdit_Designer.setText(data['designer'])
+        if data['health_point']: self.ui.spinBox_HP.setValue(data['health_point'])
+        if data['max_health_point']: self.ui.spinBox_HPMax.setValue(data['max_health_point'])
+        if data['armor_point']: self.ui.spinBox_Armor.setValue(data['armor_point'])
+        if data['sex']: self.ui.comboBox_Sex.setCurrentIndex(ef.sex(data['sex']))
+        if data['country']: self.ui.comboBox_Country.setCurrentIndex(ef.country(data['country']))
+        if data['element']: self.ui.comboBox_Element.setCurrentIndex(ef.element(data['element']))
+        if data['dedign_info']: self.ui.checkBox_Finish.setChecked(bool(data['design_info']))
+        if data['level']: self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data['level']))
         
         img = QPixmap('img/character/' + data['id'] + '.png')
         self.ui.label_Image.setPixmap(img.scaledToWidth(200))
