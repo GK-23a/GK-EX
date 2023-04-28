@@ -1,6 +1,4 @@
-sex_list = {
-    'male': 0, 'female': 1
-    }
+sex_list = {'male': 0, 'female': 1}
 
 
 def sex(body: str) -> int:
@@ -58,6 +56,13 @@ def color(body: str) -> str:
     return element_color_list[body]
 
 
+dlcs_list = {'genshin-standard': 0, 'genshin-god': 1, 'genshin-designer': 2, 'others':3}
+
+
+def dlcs(body: str) -> int:
+    return dlcs_list[body]
+
+
 def star(star_level: int) -> int:
     if star_level == 5:
         return 0
@@ -65,7 +70,10 @@ def star(star_level: int) -> int:
         return 1
 
 
-def get_fliter_list(dict_body: dict, type: str | None, item: str | None = None, return_body: str = 'id') -> list:
+def get_fliter_list(dict_body: dict,
+                    type: str | None,
+                    item: str | None = None,
+                    return_body: str = 'id') -> list:
     flitered = []
     for data in dict_body:
         if type != None:

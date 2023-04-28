@@ -1,5 +1,8 @@
-import sys
-import json
+from sys import exit as sys_exit
+from sys import argv as sys_argv
+
+from os import path as os_path
+from json import loads as json_loads
 from PySide6.QtGui import QColor, QPalette, QPixmap
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (QApplication, QCheckBox, 
@@ -11,7 +14,7 @@ import character_card
 import ExtraF as ef
 
 with open('json/data.json', encoding='UTF-8') as jsonfile:
-    gk_data = json.loads(jsonfile.read())
+    gk_data = json_loads(jsonfile.read())
     character_datas = gk_data['character_data']
 
 # 提前生成完整列表
@@ -25,6 +28,7 @@ for c in character_datas:
     cdict_name_to_id[c['name']] = c['id']
     cdict_id_to_number[c['id']] = i
     i += 1
+    
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -33,8 +37,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         
         self.ui.label_Text_VerionsInfo.setText(gk_data['verions'])
-
-
+        
         # 左侧筛选
         self.ui.listWidget_List.itemClicked.connect(self.on_listWidget_List_itemClicked)
         # 按钮组fliter_button_group
@@ -49,6 +52,14 @@ class MainWindow(QMainWindow):
             item = QListWidgetItem(character)
             item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
             self.ui.listWidget_List.addItem(item)
+            
+        # [开发] 不可使用
+        self.ui.comboBox_Filter.setEnabled(False) #DLC筛选
+        self.ui.pushButton_Save.setEnabled(False) #保存
+        self.ui.pushButton_Output.setEnabled(False) #导出
+        self.ui.pushButton_Input.setEnabled(False) #导入
+        self.ui.pushButton_NewCharacter.setEnabled(False) #添加角色
+        self.ui.pushButton_ImageBuild.setEnabled(False) #添加角色
     
     def on_fliter_button_clicked(self, button):
         if button == self.ui.radioButton_FliterID:
@@ -81,24 +92,27 @@ class MainWindow(QMainWindow):
         palelle.setColor(QPalette.WindowText, QColor(color_code)) #type: ignore
         self.ui.label_Text_AllName.setPalette(palelle)
         
-        if data['id']:
+        if data.get('id', False):
             self.ui.lineEdit_ID.setText(data['id'])
         else:
             raise
-        if data['title']: self.ui.lineEdit_Title.setText(data['title'])
-        if data['name']: self.ui.lineEdit_Name.setText(data['name'])
-        if data['designer']: self.ui.lineEdit_Designer.setText(data['designer'])
-        if data['health_point']: self.ui.spinBox_HP.setValue(data['health_point'])
-        if data['max_health_point']: self.ui.spinBox_HPMax.setValue(data['max_health_point'])
-        if data['armor_point']: self.ui.spinBox_Armor.setValue(data['armor_point'])
-        if data['sex']: self.ui.comboBox_Sex.setCurrentIndex(ef.sex(data['sex']))
-        if data['country']: self.ui.comboBox_Country.setCurrentIndex(ef.country(data['country']))
-        if data['element']: self.ui.comboBox_Element.setCurrentIndex(ef.element(data['element']))
-        if data['dedign_info']: self.ui.checkBox_Finish.setChecked(bool(data['design_info']))
-        if data['level']: self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data['level']))
         
-        img = QPixmap('img/character/' + data['id'] + '.png')
-        self.ui.label_Image.setPixmap(img.scaledToWidth(200))
+        self.ui.lineEdit_Title.setText(data.get('title', '角色称号'))
+        self.ui.lineEdit_Name.setText(data.get('name', '角色名称'))
+        self.ui.lineEdit_Designer.setText(data.get('designer', '设计师'))
+        self.ui.spinBox_HP.setValue(data.get('health_point', 0))
+        self.ui.spinBox_HPMax.setValue(data.get('max_health_point', 0))
+        self.ui.spinBox_Armor.setValue(data.get('armor_point', 0))
+        self.ui.comboBox_Sex.setCurrentIndex(ef.sex(data.get('sex', 'male')))
+        self.ui.comboBox_Country.setCurrentIndex(ef.country(data.get('country', 'others')))
+        self.ui.comboBox_Element.setCurrentIndex(ef.element(data.get('element', 'others')))
+        self.ui.checkBox_Finish.setChecked(bool(data.get('design_info', '0')))
+        self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data.get('level', 5)))
+        self.ui.comboBox_DLC.setCurrentIndex(ef.dlcs(data.get('dlc', 'others')))
+        
+        imgpath = os_path.join('img', 'character', data['id'], '.png')
+        self.img = QPixmap(imgpath).scaledToWidth(200)
+        self.ui.label_Image.setPixmap(self.img)
         
         for i in range(1, 9):
             lineEdit_name = f"lineEdit_Skill{i}_Name"
@@ -134,9 +148,9 @@ class MainWindow(QMainWindow):
         print(self.ui.lineEdit_ID.text())
         
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QApplication(sys_argv)
 
     window = MainWindow()
     window.show()
 
-    sys.exit(app.exec())
+    sys_exit(app.exec())

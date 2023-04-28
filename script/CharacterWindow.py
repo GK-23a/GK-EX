@@ -8,16 +8,10 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
-    QLabel, QLineEdit, QListWidget, QListWidgetItem,
-    QMainWindow, QMenuBar, QPushButton, QRadioButton,
+from PySide6.QtCore import (QMetaObject, QRect, Qt)
+from PySide6.QtGui import (QFont)
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame,
+    QLabel, QLineEdit, QListWidget, QMenuBar, QPushButton, QRadioButton,
     QSizePolicy, QSpinBox, QStatusBar, QTabWidget,
     QTextEdit, QWidget)
 
@@ -158,11 +152,12 @@ class Ui_MainWindow(object):
         self.label_Text_AllName.setOpenExternalLinks(False)
         
         ## 额外内容
-        # DLC筛选
+        # DLC包
         self.comboBox_DLC = QComboBox(self.centralwidget)
         self.comboBox_DLC.addItem('原神-标准包')
         self.comboBox_DLC.addItem('原神-诸神包')
         self.comboBox_DLC.addItem('原神-创作包')
+        self.comboBox_DLC.addItem('其他')
         self.comboBox_DLC.setObjectName('comboBox_DLC')
         self.comboBox_DLC.setGeometry(QRect(477, 140, 91, 24))
         # 版本号
@@ -191,22 +186,27 @@ class Ui_MainWindow(object):
         
         ## 功能区
         # 右上按钮处
+        self.pushButton_NewCharacter = QPushButton(self.centralwidget)
+        self.pushButton_NewCharacter.setObjectName('pushButton_NewCharacter')
+        self.pushButton_NewCharacter.setGeometry(QRect(450, 20, 61, 24))
+        self.pushButton_NewCharacter.setText('添加角色')
+        self.pushButton_Save = QPushButton(self.centralwidget)
+        self.pushButton_Save.setObjectName('pushButton_Save')
+        self.pushButton_Save.setGeometry(QRect(520, 20, 61, 24))
+        self.pushButton_Save.setText('保存')
         self.pushButton_ImageBuild = QPushButton(self.centralwidget)
         self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
         self.pushButton_ImageBuild.setGeometry(QRect(590, 20, 61, 24))
         self.pushButton_ImageBuild.setText('生成图片')
-        self.pushButton_Save = QPushButton(self.centralwidget)
-        self.pushButton_Save.setObjectName('pushButton_Save')
-        self.pushButton_Save.setGeometry(QRect(660, 20, 61, 24))
-        self.pushButton_Save.setText('保存')
+        self.pushButton_Input = QPushButton(self.centralwidget)
+        self.pushButton_Input.setObjectName('pushButton_Input')
+        self.pushButton_Input.setGeometry(QRect(660, 20, 61, 24))
+        self.pushButton_Input.setText('导入文件')
         self.pushButton_Output = QPushButton(self.centralwidget)
         self.pushButton_Output.setObjectName('pushButton_Output')
         self.pushButton_Output.setGeometry(QRect(730, 20, 61, 24))
         self.pushButton_Output.setText('导出文件')
-        self.pushButton_NewCharacter = QPushButton(self.centralwidget)
-        self.pushButton_NewCharacter.setObjectName('pushButton_NewCharacter')
-        self.pushButton_NewCharacter.setGeometry(QRect(520, 20, 61, 24))
-        self.pushButton_NewCharacter.setText('添加角色')
+        
         # 左侧筛选框
         self.label_Text_FliterS = QLabel(self.centralwidget)
         self.label_Text_FliterS.setObjectName('label_Text_FliterS')
@@ -217,6 +217,7 @@ class Ui_MainWindow(object):
         self.comboBox_Filter.addItem('原神-标准包')
         self.comboBox_Filter.addItem('原神-诸神包')
         self.comboBox_Filter.addItem('原神-创作包')
+        self.comboBox_Filter.addItem('其他')
         self.comboBox_Filter.setObjectName('comboBox_Filter')
         self.comboBox_Filter.setGeometry(QRect(77, 21, 91, 22))
         # 左侧显示处
@@ -244,7 +245,6 @@ class Ui_MainWindow(object):
         self.tabWidget_Skill.setGeometry(QRect(190, 170, 391, 231))
         self.tabWidget_Skill.setStyleSheet(' QTabBar::tab{ width:48px; } ')
         
-        # 动态还没写
         for i in range(1, 9):
             tab_name = f"tab_Skill{i}"
             lineEdit_name = f"lineEdit_Skill{i}_Name"
