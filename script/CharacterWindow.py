@@ -163,11 +163,7 @@ class Ui_MainWindow(object):
         # 版本号
         self.label_Text_Verions = QLabel(self.centralwidget)
         self.label_Text_Verions.setObjectName('label_Text_Verions')
-        self.label_Text_Verions.setGeometry(QRect(596, 380, 51, 16))
-        self.label_Text_Verions.setText('Verions.')
-        self.label_Text_VerionsInfo = QLabel(self.centralwidget)
-        self.label_Text_VerionsInfo.setObjectName('label_Text_VerionsInfo')
-        self.label_Text_VerionsInfo.setGeometry(QRect(650, 380, 141, 16))
+        self.label_Text_Verions.setGeometry(QRect(660, 380, 128, 16))
         # 分割线
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName('line')
@@ -206,6 +202,10 @@ class Ui_MainWindow(object):
         self.pushButton_Output.setObjectName('pushButton_Output')
         self.pushButton_Output.setGeometry(QRect(730, 20, 61, 24))
         self.pushButton_Output.setText('导出文件')
+        self.pushButton_ImageBuild = QPushButton(self.centralwidget)
+        self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
+        self.pushButton_ImageBuild.setGeometry(QRect(590, 376, 61, 24))
+        self.pushButton_ImageBuild.setText('批量生成')
         
         # 左侧筛选框
         self.label_Text_FliterS = QLabel(self.centralwidget)

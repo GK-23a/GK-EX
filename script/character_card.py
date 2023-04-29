@@ -90,7 +90,7 @@ def imgdraw(bg,
 def cardbuild(ch_id: str,
               character_data: dict,
               wlog_path='out/debug.log',
-              info_path='json/info.json',
+              info_path='data/info.json',
               img_path='img/character/',
               Qt = False):
     """返回完整的卡牌图片的Image对象。"""

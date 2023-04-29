@@ -41,7 +41,7 @@ while i < ga_data.nrows:
     gamecards[gamecard_id] = gamecard_data
 
 wlog(__file__, 'out/debug.log', '构建卡牌(gamecards)已结束。')
-with open('json/gamecards.json', 'w', encoding='utf-8') as file:
+with open('data/gamecards.json', 'w', encoding='utf-8') as file:
     json.dump(gamecards, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"gamecards.json"已成功保存。')
 
@@ -70,7 +70,7 @@ while i < de_data.nrows:
     gamecard_decks[card_deck_id] = card_info
 
 wlog(__file__, 'out/debug.log', '构建牌堆(gamecard_decks)已结束。')
-with open('json/gamecard_decks.json', 'w', encoding='utf-8') as file:
+with open('data/gamecard_decks.json', 'w', encoding='utf-8') as file:
     json.dump(gamecard_decks, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"gamecard_decks.json"已成功保存。')
 
@@ -97,7 +97,7 @@ while i < sk_data.nrows:
     })
 
 wlog(__file__, 'out/debug.log', '构建技能(skills)已结束。')
-with open('json/skills.json', 'w', encoding='utf-8') as file:
+with open('data/skills.json', 'w', encoding='utf-8') as file:
     json.dump(skills, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"skills.json"已成功保存。')
 
@@ -164,12 +164,12 @@ for i in range(1, ch_data.nrows):
     wlog(__file__, 'out/debug.log', '已成功构建角色 ' + character_data['id'] + ' 的全部信息。')
 
 wlog(__file__, 'out/debug.log', '构建角色信息(characters)已结束。')
-with open('json/characters.json', 'w', encoding='utf-8') as file:
+with open('data/data.json', 'w', encoding='utf-8') as file:
     output = {
         'character_data': characters,
         'verions': 'Beta-0318'
     }
     json.dump(output, file, ensure_ascii=False)
-    wlog(__file__, 'out/debug.log', '"characters.json"已成功保存。')
+    wlog(__file__, 'out/debug.log', '"data.json"已成功保存。')
 
 wlog(__file__, 'out/debug.log', 'json 构建结束。\n')

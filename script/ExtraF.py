@@ -13,7 +13,7 @@ country_list = {
     'liyue': 1,
     'inazuma': 2,
     'sumeru': 3,
-    'snezhnaya': 7,
+    'snezhnaya': 6,
     'others': 9
 }
 

@@ -5,15 +5,12 @@ from os import path as os_path
 from json import loads as json_loads
 from PySide6.QtGui import QColor, QPalette, QPixmap
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import (QApplication, QCheckBox, 
-    QLineEdit, QListWidgetItem, QMainWindow, QTextEdit,
-    QWidget, QButtonGroup)
+from PySide6.QtWidgets import (QApplication, QListWidgetItem, QMainWindow, QButtonGroup)
 
 from CharacterWindow import Ui_MainWindow
-import character_card
 import ExtraF as ef
 
-with open('json/data.json', encoding='UTF-8') as jsonfile:
+with open('data/data.json', encoding='UTF-8') as jsonfile:
     gk_data = json_loads(jsonfile.read())
     character_datas = gk_data['character_data']
 
@@ -36,7 +33,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
-        self.ui.label_Text_VerionsInfo.setText(gk_data['verions'])
+        self.ui.label_Text_Verions.setText('Ver.' + gk_data['verions'])
         
         # 左侧筛选
         self.ui.listWidget_List.itemClicked.connect(self.on_listWidget_List_itemClicked)
@@ -110,9 +107,13 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(data.get('level', 5)))
         self.ui.comboBox_DLC.setCurrentIndex(ef.dlcs(data.get('dlc', 'others')))
         
-        imgpath = os_path.join('img', 'character', data['id'], '.png')
-        self.img = QPixmap(imgpath).scaledToWidth(200)
-        self.ui.label_Image.setPixmap(self.img)
+        imgpath = os_path.join('img', 'character', data['id'] + '.png')
+        if os_path.exists(imgpath):
+            self.img = QPixmap(imgpath).scaledToWidth(200)
+            self.ui.label_Image.setPixmap(self.img)
+            self.ui.label_Image.setText('')
+        else:
+            self.ui.label_Image.setText('No Image.')
         
         for i in range(1, 9):
             lineEdit_name = f"lineEdit_Skill{i}_Name"
