@@ -202,10 +202,10 @@ class Ui_MainWindow(object):
         self.pushButton_Output.setObjectName('pushButton_Output')
         self.pushButton_Output.setGeometry(QRect(730, 20, 61, 24))
         self.pushButton_Output.setText('导出文件')
-        self.pushButton_ImageBuild = QPushButton(self.centralwidget)
-        self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
-        self.pushButton_ImageBuild.setGeometry(QRect(590, 376, 61, 24))
-        self.pushButton_ImageBuild.setText('批量生成')
+        self.pushButton_AllImageBuild = QPushButton(self.centralwidget)
+        self.pushButton_AllImageBuild.setObjectName('pushButton_ImageBuild')
+        self.pushButton_AllImageBuild.setGeometry(QRect(590, 376, 61, 24))
+        self.pushButton_AllImageBuild.setText('批量生成')
         
         # 左侧筛选框
         self.label_Text_FliterS = QLabel(self.centralwidget)

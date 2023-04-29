@@ -56,7 +56,8 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_Output.setEnabled(False) #导出
         self.ui.pushButton_Input.setEnabled(False) #导入
         self.ui.pushButton_NewCharacter.setEnabled(False) #添加角色
-        self.ui.pushButton_ImageBuild.setEnabled(False) #添加角色
+        self.ui.pushButton_ImageBuild.setEnabled(False) #生成图片
+        self.ui.pushButton_AllImageBuild.setEnabled(False) #批量生成
     
     def on_fliter_button_clicked(self, button):
         if button == self.ui.radioButton_FliterID:

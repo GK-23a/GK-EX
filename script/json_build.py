@@ -119,7 +119,8 @@ for i in range(1, ch_data.nrows):
         'designer': data[8],
         'health_point': int(data[9]),
         'max_health_point': int(data[10]),
-        'armor_point': int(data[11])
+        'armor_point': int(data[11]),
+        'dlc': 'genshin-standard'
     }
 
     character_data['skills'] = []
