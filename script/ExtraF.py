@@ -7,6 +7,10 @@ def sex(body: str) -> int:
     except:
         return 2
 
+def get_sex_key(value: int) -> str:
+    key = [k for k, v in sex_list.items() if v == value][0]
+    return key
+# DEBUG - 只写了一个，后面还没搞
 
 country_list = {
     'mondstadt': 0,
@@ -82,3 +86,5 @@ def get_fliter_list(dict_body: dict,
         else:
             flitered.append(data[return_body])
     return flitered
+
+

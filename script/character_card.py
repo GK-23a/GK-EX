@@ -2,24 +2,21 @@ from PIL import Image, ImageDraw, ImageFont, ImageQt
 from PySide6.QtGui import QPixmap
 from os import path as os_path, makedirs as os_makedirs
 from customlog import wlog
-import json
+from json import loads as json_loads
 
 if not os_path.exists('out/character_img'):
     os_makedirs('out/character_img')
 
 # 字体预加载
-def itt(size, font):
-    ImageFont.truetype(font, encoding='utf-8', size=size)
-
 font = {
-'sign'     : itt(  56, 'font/MiSans-Light.ttf'),       # 卡底标记
-'category' : itt(  72, 'font/MiSans-Semibold.ttf'),    # 技能类型
-'text'     : itt(  72, 'font/MiSans-Regular.ttf'),     # 技能内容
-'suit'     : itt(  72, 'font/有爱新黑CN-Regular.ttf'),  # 花色图标
-'title'    : itt(  94, 'font/SIMLI.TTF'),              # 角色称号
-'HP'       : itt( 100, 'font/MiSans-Semibold.ttf'),    # 特殊血条
-'topic'    : itt( 120, 'font/SIMLI.TTF'),              # 技能标题
-'name'     : itt( 300, 'font/SIMLI.TTF')               # 角色名字
+'sign'     : ImageFont.truetype('data/font/MiSans-Light.ttf'       ,size=  56, encoding='utf-8'),       # 卡底标记
+'category' : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size=  72, encoding='utf-8'),    # 技能类型
+'text'     : ImageFont.truetype('data/font/MiSans-Regular.ttf'     ,size=  72, encoding='utf-8'),     # 技能内容
+'suit'     : ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf' ,size=  72, encoding='utf-8'),  # 花色图标
+'title'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size=  94, encoding='utf-8'),              # 角色称号
+'HP'       : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size= 100, encoding='utf-8'),    # 特殊血条
+'topic'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 120, encoding='utf-8'),              # 技能标题
+'name'     : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 300, encoding='utf-8')               # 角色名字
 }
 
 # 颜色预定义
@@ -64,7 +61,8 @@ def imgdraw(bg,
                  direction=way,
                  language='zh-Hans',
                  stroke_width=side_width,
-                 stroke_fill=topicyy_color)
+                 stroke_fill=topicyy_color,
+                 encoding = 'UTF-8')
     elif font_style == 'name':
         img.text((position[0] + 4, position[1] + 4),
                  text,
@@ -74,7 +72,8 @@ def imgdraw(bg,
                  direction=way,
                  language='zh-Hans',
                  stroke_width=side_width + 4,
-                 stroke_fill=(126, 126, 126, 160))
+                 stroke_fill=(126, 126, 126, 160),
+                 encoding = 'UTF-8')
     img.text(position,
              text,
              fill=fill_color,
@@ -83,29 +82,27 @@ def imgdraw(bg,
              direction=way,
              language='zh-Hans',
              stroke_width=side_width,
-             stroke_fill=side_color)
+             stroke_fill=side_color,
+             encoding = 'UTF-8')
 
 
 # 预定义图像生成函数
-def cardbuild(ch_id: str,
-              character_data: dict,
+def cardbuild(character_data: dict,
+              verions: str,
               wlog_path='out/debug.log',
-              info_path='data/info.json',
-              img_path='img/character/',
-              Qt = False):
+              img_path='data/img/character/'):
     """返回完整的卡牌图片的Image对象。"""
-    if character_data[ch_id]['design_info'] == 1:
+    if character_data['design_info'] == 1:
 
         # 空白卡底
         cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
 
         # 角色立绘
         try:
-            with Image.open(img_path + ch_id +
-                            '.png') as character_image:
+            with Image.open(img_path + character_data['id'] + '.png') as character_image:
                 cardimg.paste(character_image, (380, 120))
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在角色立绘阶段发生错误：' + str(errorinfo),'Error')
+            wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo),'Error')
 
         # 技能说明
         try:
@@ -113,8 +110,8 @@ def cardbuild(ch_id: str,
             # 技能文本
             height = 50
             length = 45
-            color = element_color[character_data[ch_id]['element']]
-            for skill_data in character_data[ch_id]['skills']:
+            color = element_color[character_data['element']]
+            for skill_data in character_data['skills']:
                 fill_color = color[0]
                 if not skill_data['origin']:
                     fill_color = 'black'
@@ -264,83 +261,79 @@ def cardbuild(ch_id: str,
                         break
                     else:
                         length = 45
-            with open(info_path) as config:
-                version = json.loads(config.read())
-                imgdraw(skillimg, (50, height + 10),
-                        'GenshinKill ' + version['version'] + ' | Designer: ' +
-                        character_data[ch_id]['designer'] +
-                        ' , Artist: miHoYo',
-                        'black',
-                        font_style='sign')
+            imgdraw(skillimg, (50, height + 10),
+                    'GenshinKill ' + verions + ' | Designer: ' +
+                    character_data['designer'] +
+                    ' , Artist: miHoYo',
+                    'black',
+                    font_style='sign')
             # 技能图层剪切
             skillimg = skillimg.crop((0, 0, 2000, height + 100))
             cardimg.alpha_composite(skillimg, (380, 3260 - height))  # 技能层叠加
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
+            wlog(__file__, wlog_path, character_data['id'] + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
 
         # 元素外框
         try:
-            with Image.open('img/frame/' + character_data[ch_id]['element'] +
-                            '.png') as frame:
+            with Image.open(os_path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
                 cardimg.alpha_composite(frame)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
+            wlog(__file__, wlog_path,character_data['id'] + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
 
         # 神之眼
         try:
-            with Image.open('img/szy/' + character_data[ch_id]['country'] +
-                            '.png') as dizuo:
+            with Image.open(os_path.join('data', 'img', 'szy', character_data['country'] + '.png')) as dizuo:
                 cardimg.alpha_composite(dizuo)
-            tuanimg = character_data[ch_id]['element']
-            if character_data[ch_id]['country'] == 'liyue':
+            tuanimg = character_data['element']
+            if character_data['country'] == 'liyue':
                 tuanimg += '_'
-            with Image.open('img/szy/' + tuanimg + '.png') as tuan:
+            with Image.open(os_path.join('data', 'img', 'szy', tuanimg + '.png')) as tuan:
                 cardimg.alpha_composite(tuan)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
+            wlog(__file__, wlog_path,character_data['id'] + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
 
         # 名字、称号
         try:
             infoimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-            imgdraw(infoimg, (245, 490), character_data[ch_id]['name'],
+            imgdraw(infoimg, (245, 490), character_data['name'],
                     'white', 'name', 8, 'black', 'mt')
             namehigh = ImageDraw.Draw(infoimg).textbbox(
                 (245, 490),
-                character_data[ch_id]['name'],
+                character_data['name'],
                 font['name'],
                 direction='ttb',
                 language='zh-Hans',
                 anchor='mt')[3]
-            imgdraw(infoimg, (245, namehigh), character_data[ch_id]['title'],
+            imgdraw(infoimg, (245, namehigh), character_data['title'],
                     (255, 192, 0, 255), 'title', 4, 'black', 'mt')
             cardimg.alpha_composite(infoimg)
 
             # 体力值、初始护甲
             HPimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
             HP_height = 3100
-            HP_value = character_data[ch_id]['health_point']
+            HP_value = character_data['health_point']
             while HP_value != 0:
-                with Image.open('img/icon/HPyes.png') as HP:
+                with Image.open(os_path.join('data', 'img','icon','HPyes.png')) as HP:
                     HPimg.alpha_composite(HP, (160, HP_height))
                     HP_height -= 200
                     HP_value -= 1
-            empty_HP_value = character_data[ch_id][
-                'max_health_point'] - character_data[ch_id]['health_point']
+            empty_HP_value = character_data[
+                'max_health_point'] - character_data['health_point']
             while empty_HP_value != 0:
-                with Image.open('img/icon/HPno.png') as HP_empty:
+                with Image.open(os_path.join('data', 'img','icon','HPno.png')) as HP_empty:
                     HPimg.alpha_composite(HP_empty, (160, HP_height))
                     HP_height -= 200
                     empty_HP_value -= 1
-            armor_value = character_data[ch_id]['armor_point']
+            armor_value = character_data['armor_point']
             if armor_value != 0:
-                with Image.open('img/icon/Armor.png') as AP:
+                with Image.open(os_path.join('data', 'img','icon','Armor.png')) as AP:
                     HPimg.alpha_composite(AP, (160, HP_height))
                     imgdraw(HPimg, (225, HP_height + 55), str(armor_value),
                             'black')
             # 体力值区域后续结算：与称号和名字的防冲突（简单）
             textheight = ImageDraw.Draw(infoimg).textbbox(
                 (245, namehigh),
-                character_data[ch_id]['title'],
+                character_data['title'],
                 font['title'],
                 stroke_width=4,
                 direction='ttb',
@@ -352,8 +345,8 @@ def cardbuild(ch_id: str,
                     HPimg.alpha_composite(HP, (160, 2700))
                 ImageDraw.Draw(HPimg).text(
                     (215, 2900),
-                    str(character_data[ch_id]['health_point']) + '\n/\n' +
-                    str(character_data[ch_id]['max_health_point']),
+                    str(character_data['health_point']) + '\n/\n' +
+                    str(character_data['max_health_point']),
                     fill=(30, 140, 30),
                     spacing=4,
                     font=font['HP'],
@@ -366,15 +359,12 @@ def cardbuild(ch_id: str,
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, ch_id + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
-        message = character_data[ch_id]['name'] + ' (' + ch_id + ')' + '已成功完成生成。'
+            wlog(__file__, wlog_path,character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
+        message = character_data['name'] + ' (' +character_data['id'] + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
-        if Qt:
-            return QPixmap.fromImage(ImageQt.ImageQt(cardimg))
-        else:
-            return cardimg
+        return cardimg
     else:
-        wlog(__file__, 'out/debug.log', ch_id + ' 未设计完成，已跳过生成。')
+        wlog(__file__, 'out/debug.log',character_data['id'] + ' 未设计完成，已跳过生成。')
         return False
 
 # 预定义打印张生成函数

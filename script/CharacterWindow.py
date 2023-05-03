@@ -13,7 +13,7 @@ from PySide6.QtGui import (QFont)
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame,
     QLabel, QLineEdit, QListWidget, QMenuBar, QPushButton, QRadioButton,
     QSizePolicy, QSpinBox, QStatusBar, QTabWidget,
-    QTextEdit, QWidget)
+    QPlainTextEdit, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -271,7 +271,7 @@ class Ui_MainWindow(object):
             getattr(self, label_Text_Description).setGeometry(QRect(10, 40, 51, 16))
             getattr(self, label_Text_Description).setText('技能描述')
             
-            setattr(self, textEdit_Description, QTextEdit(getattr(self, tab_name)))
+            setattr(self, textEdit_Description, QPlainTextEdit(getattr(self, tab_name)))
             getattr(self, textEdit_Description).setObjectName(textEdit_Description)
             getattr(self, textEdit_Description).setGeometry(QRect(70, 40, 301, 150))
             
