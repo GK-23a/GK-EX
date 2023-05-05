@@ -1,4 +1,4 @@
-from customlog import wlog
+from ExtraF import wlog
 import character_card
 import json
 

@@ -1,45 +1,61 @@
-from PIL import Image, ImageDraw, ImageFont, ImageQt
-from PySide6.QtGui import QPixmap
+from PIL import Image, ImageDraw, ImageFont
 from os import path as os_path, makedirs as os_makedirs
-from customlog import wlog
-from json import loads as json_loads
+from ExtraF import wlog
 
 if not os_path.exists('out/character_img'):
     os_makedirs('out/character_img')
 
-# 字体预加载
-font = {
-'sign'     : ImageFont.truetype('data/font/MiSans-Light.ttf'       ,size=  56, encoding='utf-8'),       # 卡底标记
-'category' : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size=  72, encoding='utf-8'),    # 技能类型
-'text'     : ImageFont.truetype('data/font/MiSans-Regular.ttf'     ,size=  72, encoding='utf-8'),     # 技能内容
-'suit'     : ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf' ,size=  72, encoding='utf-8'),  # 花色图标
-'title'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size=  94, encoding='utf-8'),              # 角色称号
-'HP'       : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size= 100, encoding='utf-8'),    # 特殊血条
-'topic'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 120, encoding='utf-8'),              # 技能标题
-'name'     : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 300, encoding='utf-8')               # 角色名字
-}
+## 预加载
 
-# 颜色预定义
+# 字体
+font = {
+    'sign'     : ImageFont.truetype('data/font/MiSans-Light.ttf'       ,size=  56, encoding='utf-8'), # 卡底标记
+    'category' : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size=  72, encoding='utf-8'), # 技能类型
+    'text'     : ImageFont.truetype('data/font/MiSans-Regular.ttf'     ,size=  72, encoding='utf-8'), # 技能内容
+    'suit'     : ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf' ,size=  72, encoding='utf-8'), # 花色图标
+    'title'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size=  94, encoding='utf-8'), # 角色称号
+    'HP'       : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size= 100, encoding='utf-8'), # 特殊血条
+    'topic'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 120, encoding='utf-8'), # 技能标题
+    'name'     : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 300, encoding='utf-8')  # 角色名字
+    }
+# 颜色
 topicyy_color = (126, 126, 126, 192)
 element_color = {
-    'pyro': [(246, 136, 123), (226, 49, 29)],
-    'hydro': [(122, 176, 255), (28, 114, 253)],
-    'cryo': [(200, 230, 250), (152, 200, 232)],
+    'pyro':    [(246, 136, 123), (226,  49,  29)],
+    'hydro':   [(122, 176, 255), ( 28, 114, 253)],
+    'cryo':    [(200, 230, 250), (152, 200, 232)],
     'electro': [(236, 137, 254), (211, 118, 240)],
-    'dendro': [(182, 217, 133), (123, 180, 45)],
-    'anemo': [(137, 232, 217), (51, 204, 179)],
-    'geo': [(234, 209, 128), (207, 167, 38)],
+    'dendro':  [(182, 217, 133), (123, 180,  45)],
+    'anemo':   [(137, 232, 217), ( 51, 204, 179)],
+    'geo':     [(234, 209, 128), (207, 167,  38)],
 }
-
-# 预定义中文标点习惯修复
+# 中文标点习惯修复
 punctuation = ['，', '。', '；', '：', '？', '！', '、']
 left_punctuation = ['（', '【', '“']
 right_punctuation = ['）', '】', '”']
-
-# 预定义技能类型字符串
+# 技能名
 skill_categories = ['锁定技，', '转换技，', '限定技，', '觉醒技，', '使命技，']
 
-# 预定义简化ImageDraw函数
+
+def imgcut(img_path, width=2000, height=3240):
+    """裁切立绘图像"""
+    img = Image.open(img_path)
+    w, h = img.size
+    scale = width / w
+    new_size = (int(w*scale), int(h*scale))
+    new_img = img.resize(new_size)
+    if new_size[1] < height:
+        bg_img = Image.new('RGB', (width, height), (255, 255, 255))
+        left = (width - new_img.width) // 2
+        top = (height - new_img.height) // 2
+        bg_img.paste(new_img, (left, top))
+    else:
+        box = (0, 0, width, height)
+        bg_img = new_img.crop(box)
+    return bg_img
+
+
+
 def imgdraw(bg,
             position,
             text,
@@ -48,6 +64,7 @@ def imgdraw(bg,
             side_width=0,
             side_color=None,
             md='lt'):
+    """简化的ImageDraw函数"""
     img = ImageDraw.Draw(bg)
     way = 'ltr'
     if font_style in ['title', 'name']:
@@ -86,21 +103,24 @@ def imgdraw(bg,
              encoding = 'UTF-8')
 
 
-# 预定义图像生成函数
 def cardbuild(character_data: dict,
               verions: str,
               wlog_path='out/debug.log',
-              img_path='data/img/character/'):
-    """返回完整的卡牌图片的Image对象。"""
+              img_path='data/img/character/',
+              img_cut = False):
+    """生成GK-23a卡牌的完整函数，返回PIL.Image对象"""
     if character_data['design_info'] == 1:
-
+        
         # 空白卡底
         cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
 
         # 角色立绘
         try:
-            with Image.open(img_path + character_data['id'] + '.png') as character_image:
-                cardimg.paste(character_image, (380, 120))
+            if img_cut:
+                character_image = imgcut(img_path + character_data['id'] + '.png')
+            else:
+                character_image = Image.open(img_path + character_data['id'] + '.png')
+            cardimg.paste(character_image, (380, 120))
         except Exception as errorinfo:
             wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo),'Error')
 
@@ -123,26 +143,18 @@ def cardbuild(character_data: dict,
                 point_sign = []
                 suit_exist = False
                 point = 0
-                while True:
-                    if skilltext_origin[point:point] == '♥':
-                        skilltext_origin = skilltext_origin.replace('♥', '　', 1)
-                        suit_sign.append('heart')
+                
+                suit_dict = {'♥': ('heart',), '♠': ('spade',), '♦': ('diamond',), '♣': ('club',)}
+                while point < len(skilltext_origin):
+                    char = skilltext_origin[point:point+1]
+                    if char in suit_dict:
+                        skilltext_origin = skilltext_origin[:point] + '　' + skilltext_origin[point+1:]
+                        suit_sign.extend(suit_dict[char])
                         suit_exist = True
-                    elif skilltext_origin[point:point] == '♠':
-                        skilltext_origin = skilltext_origin.replace('♠', '　', 1)
-                        suit_sign.append('spade')
-                        suit_exist = True
-                    elif skilltext_origin[point:point] == '♦':
-                        skilltext_origin = skilltext_origin.replace('♦', '　', 1)
-                        suit_sign.append('diamond')
-                        suit_exist = True
-                    elif skilltext_origin[point:point] == '♣':
-                        skilltext_origin = skilltext_origin.replace('♣', '　', 1)
-                        suit_sign.append('club')
-                        suit_exist = True
-                    elif skilltext_origin[point:point] == '':
+                    elif char == '':
                         break
                     point += 1
+
 
                 # 换行计算
                 body_height = height
@@ -367,11 +379,20 @@ def cardbuild(character_data: dict,
         wlog(__file__, 'out/debug.log',character_data['id'] + ' 未设计完成，已跳过生成。')
         return False
 
-# 预定义打印张生成函数
-printpoint = [(0, 0), (2520, 0), (5040, 0), (0, 3520), (2520, 3520),
-              (5040, 3520), (0, 7040), (2520, 7040), (5040, 7040)]
 
-def print_build(nine_cards_list):
+def print_build(nine_cards_list: list):
+    """创建A4的打印张图像"""
+    printpoint = [
+        (0, 0),
+        (2520, 0),
+        (5040, 0),
+        (0, 3520),
+        (2520, 3520),
+        (5040, 3520),
+        (0, 7040),
+        (2520, 7040),
+        (5040, 7040)
+        ]
     a4page = Image.new('RGBA', (8168, 11552), (256, 256, 256, 256))
     try:
         i = 0

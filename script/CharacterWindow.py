@@ -12,7 +12,7 @@ from PySide6.QtCore import (QMetaObject, QRect, Qt)
 from PySide6.QtGui import (QFont)
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame,
     QLabel, QLineEdit, QListWidget, QMenuBar, QPushButton, QRadioButton,
-    QSizePolicy, QSpinBox, QStatusBar, QTabWidget,
+    QSizePolicy, QSpinBox, QStatusBar, QTabWidget, QProgressBar,
     QPlainTextEdit, QWidget)
 
 class Ui_MainWindow(object):
@@ -163,7 +163,7 @@ class Ui_MainWindow(object):
         # 版本号
         self.label_Text_Verions = QLabel(self.centralwidget)
         self.label_Text_Verions.setObjectName('label_Text_Verions')
-        self.label_Text_Verions.setGeometry(QRect(660, 380, 128, 16))
+        self.label_Text_Verions.setGeometry(QRect(590, 380, 256, 16))
         # 分割线
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName('line')
@@ -194,24 +194,11 @@ class Ui_MainWindow(object):
         self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
         self.pushButton_ImageBuild.setGeometry(QRect(590, 20, 61, 24))
         self.pushButton_ImageBuild.setText('生成图片')
-        self.pushButton_Input = QPushButton(self.centralwidget)
-        self.pushButton_Input.setObjectName('pushButton_Input')
-        self.pushButton_Input.setGeometry(QRect(660, 20, 61, 24))
-        self.pushButton_Input.setText('导入文件')
-        self.pushButton_Output = QPushButton(self.centralwidget)
-        self.pushButton_Output.setObjectName('pushButton_Output')
-        self.pushButton_Output.setGeometry(QRect(730, 20, 61, 24))
-        self.pushButton_Output.setText('导出文件')
-        self.pushButton_AllImageBuild = QPushButton(self.centralwidget)
-        self.pushButton_AllImageBuild.setObjectName('pushButton_ImageBuild')
-        self.pushButton_AllImageBuild.setGeometry(QRect(590, 376, 61, 24))
-        self.pushButton_AllImageBuild.setText('批量生成')
-        
         # 左侧筛选框
-        self.label_Text_FliterS = QLabel(self.centralwidget)
-        self.label_Text_FliterS.setObjectName('label_Text_FliterS')
-        self.label_Text_FliterS.setGeometry(QRect(20, 24, 71, 16))     
-        self.label_Text_FliterS.setText('DLC筛选')   
+        self.label_Text_FilterS = QLabel(self.centralwidget)
+        self.label_Text_FilterS.setObjectName('label_Text_FilterS')
+        self.label_Text_FilterS.setGeometry(QRect(20, 24, 71, 16))     
+        self.label_Text_FilterS.setText('DLC筛选')   
         self.comboBox_Filter = QComboBox(self.centralwidget)
         self.comboBox_Filter.addItem('全部')
         self.comboBox_Filter.addItem('原神-标准包')
@@ -224,26 +211,30 @@ class Ui_MainWindow(object):
         self.listWidget_List = QListWidget(self.centralwidget)
         self.listWidget_List.setObjectName('listWidget_List')
         self.listWidget_List.setGeometry(QRect(20, 50, 151, 311))
-        
         # 左下查看方式
         self.label_Text_FilterN = QLabel(self.centralwidget)
         self.label_Text_FilterN.setObjectName('label_Text_FilterN')
         self.label_Text_FilterN.setGeometry(QRect(20, 370, 51, 16))
         self.label_Text_FilterN.setText('查看方式')
-        self.radioButton_FliterName = QRadioButton(self.centralwidget)
-        self.radioButton_FliterName.setObjectName('radioButton_FliterName')
-        self.radioButton_FliterName.setGeometry(QRect(120, 368, 51, 20))
-        self.radioButton_FliterName.setText('名称')
-        self.radioButton_FliterID = QRadioButton(self.centralwidget)
-        self.radioButton_FliterID.setObjectName('radioButton_FliterID')
-        self.radioButton_FliterID.setGeometry(QRect(80, 368, 41, 20))
-        self.radioButton_FliterID.setText('ID')
+        self.radioButton_FilterName = QRadioButton(self.centralwidget)
+        self.radioButton_FilterName.setObjectName('radioButton_FilterName')
+        self.radioButton_FilterName.setGeometry(QRect(120, 368, 51, 20))
+        self.radioButton_FilterName.setText('名称')
+        self.radioButton_FilterID = QRadioButton(self.centralwidget)
+        self.radioButton_FilterID.setObjectName('radioButton_FilterID')
+        self.radioButton_FilterID.setGeometry(QRect(80, 368, 41, 20))
+        self.radioButton_FilterID.setText('ID')
+        # 进度条
+        self.progressBar = QProgressBar(self.centralwidget)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setGeometry(QRect(660, 20, 167, 23))
+        self.progressBar.setFormat("")
         
         # 技能区
         self.tabWidget_Skill = QTabWidget(self.centralwidget)
         self.tabWidget_Skill.setObjectName('tabWidget_Skill')
-        self.tabWidget_Skill.setGeometry(QRect(190, 170, 391, 231))
-        self.tabWidget_Skill.setStyleSheet(' QTabBar::tab{ width:48px; } ')
+        self.tabWidget_Skill.setGeometry(QRect(190, 170, 392, 231))
+        self.tabWidget_Skill.setStyleSheet(' QTabBar::tab{ width:49px; } ')
         
         for i in range(1, 9):
             tab_name = f"tab_Skill{i}"

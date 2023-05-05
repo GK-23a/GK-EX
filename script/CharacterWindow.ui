@@ -949,7 +949,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="label_Text_Fliter">
+   <widget class="QLabel" name="label_Text_Filter">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -988,7 +988,7 @@
      <string>ID</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_FliterName">
+   <widget class="QRadioButton" name="radioButton_FilterName">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -1001,7 +1001,7 @@
      <string>名称</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_FliterID">
+   <widget class="QRadioButton" name="radioButton_FilterID">
     <property name="geometry">
      <rect>
       <x>80</x>

@@ -1,32 +1,23 @@
-sex_list = {'male': 0, 'female': 1}
+from os import path
+from time import asctime, localtime, time
 
+def wlog(filename, logfile, logbody, level='Info'):
+    # 日志结构：[时间戳] 消息级别: <文件名> 消息内容
+    nowtime = '[' + asctime(localtime(time()))[4:19] + ']'
+    with open(logfile, 'a', encoding='UTF-8') as log:
+        log.write(nowtime + ' ' +  level +': <' + path.basename(filename) + '> ' + logbody + '\n')
+sex_dict = {'male': 0, 'female': 1, 'both': 2}
 
-def sex(body: str) -> int:
-    try:
-        return sex_list[body]
-    except:
-        return 2
-
-def get_sex_key(value: int) -> str:
-    key = [k for k, v in sex_list.items() if v == value][0]
-    return key
-# DEBUG - 只写了一个，后面还没搞
-
-country_list = {
+country_dict = {
     'mondstadt': 0,
     'liyue': 1,
     'inazuma': 2,
     'sumeru': 3,
     'snezhnaya': 6,
-    'others': 9
+    'others': 8
 }
 
-
-def country(body: str) -> int:
-    return country_list[body]
-
-
-element_list = {
+element_dict = {
     'pyro': 0,
     'hydro': 1,
     'anemo': 2,
@@ -35,15 +26,9 @@ element_list = {
     'cryo': 5,
     'geo': 6,
     'others': 7,
-    'none': 7
 }
 
-
-def element(body: str) -> int:
-    return element_list[body]
-
-
-element_color_list = {
+element_color_dict = {
     'pyro': '#e2311d',
     'hydro': '#1c72fd',
     'anemo': '#33cc83',
@@ -52,20 +37,59 @@ element_color_list = {
     'cryo': '#98c8e8',
     'geo': '#cfa726',
     'others': '#000000',
-    'none': '#000000',
+}
+dlc_dict = {
+    'genshin-standard': 0,
+    'genshin-god': 1,
+    'genshin-designer': 2,
+    'others': 3
 }
 
 
+def country(body: str) -> int:
+    return country_dict[body]
+
+def country_back(num: int) -> str:
+    for key, value in country_dict.items():
+        if value == num:
+            return key
+    return ''
+
+def sex(body: str) -> int:
+    return sex_dict[body]
+    
+def sex_back(num: int) -> str:
+    for key, value in sex_dict.items():
+        if value == num:
+            return key
+    return ''
+
+def element(body: str) -> int:
+    return element_dict[body]
+
+def element_back(num: int) -> str:
+    for key, value in element_dict.items():
+        if value == num:
+            return key
+    return ''
+
 def color(body: str) -> str:
-    return element_color_list[body]
+    return element_color_dict[body]
 
-
-dlcs_list = {'genshin-standard': 0, 'genshin-god': 1, 'genshin-designer': 2, 'others':3}
-
+def color_back(body: str) -> str:
+    for key, value in element_color_dict.items():
+        if value == body:
+            return key
+    return ''
 
 def dlcs(body: str) -> int:
-    return dlcs_list[body]
+    return dlc_dict[body]
 
+def dlcs_back(num: int) -> str:
+    for key, value in dlc_dict.items():
+        if value == num:
+            return key
+    return ''
 
 def star(star_level: int) -> int:
     if star_level == 5:
@@ -73,18 +97,8 @@ def star(star_level: int) -> int:
     else:
         return 1
 
-
-def get_fliter_list(dict_body: dict,
-                    type: str | None,
-                    item: str | None = None,
-                    return_body: str = 'id') -> list:
-    flitered = []
-    for data in dict_body:
-        if type != None:
-            if data[type] == item:
-                flitered.append(data[return_body])
-        else:
-            flitered.append(data[return_body])
-    return flitered
-
-
+def star_back(num: int) -> int:
+    if num == 0:
+        return 5
+    else:
+        return 4
