@@ -3,7 +3,8 @@ from sys import exit as sys_exit
 from sys import argv as sys_argv
 from os import path as os_path
 
-from PySide6.QtGui import QColor, QPalette, QPixmap
+from PIL.ImageQt import ImageQt
+from PySide6.QtGui import QColor, QPalette, QPixmap, QImage
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import (QApplication, QListWidgetItem, QMainWindow, QButtonGroup)
 from CharacterWindow import Ui_MainWindow
@@ -99,13 +100,18 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(self.data.get('level', 5)))
         self.ui.comboBox_DLC.setCurrentIndex(ef.dlcs(self.data.get('dlc', 'others')))
         
-        imgpath = os_path.join('data', 'img', 'character', self.data['id'] + '.png')
-        if os_path.exists(imgpath):
-            self.img = QPixmap(imgpath).scaledToWidth(200)
-            self.ui.label_Image.setPixmap(self.img)
+        self.imgpath = os_path.join('data', 'img', 'character', self.data['id'] + '.png')
+        if os_path.exists(self.imgpath):
+            with open(self.imgpath, 'rb') as f:
+                img_data = f.read()
+            self.img = QImage.fromData(img_data)
+            self.img_scaled = self.img.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore
+            self.pixmap = QPixmap.fromImage(self.img_scaled)
+            self.ui.label_Image.setPixmap(self.pixmap)
             self.ui.label_Image.setText('')
         else:
             self.ui.label_Image.setText('No Image.')
+        self.outputimg = None
         
         for i in range(1, 9):
             self.lineEdit_name = f"lineEdit_Skill{i}_Name"
@@ -213,13 +219,46 @@ class MainWindow(QMainWindow):
                     }
                 )
         
-        outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['verions'])
-        if outputimg:
-            outputimg.show()
+        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['verions'], progress_bar=self.ui.progressBar)
+        if self.outputimg:
+            self.qimg = ImageQt(self.outputimg)
+            self.img_scaled = self.qimg.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore
+            self.pixmap = QPixmap.fromImage(self.img_scaled)
+            self.ui.label_Image.setPixmap(self.pixmap)
+            self.ui.label_Image.mousePressEvent = self.on_label_Image_clicked
+        self.ui.progressBar.setValue(0)
+    
+    def on_label_Image_clicked(self, ev):
+        if self.outputimg:
+            self.ui.progressBar.setValue(100)
+            self.outputimg.show()
+            self.ui.progressBar.setValue(0)
+    
     
     # 保存
     def on_pushButton_clicked(self):
-        pass
+        now_save_log = []
+        # 确认增删
+        removed_items = list(set(gk_character_data) - set(self.character_data))
+        for item in removed_items:
+            now_save_log.append('')
+            pass
+        added_items = list(set(self.character_data) - set(gk_character_data)) 
+        for item in added_items:
+            
+            pass
+        
+        # 确认修改
+        
+        # 保存修改
+        
+        # 保存修改记录
+        if not os_path.isfile('out/savelog.csv'):
+            with open('out/savelog.csv', 'w', encoding='utf-8') as slg:
+                slg.write('"time","operation","character_id","project","origin_body","new_body"')
+        with open('out/savelog.csv', 'a', encoding='utf-8') as slg:
+            pass
+        
         # self.my_dict[self.ui.listWidget_List.currentItem().text()] = {
         #     "field1": self.ui.lineEdit1.text(),
         #     "field2": self.ui.lineEdit2.text(),

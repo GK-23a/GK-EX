@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 from os import path as os_path, makedirs as os_makedirs
+
 from ExtraF import wlog
 
 if not os_path.exists('out/character_img'):
@@ -107,12 +108,14 @@ def cardbuild(character_data: dict,
               verions: str,
               wlog_path='out/debug.log',
               img_path='data/img/character/',
-              img_cut = False):
+              img_cut = False,
+              progress_bar = None):
     """生成GK-23a卡牌的完整函数，返回PIL.Image对象"""
     if character_data['design_info'] == 1:
         
         # 空白卡底
         cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
+        if progress_bar: progress_bar.setValue(5) # progressBar - Setting
 
         # 角色立绘
         try:
@@ -123,7 +126,7 @@ def cardbuild(character_data: dict,
             cardimg.paste(character_image, (380, 120))
         except Exception as errorinfo:
             wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo),'Error')
-
+        if progress_bar: progress_bar.setValue(12) # progressBar - Setting
         # 技能说明
         try:
             skillimg = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
@@ -279,18 +282,21 @@ def cardbuild(character_data: dict,
                     ' , Artist: miHoYo',
                     'black',
                     font_style='sign')
+            if progress_bar: progress_bar.setValue(55) # progressBar - Setting
             # 技能图层剪切
             skillimg = skillimg.crop((0, 0, 2000, height + 100))
             cardimg.alpha_composite(skillimg, (380, 3260 - height))  # 技能层叠加
         except Exception as errorinfo:
             wlog(__file__, wlog_path, character_data['id'] + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
-
+        if progress_bar: progress_bar.setValue(60) # progressBar - Setting
+        
         # 元素外框
         try:
             with Image.open(os_path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
                 cardimg.alpha_composite(frame)
         except Exception as errorinfo:
             wlog(__file__, wlog_path,character_data['id'] + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
+        if progress_bar: progress_bar.setValue(68) # progressBar - Setting
 
         # 神之眼
         try:
@@ -303,6 +309,7 @@ def cardbuild(character_data: dict,
                 cardimg.alpha_composite(tuan)
         except Exception as errorinfo:
             wlog(__file__, wlog_path,character_data['id'] + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
+        if progress_bar: progress_bar.setValue(76) # progressBar - Setting
 
         # 名字、称号
         try:
@@ -342,6 +349,7 @@ def cardbuild(character_data: dict,
                     HPimg.alpha_composite(AP, (160, HP_height))
                     imgdraw(HPimg, (225, HP_height + 55), str(armor_value),
                             'black')
+            if progress_bar: progress_bar.setValue(84) # progressBar - Setting
             # 体力值区域后续结算：与称号和名字的防冲突（简单）
             textheight = ImageDraw.Draw(infoimg).textbbox(
                 (245, namehigh),
@@ -370,14 +378,16 @@ def cardbuild(character_data: dict,
                         HPimg.alpha_composite(AP, (160, 2500))
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
+            if progress_bar: progress_bar.setValue(96) # progressBar - Setting
         except Exception as errorinfo:
             wlog(__file__, wlog_path,character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
         message = character_data['name'] + ' (' +character_data['id'] + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
+        if progress_bar: progress_bar.setValue(100) # progressBar - Setting
         return cardimg
     else:
         wlog(__file__, 'out/debug.log',character_data['id'] + ' 未设计完成，已跳过生成。')
-        return False
+        return None
 
 
 def print_build(nine_cards_list: list):
