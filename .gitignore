@@ -5,3 +5,5 @@ beta/
 build/
 dist/
 main.spec
+
+.idea/

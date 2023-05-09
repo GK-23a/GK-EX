@@ -168,7 +168,7 @@ wlog(__file__, 'out/debug.log', '构建角色信息(characters)已结束。')
 with open('data/data.json', 'w', encoding='utf-8') as file:
     output = {
         'character_data': characters,
-        'verions': 'Beta-0318'
+        'versions': 'Beta-0318'
     }
     json.dump(output, file, ensure_ascii=False)
     wlog(__file__, 'out/debug.log', '"data.json"已成功保存。')

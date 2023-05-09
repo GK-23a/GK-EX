@@ -184,12 +184,8 @@ class Ui_MainWindow(object):
         # 右上按钮处
         self.pushButton_NewCharacter = QPushButton(self.centralwidget)
         self.pushButton_NewCharacter.setObjectName('pushButton_NewCharacter')
-        self.pushButton_NewCharacter.setGeometry(QRect(450, 20, 61, 24))
+        self.pushButton_NewCharacter.setGeometry(QRect(520, 20, 61, 24))
         self.pushButton_NewCharacter.setText('添加角色')
-        self.pushButton_Save = QPushButton(self.centralwidget)
-        self.pushButton_Save.setObjectName('pushButton_Save')
-        self.pushButton_Save.setGeometry(QRect(520, 20, 61, 24))
-        self.pushButton_Save.setText('保存')
         self.pushButton_ImageBuild = QPushButton(self.centralwidget)
         self.pushButton_ImageBuild.setObjectName('pushButton_ImageBuild')
         self.pushButton_ImageBuild.setGeometry(QRect(590, 20, 61, 24))

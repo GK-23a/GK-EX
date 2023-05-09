@@ -1,11 +1,16 @@
 from os import path
 from time import asctime, localtime, time
 
+def get_time(l = 0 , r = 0):
+    return asctime(localtime(time()))[4+l:19+r]
+
 def wlog(filename, logfile, logbody, level='Info'):
     # 日志结构：[时间戳] 消息级别: <文件名> 消息内容
-    nowtime = '[' + asctime(localtime(time()))[4:19] + ']'
+    nowtime = '[' + get_time() + ']'
     with open(logfile, 'a', encoding='UTF-8') as log:
         log.write(nowtime + ' ' +  level +': <' + path.basename(filename) + '> ' + logbody + '\n')
+
+
 sex_dict = {'male': 0, 'female': 1, 'both': 2}
 
 country_dict = {

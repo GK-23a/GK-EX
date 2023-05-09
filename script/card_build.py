@@ -20,7 +20,7 @@ wlog(__file__, 'out/debug.log', '"data.json"读取完成。')
 
 # 循环图像生成
 for ch in character_data:
-    ch_img = character_card.cardbuild(ch, filedict['verions'])
+    ch_img = character_card.cardbuild(ch, filedict['versions'])
     if ch_img:
         ch_img.save('out/character_img/' + ch['id'] + '.png')
         wlog(

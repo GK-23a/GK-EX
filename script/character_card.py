@@ -105,7 +105,7 @@ def imgdraw(bg,
 
 
 def cardbuild(character_data: dict,
-              verions: str,
+              versions: str,
               wlog_path='out/debug.log',
               img_path='data/img/character/',
               img_cut = False,
@@ -277,7 +277,7 @@ def cardbuild(character_data: dict,
                     else:
                         length = 45
             imgdraw(skillimg, (50, height + 10),
-                    'GenshinKill ' + verions + ' | Designer: ' +
+                    'GenshinKill ' + versions + ' | Designer: ' +
                     character_data['designer'] +
                     ' , Artist: miHoYo',
                     'black',

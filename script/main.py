@@ -1,5 +1,4 @@
 from json import loads as json_loads
-from sys import exit as sys_exit
 from sys import argv as sys_argv
 from os import path as os_path
 
@@ -9,16 +8,12 @@ from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import (QApplication, QListWidgetItem, QMainWindow, QButtonGroup)
 from CharacterWindow import Ui_MainWindow
 
-import ExtraF as ef
+import ExtraF
 import character_card
 
 with open('data/data.json', encoding='UTF-8') as jsonfile:
     gk_data = json_loads(jsonfile.read())
     gk_character_data = gk_data['character_data']
-
-# 提前生成完整列表
-cdict_id_to_name = {c['id']: c['name'] for c in gk_character_data}
-cdict_id_to_number = {c['id']: i for i, c in enumerate(gk_character_data)}
 
 
 class MainWindow(QMainWindow):
@@ -27,9 +22,11 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
-        #预准备
-        self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + gk_data['verions'])
+        # 预准备
+        self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + gk_data['versions'])
         self.character_data = gk_character_data[:]
+        self.cdict_id_to_name = {c['id']: c['name'] for c in gk_character_data}
+        self.cdict_id_to_number = {c['id']: i for i, c in enumerate(gk_character_data)}
         
         # 左侧筛选
         self.ui.listWidget_List.itemClicked.connect(self.on_listWidget_List_itemClicked)
@@ -49,35 +46,32 @@ class MainWindow(QMainWindow):
             item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
             self.ui.listWidget_List.addItem(item)
             self.filter_list.append(character)
-
+        self.save_list = []
+        for j in self.filter_list:
+            self.save_list.append(j[0])
             
         # [开发] 不可使用
-        self.ui.comboBox_Filter.setEnabled(False) #DLC筛选
-        self.ui.pushButton_Save.setEnabled(False) #保存
+        self.ui.comboBox_Filter.setEnabled(False)#DLC筛选
         
         # 生成图片
         self.ui.pushButton_ImageBuild.clicked.connect(self.on_pushButton_ImageBuild_clicked)
-        
         # 添加角色
         self.ui.pushButton_NewCharacter.clicked.connect(self.on_pushButton_NewCharacter_click)
         
-        # 保存
-        # self.ui.pushButton_Save.clicked.connect(self.on_pushButton_Save_clicked)
-        
-        
-        
+        # 显示第一个
+        self.id = self.ui.listWidget_List.item(0).data(Qt.UserRole) #type: ignore
+        self.show_data()
+        self.ui.listWidget_List.setCurrentRow(0)
 
-    # ID或名字列表点击 - 角色详情显示
-    def on_listWidget_List_itemClicked(self, item):
-        """角色信息显示"""
-        self.id = item.data(Qt.UserRole) #type: ignore
-        self.data = self.character_data[cdict_id_to_number[self.id]]
+    
+    def show_data(self):
+        self.data = self.character_data[self.cdict_id_to_number[self.id]]
         if self.data['title'] != '':
             Allname = '「' + self.data['title'] + '·' + self.data['name'] + '」'
         else:
             Allname = self.data['name']
         self.ui.label_Text_AllName.setText(Allname)
-        color_code = ef.color(self.data['element'])
+        color_code = ExtraF.color(self.data['element'])
         palelle = QPalette()
         palelle.setColor(QPalette.WindowText, QColor(color_code)) #type: ignore
         self.ui.label_Text_AllName.setPalette(palelle)
@@ -93,12 +87,12 @@ class MainWindow(QMainWindow):
         self.ui.spinBox_HP.setValue(self.data.get('health_point', 0))
         self.ui.spinBox_HPMax.setValue(self.data.get('max_health_point', 0))
         self.ui.spinBox_Armor.setValue(self.data.get('armor_point', 0))
-        self.ui.comboBox_Sex.setCurrentIndex(ef.sex(self.data.get('sex', 'male')))
-        self.ui.comboBox_Country.setCurrentIndex(ef.country(self.data.get('country', 'others')))
-        self.ui.comboBox_Element.setCurrentIndex(ef.element(self.data.get('element', 'others')))
+        self.ui.comboBox_Sex.setCurrentIndex(ExtraF.sex(self.data.get('sex', 'male')))
+        self.ui.comboBox_Country.setCurrentIndex(ExtraF.country(self.data.get('country', 'others')))
+        self.ui.comboBox_Element.setCurrentIndex(ExtraF.element(self.data.get('element', 'others')))
         self.ui.checkBox_Finish.setChecked(bool(self.data.get('design_info', '0')))
-        self.ui.comboBox_StarLevel.setCurrentIndex(ef.star(self.data.get('level', 5)))
-        self.ui.comboBox_DLC.setCurrentIndex(ef.dlcs(self.data.get('dlc', 'others')))
+        self.ui.comboBox_StarLevel.setCurrentIndex(ExtraF.star(self.data.get('level', 5)))
+        self.ui.comboBox_DLC.setCurrentIndex(ExtraF.dlcs(self.data.get('dlc', 'others')))
         
         self.imgpath = os_path.join('data', 'img', 'character', self.data['id'] + '.png')
         if os_path.exists(self.imgpath):
@@ -130,6 +124,56 @@ class MainWindow(QMainWindow):
                 getattr(self.ui, self.textEdit_Description).setPlainText('')
                 getattr(self.ui, self.checkBox_Visibled).setChecked(False)
                 getattr(self.ui, self.checkBox_Enabled).setChecked(False)
+        
+    def save_data(self, data: dict):
+        if data['id']:
+            self.save_log = []
+            if data['id'] in self.save_list:
+                print('character~')
+                pass
+            else:
+                print('character+')
+            pass
+    
+    # ID或名字列表点击 - 角色详情显示与保存
+    def on_listWidget_List_itemClicked(self, item):
+        """保存上一个角色内容，显示新的角色内容"""
+
+        # 保存
+        self.saved_data = {
+            'id': self.ui.lineEdit_ID.text(),
+            'title': self.ui.lineEdit_Title.text(),
+            'name': self.ui.lineEdit_Name.text(),
+            'designer': self.ui.lineEdit_Designer.text(),
+            'health_point': self.ui.spinBox_HP.value(),
+            'max_health_point': self.ui.spinBox_HPMax.value(),
+            'armor_point': self.ui.spinBox_Armor.value(),
+            'sex': ExtraF.sex_back(self.ui.comboBox_Sex.currentIndex()),
+            'country': ExtraF.country_back(self.ui.comboBox_Country.currentIndex()),
+            'element': ExtraF.element_back(self.ui.comboBox_Element.currentIndex()),
+            'design_info': int(self.ui.checkBox_Finish.isChecked()),
+            'level': ExtraF.star_back(self.ui.comboBox_StarLevel.currentIndex()),
+            'dlc': ExtraF.dlcs_back(self.ui.comboBox_DLC.currentIndex()),
+            'skills': []
+        }
+        for i in range(1, 9):
+            self.checkBox_Enabled = f"checkBox_Skill{i}_Enabled"
+            if getattr(self.ui, self.checkBox_Enabled).isChecked():
+                self.lineEdit_name = f"lineEdit_Skill{i}_Name"
+                self.textEdit_Description = f"textEdit_Skill{i}_Description"
+                self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
+                self.saved_data['skills'].append(
+                    {
+                        'name': getattr(self.ui, self.lineEdit_name).text(),
+                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked()
+                    }
+                )
+        self.save_data(self.saved_data)
+        
+        # 显示
+        self.id = item.data(Qt.UserRole) #type: ignore
+        self.show_data()
  
     # ID或名字筛选
     def on_filter_button_clicked(self, button):
@@ -150,21 +194,24 @@ class MainWindow(QMainWindow):
     # 添加角色
     def on_pushButton_NewCharacter_click(self):
         i = 1
-        while 'new_character_' + str(i) in self.filter_list:
+        self.newlist = []
+        for j in self.filter_list:
+            self.newlist.append(j[0])
+        while 'new_character_' + str(i) not in self.newlist:
             i += 1
         
-        new_id = 'new_character_' + str(i)
-        
-        item = QListWidgetItem(new_id)
-        item.setData(Qt.UserRole, new_id) #type: ignore
-        item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
-        self.ui.listWidget_List.addItem(item)
-        self.filter_list.append(new_id)
+        self.new_id = 'new_character_' + str(i)
+
+        self.item = QListWidgetItem(self.new_id)
+        self.item.setData(Qt.UserRole, self.new_id) #type: ignore
+        self.item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
+        self.ui.listWidget_List.addItem(self.item)
+        self.filter_list.append([self.new_id, self.new_id])
         self.character_data.append(
             {
-                'id': new_id,
+                'id': self.new_id,
                 'title': '',
-                'name': new_id,
+                'name': self.new_id,
                 'sex': 'both',
                 'element': 'others',
                 'country': 'others',
@@ -178,11 +225,11 @@ class MainWindow(QMainWindow):
                 'skills': []
                 }
             )
-        cdict_id_to_name[new_id] = new_id
-        cdict_id_to_number[new_id] = len(cdict_id_to_number)
+        self.cdict_id_to_name[self.new_id] = self.new_id
+        self.cdict_id_to_number[self.new_id] = len(self.cdict_id_to_number)
         
         self.ui.listWidget_List.setCurrentRow(len(self.filter_list)-1)
-        self.on_listWidget_List_itemClicked(item)
+        self.on_listWidget_List_itemClicked(self.item)
         
         
     # 生成图片
@@ -197,12 +244,12 @@ class MainWindow(QMainWindow):
             'health_point': self.ui.spinBox_HP.value(),
             'max_health_point': self.ui.spinBox_HPMax.value(),
             'armor_point': self.ui.spinBox_Armor.value(),
-            'sex': ef.sex_back(self.ui.comboBox_Sex.currentIndex()),
-            'country': ef.country_back(self.ui.comboBox_Country.currentIndex()),
-            'element': ef.element_back(self.ui.comboBox_Element.currentIndex()),
+            'sex': ExtraF.sex_back(self.ui.comboBox_Sex.currentIndex()),
+            'country': ExtraF.country_back(self.ui.comboBox_Country.currentIndex()),
+            'element': ExtraF.element_back(self.ui.comboBox_Element.currentIndex()),
             'design_info': int(self.ui.checkBox_Finish.isChecked()),
-            'level': ef.star_back(self.ui.comboBox_StarLevel.currentIndex()),
-            'dlc': ef.dlcs_back(self.ui.comboBox_DLC.currentIndex()),
+            'level': ExtraF.star_back(self.ui.comboBox_StarLevel.currentIndex()),
+            'dlc': ExtraF.dlcs_back(self.ui.comboBox_DLC.currentIndex()),
             'skills': []
         }
         for i in range(1, 9):
@@ -219,7 +266,7 @@ class MainWindow(QMainWindow):
                     }
                 )
         
-        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['verions'], progress_bar=self.ui.progressBar)
+        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['versions'], progress_bar=self.ui.progressBar)
         if self.outputimg:
             self.qimg = ImageQt(self.outputimg)
             self.img_scaled = self.qimg.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore
@@ -233,45 +280,46 @@ class MainWindow(QMainWindow):
             self.ui.progressBar.setValue(100)
             self.outputimg.show()
             self.ui.progressBar.setValue(0)
-    
-    
-    # 保存
-    def on_pushButton_clicked(self):
-        now_save_log = []
-        # 确认增删
-        removed_items = list(set(gk_character_data) - set(self.character_data))
-        for item in removed_items:
-            now_save_log.append('')
-            pass
-        added_items = list(set(self.character_data) - set(gk_character_data)) 
-        for item in added_items:
             
-            pass
+    def closeEvent(self, event):
         
-        # 确认修改
-        
-        # 保存修改
-        
-        # 保存修改记录
-        if not os_path.isfile('out/savelog.csv'):
-            with open('out/savelog.csv', 'w', encoding='utf-8') as slg:
-                slg.write('"time","operation","character_id","project","origin_body","new_body"')
-        with open('out/savelog.csv', 'a', encoding='utf-8') as slg:
-            pass
-        
-        # self.my_dict[self.ui.listWidget_List.currentItem().text()] = {
-        #     "field1": self.ui.lineEdit1.text(),
-        #     "field2": self.ui.lineEdit2.text(),
-        #     "field3": self.ui.spinBox.value(),
-        #     "field4": self.ui.comboBox.currentIndex()
-        #     # ... 将其他小部件的内容保存到相应的字典条目
-        # }
-
+        # 保存
+        self.saved_data = {
+            'id': self.ui.lineEdit_ID.text(),
+            'title': self.ui.lineEdit_Title.text(),
+            'name': self.ui.lineEdit_Name.text(),
+            'designer': self.ui.lineEdit_Designer.text(),
+            'health_point': self.ui.spinBox_HP.value(),
+            'max_health_point': self.ui.spinBox_HPMax.value(),
+            'armor_point': self.ui.spinBox_Armor.value(),
+            'sex': ExtraF.sex_back(self.ui.comboBox_Sex.currentIndex()),
+            'country': ExtraF.country_back(self.ui.comboBox_Country.currentIndex()),
+            'element': ExtraF.element_back(self.ui.comboBox_Element.currentIndex()),
+            'design_info': int(self.ui.checkBox_Finish.isChecked()),
+            'level': ExtraF.star_back(self.ui.comboBox_StarLevel.currentIndex()),
+            'dlc': ExtraF.dlcs_back(self.ui.comboBox_DLC.currentIndex()),
+            'skills': []
+        }
+        for i in range(1, 9):
+            self.checkBox_Enabled = f"checkBox_Skill{i}_Enabled"
+            if getattr(self.ui, self.checkBox_Enabled).isChecked():
+                self.lineEdit_name = f"lineEdit_Skill{i}_Name"
+                self.textEdit_Description = f"textEdit_Skill{i}_Description"
+                self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
+                self.saved_data['skills'].append(
+                    {
+                        'name': getattr(self.ui, self.lineEdit_name).text(),
+                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked()
+                    }
+                )
+        self.save_data(self.saved_data)
+        event.accept()
     
 if __name__ == "__main__":
     app = QApplication(sys_argv)
 
     window = MainWindow()
     window.show()
-
-    sys_exit(app.exec())
+    
+    app.exec()
