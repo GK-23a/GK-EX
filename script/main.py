@@ -65,6 +65,7 @@ class MainWindow(QMainWindow):
 
     
     def show_data(self):
+        """显示数据"""
         self.data = self.character_data[self.cdict_id_to_number[self.id]]
         if self.data['title'] != '':
             Allname = '「' + self.data['title'] + '·' + self.data['name'] + '」'
@@ -126,14 +127,60 @@ class MainWindow(QMainWindow):
                 getattr(self.ui, self.checkBox_Enabled).setChecked(False)
         
     def save_data(self, data: dict):
+        """保存数据"""
+        # 确认是否需要保存
+        self.save_tag = False
         if data['id']:
-            self.save_log = []
+            self.save_info = []
             if data['id'] in self.save_list:
-                print('character~')
+                # 未修改ID
+                print('未修改ID')
+                self.id_num = self.cdict_id_to_number[data['id']]
+                for key in self.saved_data:
+                    if key == 'skills':
+                        self.ss = []
+                        for s in gk_character_data[self.id_num]['skills']:
+                            self.ss.append(s['name'])
+                        for skill in data['skills']:
+                            if skill['name'] in self.ss:
+                                # 检测到
+                                self.ss.remove(skill['name'])
+                            else:
+                                # 未检测到——新增
+                                pass
+                        for s in self.ss:
+                            # 删除的技能
+                            pass
+                    else:
+                        if key in gk_character_data[self.id_num]:
+                            if self.saved_data[key] != gk_character_data[self.id_num][key]:
+                                self.save_tag = True
+                                self.save_info.append(
+                                    [
+                                        ExtraF.get_time(),
+                                        'M',
+                                        data['id'],
+                                        key,
+                                        gk_character_data[self.id_num][key],
+                                        self.saved_data[key]
+                                        ]
+                                    )
+                                print(self.save_info)
+            elif self.now_id in self.save_list:
+                # 修改了ID
+                print('修改了ID')
+                self.save_tag = True
                 pass
             else:
-                print('character+')
-            pass
+                # 新增角色
+                print('新增角色')
+                self.save_tag = True
+                self.save_list.append(data['id'])
+        # 保存操作
+        if self.save_tag:
+            self.ui.progressBar.setValue(20)
+        self.ui.progressBar.setValue(0)
+
     
     # ID或名字列表点击 - 角色详情显示与保存
     def on_listWidget_List_itemClicked(self, item):
@@ -174,6 +221,7 @@ class MainWindow(QMainWindow):
         # 显示
         self.id = item.data(Qt.UserRole) #type: ignore
         self.show_data()
+        self.now_id = self.data['id']
  
     # ID或名字筛选
     def on_filter_button_clicked(self, button):
@@ -193,13 +241,13 @@ class MainWindow(QMainWindow):
                 
     # 添加角色
     def on_pushButton_NewCharacter_click(self):
+        
         i = 1
         self.newlist = []
         for j in self.filter_list:
             self.newlist.append(j[0])
-        while 'new_character_' + str(i) not in self.newlist:
+        while 'new_character_' + str(i) in self.newlist:
             i += 1
-        
         self.new_id = 'new_character_' + str(i)
 
         self.item = QListWidgetItem(self.new_id)
@@ -266,7 +314,7 @@ class MainWindow(QMainWindow):
                     }
                 )
         
-        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['versions'], progress_bar=self.ui.progressBar)
+        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['versions'], progress_bar=self.ui.progressBar, ignore_designer=True)
         if self.outputimg:
             self.qimg = ImageQt(self.outputimg)
             self.img_scaled = self.qimg.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore

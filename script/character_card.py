@@ -109,10 +109,17 @@ def cardbuild(character_data: dict,
               wlog_path='out/debug.log',
               img_path='data/img/character/',
               img_cut = False,
-              progress_bar = None):
-    """生成GK-23a卡牌的完整函数，返回PIL.Image对象"""
-    if character_data['design_info'] == 1:
-        
+              progress_bar = None,
+              ignore_designer = False):
+    """生成GK-23a卡牌的完整函数，返回PIL.Image对象(或返回空值)"""
+    if ignore_designer:
+        design_tag = True
+    elif character_data['design_info'] == 1:
+        design_tag = True
+    else:
+        design_tag = False
+    
+    if design_tag:
         # 空白卡底
         cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
         if progress_bar: progress_bar.setValue(5) # progressBar - Setting
@@ -158,7 +165,7 @@ def cardbuild(character_data: dict,
                         break
                     point += 1
 
-
+        
                 # 换行计算
                 body_height = height
                 body_skilltext_origin = skilltext_origin
