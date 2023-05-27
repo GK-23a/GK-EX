@@ -134,24 +134,38 @@ class MainWindow(QMainWindow):
             self.save_info = []
             if data['id'] in self.save_list:
                 # 未修改ID
+                
                 print('未修改ID')
                 self.id_num = self.cdict_id_to_number[data['id']]
                 for key in self.saved_data:
+                    
                     if key == 'skills':
+                        
                         self.ss = []
+                        # 填充ss列表：曾经的技能名
                         for s in gk_character_data[self.id_num]['skills']:
                             self.ss.append(s['name'])
+                        self.ss2 = self.ss[:]
+                        
+                        self.skill_fix = [[],[],[]]
                         for skill in data['skills']:
-                            if skill['name'] in self.ss:
-                                # 检测到
-                                self.ss.remove(skill['name'])
-                            else:
-                                # 未检测到——新增
-                                pass
+                            if skill['enabled']:
+                                if skill['name'] in self.ss:
+                                    # 检测到
+                                    for s in skill:
+                                        print(s)
+                                        self.skill_fix[2].append(skill['name'])
+                                        self.ss.remove(skill['name'])
+                                else:
+                                    # 未检测到——新增
+                                    self.skill_fix[0] = skill['name']
                         for s in self.ss:
                             # 删除的技能
-                            pass
+                            self.skill_fix[1] = s
+                    
+                        
                     else:
+                        
                         if key in gk_character_data[self.id_num]:
                             if self.saved_data[key] != gk_character_data[self.id_num][key]:
                                 self.save_tag = True
@@ -166,16 +180,21 @@ class MainWindow(QMainWindow):
                                         ]
                                     )
                                 print(self.save_info)
+                                
             elif self.now_id in self.save_list:
                 # 修改了ID
+                
                 print('修改了ID')
                 self.save_tag = True
                 pass
+            
             else:
                 # 新增角色
+                
                 print('新增角色')
                 self.save_tag = True
                 self.save_list.append(data['id'])
+                
         # 保存操作
         if self.save_tag:
             self.ui.progressBar.setValue(20)
@@ -213,7 +232,8 @@ class MainWindow(QMainWindow):
                     {
                         'name': getattr(self.ui, self.lineEdit_name).text(),
                         'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
-                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked()
+                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
+                        'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
                     }
                 )
         self.save_data(self.saved_data)
