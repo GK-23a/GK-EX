@@ -368,7 +368,7 @@ def cardbuild(character_data: dict,
                 anchor='mt')[3]
             if HP_height <= textheight:
                 HPimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-                with Image.open('img/icon/HPyes.png') as HP:
+                with Image.open(os_path.join('data', 'img','icon','HPyes.png')) as HP:
                     HPimg.alpha_composite(HP, (160, 2700))
                 ImageDraw.Draw(HPimg).text(
                     (215, 2900),
@@ -381,7 +381,7 @@ def cardbuild(character_data: dict,
                     stroke_width=8,
                     stroke_fill=(0, 115, 0))
                 if armor_value != 0:
-                    with Image.open('img/icon/Armor.png') as AP:
+                    with Image.open(os_path.join('data', 'img','icon','Armor.png')) as AP:
                         HPimg.alpha_composite(AP, (160, 2500))
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
