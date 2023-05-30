@@ -1,4 +1,4 @@
-from json import loads as json_loads
+from json import loads as json_loads, dump as json_dump
 from sys import argv as sys_argv
 from os import path as os_path
 
@@ -13,7 +13,6 @@ import character_card
 
 with open('data/data.json', encoding='UTF-8') as jsonfile:
     gk_data = json_loads(jsonfile.read())
-    gk_character_data = gk_data['character_data']
 
 
 class MainWindow(QMainWindow):
@@ -23,10 +22,11 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         
         # 预准备
+        self.gk_character_data = gk_data['character_data']
         self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + gk_data['versions'])
-        self.character_data = gk_character_data[:]
-        self.cdict_id_to_name = {c['id']: c['name'] for c in gk_character_data}
-        self.cdict_id_to_number = {c['id']: i for i, c in enumerate(gk_character_data)}
+        self.character_data = self.gk_character_data[:]
+        self.cdict_id_to_name = {c['id']: c['name'] for c in self.gk_character_data}
+        self.cdict_id_to_number = {c['id']: i for i, c in enumerate(self.gk_character_data)}
         
         # 左侧筛选
         self.ui.listWidget_List.itemClicked.connect(self.on_listWidget_List_itemClicked)
@@ -129,6 +129,7 @@ class MainWindow(QMainWindow):
         
     def save_data(self, data: dict):
         """保存数据"""
+        # print(data)
         # 确认是否需要保存
         self.save_tag = False
         if data['id']:
@@ -140,7 +141,7 @@ class MainWindow(QMainWindow):
                     if key == 'skills':
                         self.ss = []
                         # 填充ss列表：曾经的技能名
-                        for s in gk_character_data[self.id_num]['skills']:
+                        for s in self.gk_character_data[self.id_num]['skills']:
                             self.ss.append(s['name'])
                         try:
                             for skill_num in range(8):
@@ -150,11 +151,11 @@ class MainWindow(QMainWindow):
                                         # 检测到
                                         for s in skill:
                                             if s != 'enabled':
-                                                if skill[s] != gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][s]:
                                                     self.save_tag = True
                                                     self.save_info.append(
                                                         [ExtraF.get_time(), 'C', data['id'], 'skills', s,
-                                                         gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
+                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
                                                         )
                                         self.ss.remove(skill['name'])
                                     else:
@@ -177,13 +178,16 @@ class MainWindow(QMainWindow):
                                         [ExtraF.get_time(), 'D', data['id'], 'skills',
                                          skill['name']]
                                         )
+                                    # print(skill)
+                                else:
+                                    pass            
                     else:
-                        if key in gk_character_data[self.id_num]:
-                            if self.saved_data[key] != gk_character_data[self.id_num][key]:
+                        if key in self.gk_character_data[self.id_num]:
+                            if self.saved_data[key] != self.gk_character_data[self.id_num][key]:
                                 self.save_tag = True
                                 self.save_info.append(
                                     [ExtraF.get_time(), 'C', data['id'], key,
-                                     gk_character_data[self.id_num][key], self.saved_data[key]]
+                                     self.gk_character_data[self.id_num][key], self.saved_data[key]]
                                     )
             elif self.now_id in self.save_list:
                 # 修改了ID
@@ -196,7 +200,7 @@ class MainWindow(QMainWindow):
                     if key == 'skills':
                         self.ss = []
                         # 填充ss列表：曾经的技能名
-                        for s in gk_character_data[self.id_num]['skills']:
+                        for s in self.gk_character_data[self.id_num]['skills']:
                             self.ss.append(s['name'])
                         self.ss2 = self.ss[:]
                         try:
@@ -207,11 +211,11 @@ class MainWindow(QMainWindow):
                                         # 检测到
                                         for s in skill:
                                             if s != 'enabled':
-                                                if skill[s] != gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][s]:
                                                     self.save_tag = True
                                                     self.save_info.append(
                                                         [ExtraF.get_time(), 'C', data['id'], 'skills', s,
-                                                         gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
+                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
                                                         )
                                         self.ss.remove(skill['name'])
                                     else:
@@ -233,11 +237,11 @@ class MainWindow(QMainWindow):
                                      del_skill]
                                     )
                     elif key != 'id':
-                        if key in gk_character_data[self.id_num]:
-                            if self.saved_data[key] != gk_character_data[self.id_num][key]:
+                        if key in self.gk_character_data[self.id_num]:
+                            if self.saved_data[key] != self.gk_character_data[self.id_num][key]:
                                 self.save_info.append(
                                     [ExtraF.get_time(), 'C', data['id'], key,
-                                     gk_character_data[self.id_num][key], self.saved_data[key]]
+                                     self.gk_character_data[self.id_num][key], self.saved_data[key]]
                                     )
             else:
                 # 新增角色
@@ -262,19 +266,42 @@ class MainWindow(QMainWindow):
                             [ExtraF.get_time(), 'A', data['id'], key,
                              self.saved_data[key]]
                             )
-                
+        
+        data['skills'] = [d for d in data['skills'] if d['enabled']]
+        for s in data['skills']:
+            s.pop('enabled', None)
         # 保存操作
         if self.save_tag:
-            print(self.save_info)
             self.ui.progressBar.setValue(30)
             # 读取文件
             with open('data/data.json', encoding='UTF-8') as jsonfile:
-                gk_save_data = json_loads(jsonfile.read())
+                self.gk_save_data = json_loads(jsonfile.read())
             # 找到相应条目
-            print(gk_save_data)
-            # 修改
+            self.gk_save_data['character_data'][self.cdict_id_to_number[data['id']]] = data
             # 保存
+            with open('data/data.json', 'w', encoding='UTF-8') as jsonfile:
+                json_dump(self.gk_save_data, jsonfile, ensure_ascii=False)
+            # 更改记录保存
+            with open('out/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
+                for log in self.save_info:
+                    gkcl.write(str(log) + '\n')
             # 重载
+            self.gk_character_data = self.gk_save_data['character_data']
+            self.character_data = self.gk_character_data[:]
+            self.cdict_id_to_name = {c['id']: c['name'] for c in self.gk_character_data}
+            self.cdict_id_to_number = {c['id']: i for i, c in enumerate(self.gk_character_data)}
+            self.filter_list = []
+            for data in self.character_data:
+                character = [data['id'], data['name']]
+                item = QListWidgetItem(character[1])
+                item.setData(Qt.UserRole, character[0]) #type: ignore
+                item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
+                self.ui.listWidget_List.addItem(item)
+                self.filter_list.append(character)
+            self.save_list = []
+            for j in self.filter_list:
+                self.save_list.append(j[0])
+            
         self.ui.progressBar.setValue(0)
 
     
@@ -304,15 +331,15 @@ class MainWindow(QMainWindow):
             self.lineEdit_name = f"lineEdit_Skill{i}_Name"
             self.textEdit_Description = f"textEdit_Skill{i}_Description"
             self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
-            self.saved_data['skills'].append(
-                {
-                    'name': getattr(self.ui, self.lineEdit_name).text(),
-                    'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
-                    'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
-                    'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
-                }
-            )
-
+            if getattr(self.ui, self.lineEdit_name).text():
+                self.saved_data['skills'].append(
+                    {
+                        'name': getattr(self.ui, self.lineEdit_name).text(),
+                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
+                        'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
+                    }
+                )
         self.save_data(self.saved_data)
         
         # 显示
@@ -449,14 +476,15 @@ class MainWindow(QMainWindow):
             self.lineEdit_name = f"lineEdit_Skill{i}_Name"
             self.textEdit_Description = f"textEdit_Skill{i}_Description"
             self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
-            self.saved_data['skills'].append(
-                {
-                    'name': getattr(self.ui, self.lineEdit_name).text(),
-                    'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
-                    'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
-                    'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
-                }
-            )
+            if getattr(self.ui, self.lineEdit_name).text():
+                self.saved_data['skills'].append(
+                    {
+                        'name': getattr(self.ui, self.lineEdit_name).text(),
+                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
+                        'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
+                    }
+                )
         self.save_data(self.saved_data)
         event.accept()
     
