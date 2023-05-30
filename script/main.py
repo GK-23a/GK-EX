@@ -125,6 +125,7 @@ class MainWindow(QMainWindow):
                 getattr(self.ui, self.textEdit_Description).setPlainText('')
                 getattr(self.ui, self.checkBox_Visibled).setChecked(False)
                 getattr(self.ui, self.checkBox_Enabled).setChecked(False)
+        self.now_id = self.data['id']
         
     def save_data(self, data: dict):
         """保存数据"""
@@ -134,70 +135,146 @@ class MainWindow(QMainWindow):
             self.save_info = []
             if data['id'] in self.save_list:
                 # 未修改ID
-                
-                print('未修改ID')
                 self.id_num = self.cdict_id_to_number[data['id']]
                 for key in self.saved_data:
-                    
                     if key == 'skills':
-                        
+                        self.ss = []
+                        # 填充ss列表：曾经的技能名
+                        for s in gk_character_data[self.id_num]['skills']:
+                            self.ss.append(s['name'])
+                        try:
+                            for skill_num in range(8):
+                                skill = data['skills'][skill_num]
+                                if skill['enabled']:
+                                    if skill['name'] in self.ss:
+                                        # 检测到
+                                        for s in skill:
+                                            if s != 'enabled':
+                                                if skill[s] != gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                    self.save_tag = True
+                                                    self.save_info.append(
+                                                        [ExtraF.get_time(), 'C', data['id'], 'skills', s,
+                                                         gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
+                                                        )
+                                        self.ss.remove(skill['name'])
+                                    else:
+                                        # 未检测到——新增
+                                        self.save_tag = True
+                                        for s in skill:
+                                            if s != 'enabled':
+                                                self.save_info.append(
+                                                    [ExtraF.get_time(), 'A', data['id'], 'skills', s,
+                                                     self.saved_data['skills'][skill_num][s]]
+                                                    )
+                        except IndexError:
+                            pass
+                        for del_skill in self.ss:
+                            # 删除的技能
+                            self.save_tag = True
+                            for skill in data['skills']:
+                                if skill['name'] == del_skill:
+                                    self.save_info.append(
+                                        [ExtraF.get_time(), 'D', data['id'], 'skills',
+                                         skill['name']]
+                                        )
+                    else:
+                        if key in gk_character_data[self.id_num]:
+                            if self.saved_data[key] != gk_character_data[self.id_num][key]:
+                                self.save_tag = True
+                                self.save_info.append(
+                                    [ExtraF.get_time(), 'C', data['id'], key,
+                                     gk_character_data[self.id_num][key], self.saved_data[key]]
+                                    )
+            elif self.now_id in self.save_list:
+                # 修改了ID
+                self.save_tag = True
+                self.save_info.append(
+                    [ExtraF.get_time(), 'CI', self.now_id, 'id', data['id']]
+                    )
+                self.id_num = self.cdict_id_to_number[self.now_id]
+                for key in self.saved_data:
+                    if key == 'skills':
                         self.ss = []
                         # 填充ss列表：曾经的技能名
                         for s in gk_character_data[self.id_num]['skills']:
                             self.ss.append(s['name'])
                         self.ss2 = self.ss[:]
-                        
-                        self.skill_fix = [[],[],[]]
-                        for skill in data['skills']:
-                            if skill['enabled']:
-                                if skill['name'] in self.ss:
-                                    # 检测到
-                                    for s in skill:
-                                        print(s)
-                                        self.skill_fix[2].append(skill['name'])
+                        try:
+                            for skill_num in range(8):
+                                skill = data['skills'][skill_num]
+                                if skill['enabled']:
+                                    if skill['name'] in self.ss:
+                                        # 检测到
+                                        for s in skill:
+                                            if s != 'enabled':
+                                                if skill[s] != gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                    self.save_tag = True
+                                                    self.save_info.append(
+                                                        [ExtraF.get_time(), 'C', data['id'], 'skills', s,
+                                                         gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
+                                                        )
                                         self.ss.remove(skill['name'])
-                                else:
-                                    # 未检测到——新增
-                                    self.skill_fix[0] = skill['name']
-                        for s in self.ss:
+                                    else:
+                                        # 未检测到——新增
+                                        self.save_tag = True
+                                        for s in skill:
+                                            if s != 'enabled':
+                                                self.save_info.append(
+                                                    [ExtraF.get_time(), 'A', data['id'], 'skills', s,
+                                                     self.saved_data['skills'][skill_num][s]]
+                                                    )
+                        except IndexError:
+                            pass
+                        for del_skill in self.ss:
                             # 删除的技能
-                            self.skill_fix[1] = s
-                    
-                        
-                    else:
-                        
+                            for skill in data['skills']:
+                                self.save_info.append(
+                                    [ExtraF.get_time(), 'D', data['id'], 'skills',
+                                     del_skill]
+                                    )
+                    elif key != 'id':
                         if key in gk_character_data[self.id_num]:
                             if self.saved_data[key] != gk_character_data[self.id_num][key]:
-                                self.save_tag = True
                                 self.save_info.append(
-                                    [
-                                        ExtraF.get_time(),
-                                        'M',
-                                        data['id'],
-                                        key,
-                                        gk_character_data[self.id_num][key],
-                                        self.saved_data[key]
-                                        ]
+                                    [ExtraF.get_time(), 'C', data['id'], key,
+                                     gk_character_data[self.id_num][key], self.saved_data[key]]
                                     )
-                                print(self.save_info)
-                                
-            elif self.now_id in self.save_list:
-                # 修改了ID
-                
-                print('修改了ID')
-                self.save_tag = True
-                pass
-            
             else:
                 # 新增角色
-                
-                print('新增角色')
                 self.save_tag = True
                 self.save_list.append(data['id'])
+                for key in self.saved_data:
+                    if key == 'skills':
+                        try:
+                            for skill_num in range(8):
+                                skill = data['skills'][skill_num]
+                                if skill['enabled']:
+                                    for s in skill:
+                                        if s != 'enabled':
+                                            self.save_info.append(
+                                                [ExtraF.get_time(), 'A', data['id'], 'skills', s,
+                                                 self.saved_data['skills'][skill_num][s]]
+                                                )
+                        except IndexError:
+                            pass
+                    else:
+                        self.save_info.append(
+                            [ExtraF.get_time(), 'A', data['id'], key,
+                             self.saved_data[key]]
+                            )
                 
         # 保存操作
         if self.save_tag:
-            self.ui.progressBar.setValue(20)
+            print(self.save_info)
+            self.ui.progressBar.setValue(30)
+            # 读取文件
+            with open('data/data.json', encoding='UTF-8') as jsonfile:
+                gk_save_data = json_loads(jsonfile.read())
+            # 找到相应条目
+            print(gk_save_data)
+            # 修改
+            # 保存
+            # 重载
         self.ui.progressBar.setValue(0)
 
     
@@ -224,24 +301,23 @@ class MainWindow(QMainWindow):
         }
         for i in range(1, 9):
             self.checkBox_Enabled = f"checkBox_Skill{i}_Enabled"
-            if getattr(self.ui, self.checkBox_Enabled).isChecked():
-                self.lineEdit_name = f"lineEdit_Skill{i}_Name"
-                self.textEdit_Description = f"textEdit_Skill{i}_Description"
-                self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
-                self.saved_data['skills'].append(
-                    {
-                        'name': getattr(self.ui, self.lineEdit_name).text(),
-                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
-                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
-                        'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
-                    }
-                )
+            self.lineEdit_name = f"lineEdit_Skill{i}_Name"
+            self.textEdit_Description = f"textEdit_Skill{i}_Description"
+            self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
+            self.saved_data['skills'].append(
+                {
+                    'name': getattr(self.ui, self.lineEdit_name).text(),
+                    'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                    'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
+                    'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
+                }
+            )
+
         self.save_data(self.saved_data)
         
         # 显示
         self.id = item.data(Qt.UserRole) #type: ignore
         self.show_data()
-        self.now_id = self.data['id']
  
     # ID或名字筛选
     def on_filter_button_clicked(self, button):
@@ -370,17 +446,17 @@ class MainWindow(QMainWindow):
         }
         for i in range(1, 9):
             self.checkBox_Enabled = f"checkBox_Skill{i}_Enabled"
-            if getattr(self.ui, self.checkBox_Enabled).isChecked():
-                self.lineEdit_name = f"lineEdit_Skill{i}_Name"
-                self.textEdit_Description = f"textEdit_Skill{i}_Description"
-                self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
-                self.saved_data['skills'].append(
-                    {
-                        'name': getattr(self.ui, self.lineEdit_name).text(),
-                        'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
-                        'origin': getattr(self.ui, self.checkBox_Visibled).isChecked()
-                    }
-                )
+            self.lineEdit_name = f"lineEdit_Skill{i}_Name"
+            self.textEdit_Description = f"textEdit_Skill{i}_Description"
+            self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
+            self.saved_data['skills'].append(
+                {
+                    'name': getattr(self.ui, self.lineEdit_name).text(),
+                    'description': getattr(self.ui, self.textEdit_Description).toPlainText(),
+                    'origin': getattr(self.ui, self.checkBox_Visibled).isChecked(),
+                    'enabled': getattr(self.ui, self.checkBox_Enabled).isChecked()
+                }
+            )
         self.save_data(self.saved_data)
         event.accept()
     
