@@ -4,8 +4,8 @@ from os import path as os_path, makedirs as os_makedirs
 from ExtraF import wlog
 import gk_card
 
-if not os_path.exists('out/character_img'):
-    os_makedirs('out/character_img')
+# if not os_path.exists('out/character_img'):
+#     os_makedirs('out/character_img')
 
 # 预加载
 
@@ -104,13 +104,16 @@ def imgdraw(bg,
              encoding='UTF-8')
 
 
-def cardbuild(character_data: dict,
-              versions: str,
-              wlog_path='out/debug.log',
-              img_path='data/img/character/',
-              img_cut=False,
-              progress_bar=None,
-              ignore_designer=False):
+def build_card
+
+
+def cardbuild_func(character_data: dict,
+                   versions: str,
+                   wlog_path='out/debug.log',
+                   img_path='data/img/character/',
+                   img_cut=False,
+                   progress_bar=None,
+                   ignore_designer=False):
     """生成GK-23a卡牌的完整函数，返回PIL.Image对象(或返回空值)"""
     if ignore_designer:
         design_tag = True
@@ -121,7 +124,7 @@ def cardbuild(character_data: dict,
 
     if design_tag:
         # 空白卡底
-        cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
+        card_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
         if progress_bar: progress_bar.setValue(5)  # progressBar - Setting
 
         # 角色立绘
@@ -130,13 +133,13 @@ def cardbuild(character_data: dict,
                 character_image = imgcut(img_path + character_data['id'] + '.png')
             else:
                 character_image = Image.open(img_path + character_data['id'] + '.png')
-            cardimg.paste(character_image, (380, 120))
-        except Exception as errorinfo:
-            wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo), 'Error')
+            card_img.paste(character_image, (380, 120))
+        except Exception as error_info:
+            wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(error_info), 'Error')
         if progress_bar: progress_bar.setValue(12)  # progressBar - Setting
         # 技能说明
         try:
-            skillimg = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
+            skill_img = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
             # 技能文本
             height = 50
             length = 45
@@ -145,7 +148,7 @@ def cardbuild(character_data: dict,
                 fill_color = color[0]
                 if not skill_data['origin']:
                     fill_color = 'black'
-                imgdraw(skillimg, (50, height), skill_data['name'], fill_color,
+                imgdraw(skill_img, (50, height), skill_data['name'], fill_color,
                         'topic', 7, color[1])
                 skilltext_origin = skill_data['description']
                 # 花色标记
@@ -171,7 +174,7 @@ def cardbuild(character_data: dict,
                 while True:
                     while True:
                         textline = skilltext_origin[:length]
-                        linelen = ImageDraw.Draw(skillimg).textbbox(
+                        linelen = ImageDraw.Draw(skill_img).textbbox(
                             (50, height + 95),
                             textline,
                             font['text'],
@@ -194,13 +197,13 @@ def cardbuild(character_data: dict,
                                 length -= 1
                             textline = skilltext_origin[:length]
                             break
-                    imgdraw(skillimg, (50, height + 95), textline, 'black')
+                    imgdraw(skill_img, (50, height + 95), textline, 'black')
                     if suit_exist:
                         point = 0
                         while point <= len(textline):
                             if textline[:point][-1:] == '　':
                                 point_sign.append(
-                                    ImageDraw.Draw(skillimg).textbbox(
+                                    ImageDraw.Draw(skill_img).textbbox(
                                         (50, height + 95),
                                         textline[:point - 1],
                                         font['text'],
@@ -234,7 +237,7 @@ def cardbuild(character_data: dict,
                             suit_color = 'black'
                             suit_text = '♣'
                         imgdraw(
-                            skillimg,
+                            skill_img,
                             (point_sign[point][2], point_sign[point][3] - 84),
                             suit_text, suit_color, 'suit')
                         point += 1
@@ -248,7 +251,7 @@ def cardbuild(character_data: dict,
                 while True:
                     while True:
                         textline = boldtext[:length]
-                        linelen = ImageDraw.Draw(skillimg).textbbox(
+                        linelen = ImageDraw.Draw(skill_img).textbbox(
                             (50, body_height + 95),
                             textline,
                             font['text'],
@@ -273,7 +276,7 @@ def cardbuild(character_data: dict,
                                 length -= 1
                             textline = boldtext[:length]
                             break
-                    imgdraw(skillimg, (50, body_height + 95), textline,
+                    imgdraw(skill_img, (50, body_height + 95), textline,
                             'black', 'category')
                     boldtext = boldtext[length:]
                     body_height += 77
@@ -282,7 +285,7 @@ def cardbuild(character_data: dict,
                         break
                     else:
                         length = 45
-            imgdraw(skillimg, (50, height + 10),
+            imgdraw(skill_img, (50, height + 10),
                     'GenshinKill ' + versions + ' | Designer: ' +
                     character_data['designer'] +
                     ' , Artist: miHoYo',
@@ -290,31 +293,31 @@ def cardbuild(character_data: dict,
                     font_style='sign')
             if progress_bar: progress_bar.setValue(55)  # progressBar - Setting
             # 技能图层剪切
-            skillimg = skillimg.crop((0, 0, 2000, height + 100))
-            cardimg.alpha_composite(skillimg, (380, 3260 - height))  # 技能层叠加
-        except Exception as errorinfo:
-            wlog(__file__, wlog_path, character_data['id'] + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
+            skill_img = skill_img.crop((0, 0, 2000, height + 100))
+            card_img.alpha_composite(skill_img, (380, 3260 - height))  # 技能层叠加
+        except Exception as error_info:
+            wlog(__file__, wlog_path, character_data['id'] + '在技能生成阶段发生错误：' + str(error_info), 'Error')
         if progress_bar: progress_bar.setValue(60)  # progressBar - Setting
 
         # 元素外框
         try:
             with Image.open(os_path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
-                cardimg.alpha_composite(frame)
-        except Exception as errorinfo:
-            wlog(__file__, wlog_path, character_data['id'] + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
+                card_img.alpha_composite(frame)
+        except Exception as error_info:
+            wlog(__file__, wlog_path, character_data['id'] + '在元素外框生成阶段发生错误：' + str(error_info), 'Error')
         if progress_bar: progress_bar.setValue(68)  # progressBar - Setting
 
         # 神之眼
         try:
             with Image.open(os_path.join('data', 'img', 'szy', character_data['country'] + '.png')) as dizuo:
-                cardimg.alpha_composite(dizuo)
+                card_img.alpha_composite(dizuo)
             tuanimg = character_data['element']
             if character_data['country'] == 'liyue':
                 tuanimg += '_'
             with Image.open(os_path.join('data', 'img', 'szy', tuanimg + '.png')) as tuan:
-                cardimg.alpha_composite(tuan)
-        except Exception as errorinfo:
-            wlog(__file__, wlog_path, character_data['id'] + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
+                card_img.alpha_composite(tuan)
+        except Exception as error_info:
+            wlog(__file__, wlog_path, character_data['id'] + '在神之眼生成阶段发生错误：' + str(error_info), 'Error')
         if progress_bar: progress_bar.setValue(76)  # progressBar - Setting
 
         # 名字、称号
@@ -331,7 +334,7 @@ def cardbuild(character_data: dict,
                 anchor='mt')[3]
             imgdraw(infoimg, (245, namehigh), character_data['title'],
                     (255, 192, 0, 255), 'title', 4, 'black', 'mt')
-            cardimg.alpha_composite(infoimg)
+            card_img.alpha_composite(infoimg)
 
             # 体力值、初始护甲
             HPimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
@@ -383,15 +386,15 @@ def cardbuild(character_data: dict,
                     with Image.open(os_path.join('data', 'img', 'icon', 'Armor.png')) as AP:
                         HPimg.alpha_composite(AP, (160, 2500))
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
-            cardimg.alpha_composite(HPimg)
+            card_img.alpha_composite(HPimg)
             if progress_bar: progress_bar.setValue(96)  # progressBar - Setting
-        except Exception as errorinfo:
+        except Exception as error_info:
             wlog(__file__, wlog_path,
-                 character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
+                 character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(error_info), 'Error')
         message = character_data['name'] + ' (' + character_data['id'] + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
         if progress_bar: progress_bar.setValue(100)  # progressBar - Setting
-        return cardimg
+        return card_img
     else:
         wlog(__file__, 'out/debug.log', character_data['id'] + ' 未设计完成，已跳过生成。')
         return None

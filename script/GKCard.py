@@ -39,7 +39,7 @@ class GKCharacterCard:
         }
         for i in range(1, self.skill_num + 1):
             skill = f'skill{i}'
-            if getattr(self, skill).get('name', None) and getattr(self, skill).get('description', None):
+            if getattr(self, skill).get('name', None):
                 datas['skills'].append(getattr(self, skill))
         return datas
 
