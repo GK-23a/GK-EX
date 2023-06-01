@@ -1,14 +1,16 @@
 from os import path
 from time import asctime, localtime, time
 
-def get_time(l = 0 , r = 0):
-    return asctime(localtime(time()))[4+l:19+r]
 
-def wlog(filename, logfile, logbody, level='Info'):
+def get_time(left=0, right=0):
+    return asctime(localtime(time()))[4 + left:19 + right]
+
+
+def wlog(filename, logfile, log_body, level='Info'):
     # 日志结构：[时间戳] 消息级别: <文件名> 消息内容
-    nowtime = '[' + get_time() + ']'
+    now_time = '[' + get_time() + ']'
     with open(logfile, 'a', encoding='UTF-8') as log:
-        log.write(nowtime + ' ' +  level +': <' + path.basename(filename) + '> ' + logbody + '\n')
+        log.write(now_time + ' ' + level + ': <' + path.basename(filename) + '> ' + log_body + '\n')
 
 
 sex_dict = {'male': 0, 'female': 1, 'both': 2}
@@ -54,23 +56,28 @@ dlc_dict = {
 def country(body: str) -> int:
     return country_dict[body]
 
+
 def country_back(num: int) -> str:
     for key, value in country_dict.items():
         if value == num:
             return key
     return ''
 
+
 def sex(body: str) -> int:
     return sex_dict[body]
-    
+
+
 def sex_back(num: int) -> str:
     for key, value in sex_dict.items():
         if value == num:
             return key
     return ''
 
+
 def element(body: str) -> int:
     return element_dict[body]
+
 
 def element_back(num: int) -> str:
     for key, value in element_dict.items():
@@ -78,8 +85,10 @@ def element_back(num: int) -> str:
             return key
     return ''
 
+
 def color(body: str) -> str:
     return element_color_dict[body]
+
 
 def color_back(body: str) -> str:
     for key, value in element_color_dict.items():
@@ -87,8 +96,10 @@ def color_back(body: str) -> str:
             return key
     return ''
 
+
 def dlcs(body: str) -> int:
     return dlc_dict[body]
+
 
 def dlcs_back(num: int) -> str:
     for key, value in dlc_dict.items():
@@ -96,11 +107,13 @@ def dlcs_back(num: int) -> str:
             return key
     return ''
 
+
 def star(star_level: int) -> int:
     if star_level == 5:
         return 0
     else:
         return 1
+
 
 def star_back(num: int) -> int:
     if num == 0:

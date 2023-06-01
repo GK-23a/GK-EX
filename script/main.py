@@ -11,23 +11,22 @@ from CharacterWindow import Ui_MainWindow
 import ExtraF
 import character_card
 
-with open('data/data.json', encoding='UTF-8') as jsonfile:
-    gk_data = json_loads(jsonfile.read())
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         # 预准备
-        self.gk_character_data = gk_data['character_data']
-        self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + gk_data['versions'])
+        with open('data/data.json', encoding='UTF-8') as jsonfile:
+            self.gk_data = json_loads(jsonfile.read())
+        self.gk_character_data = self.gk_data['character_data']
+        self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + self.gk_data['versions'])
         self.character_data = self.gk_character_data[:]
         self.cdict_id_to_name = {c['id']: c['name'] for c in self.gk_character_data}
         self.cdict_id_to_number = {c['id']: i for i, c in enumerate(self.gk_character_data)}
-        
+
         # 左侧筛选
         self.ui.listWidget_List.itemClicked.connect(self.on_listWidget_List_itemClicked)
         # 按钮组filter_button_group
@@ -42,28 +41,27 @@ class MainWindow(QMainWindow):
         for data in self.character_data:
             character = [data['id'], data['name']]
             item = QListWidgetItem(character[1])
-            item.setData(Qt.UserRole, character[0]) #type: ignore
+            item.setData(Qt.UserRole, character[0])  # type: ignore
             item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
             self.ui.listWidget_List.addItem(item)
             self.filter_list.append(character)
         self.save_list = []
         for j in self.filter_list:
             self.save_list.append(j[0])
-            
+
         # [开发] 不可使用
-        self.ui.comboBox_Filter.setEnabled(False)#DLC筛选
-        
+        self.ui.comboBox_Filter.setEnabled(False)  # DLC筛选
+
         # 生成图片
         self.ui.pushButton_ImageBuild.clicked.connect(self.on_pushButton_ImageBuild_clicked)
         # 添加角色
         self.ui.pushButton_NewCharacter.clicked.connect(self.on_pushButton_NewCharacter_click)
-        
+
         # 显示第一个
-        self.id = self.ui.listWidget_List.item(0).data(Qt.UserRole) #type: ignore
+        self.id = self.ui.listWidget_List.item(0).data(Qt.UserRole)  # type: ignore
         self.show_data()
         self.ui.listWidget_List.setCurrentRow(0)
 
-    
     def show_data(self):
         """显示数据"""
         self.data = self.character_data[self.cdict_id_to_number[self.id]]
@@ -74,14 +72,14 @@ class MainWindow(QMainWindow):
         self.ui.label_Text_AllName.setText(Allname)
         color_code = ExtraF.color(self.data['element'])
         palelle = QPalette()
-        palelle.setColor(QPalette.WindowText, QColor(color_code)) #type: ignore
+        palelle.setColor(QPalette.WindowText, QColor(color_code))  # type: ignore
         self.ui.label_Text_AllName.setPalette(palelle)
-        
+
         if self.data.get('id', False):
             self.ui.lineEdit_ID.setText(self.data['id'])
         else:
             raise
-        
+
         self.ui.lineEdit_Title.setText(self.data.get('title', '角色称号'))
         self.ui.lineEdit_Name.setText(self.data.get('name', '角色名称'))
         self.ui.lineEdit_Designer.setText(self.data.get('designer', '设计师'))
@@ -94,39 +92,40 @@ class MainWindow(QMainWindow):
         self.ui.checkBox_Finish.setChecked(bool(self.data.get('design_info', '0')))
         self.ui.comboBox_StarLevel.setCurrentIndex(ExtraF.star(self.data.get('level', 5)))
         self.ui.comboBox_DLC.setCurrentIndex(ExtraF.dlcs(self.data.get('dlc', 'others')))
-        
+
         self.imgpath = os_path.join('data', 'img', 'character', self.data['id'] + '.png')
         if os_path.exists(self.imgpath):
             with open(self.imgpath, 'rb') as f:
                 img_data = f.read()
             self.img = QImage.fromData(img_data)
-            self.img_scaled = self.img.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore
+            self.img_scaled = self.img.scaled(QSize(200, 320), Qt.KeepAspectRatio,
+                                              Qt.SmoothTransformation)  # type: ignore
             self.pixmap = QPixmap.fromImage(self.img_scaled)
             self.ui.label_Image.setPixmap(self.pixmap)
             self.ui.label_Image.setText('')
         else:
             self.ui.label_Image.setText('No Image.')
         self.outputimg = None
-        
+
         for i in range(1, 9):
             self.lineEdit_name = f"lineEdit_Skill{i}_Name"
             self.textEdit_Description = f"textEdit_Skill{i}_Description"
             self.checkBox_Enabled = f"checkBox_Skill{i}_Enabled"
             self.checkBox_Visibled = f"checkBox_Skill{i}_Visibled"
             if i <= len(self.data['skills']):
-                self.ui.tabWidget_Skill.setTabText(i-1, self.data['skills'][i-1]['name'])
-                getattr(self.ui, self.lineEdit_name).setText(self.data['skills'][i-1]['name'])
-                getattr(self.ui, self.textEdit_Description).setPlainText(self.data['skills'][i-1]['description'])
-                getattr(self.ui, self.checkBox_Visibled).setChecked(self.data['skills'][i-1]['origin'])
+                self.ui.tabWidget_Skill.setTabText(i - 1, self.data['skills'][i - 1]['name'])
+                getattr(self.ui, self.lineEdit_name).setText(self.data['skills'][i - 1]['name'])
+                getattr(self.ui, self.textEdit_Description).setPlainText(self.data['skills'][i - 1]['description'])
+                getattr(self.ui, self.checkBox_Visibled).setChecked(self.data['skills'][i - 1]['origin'])
                 getattr(self.ui, self.checkBox_Enabled).setChecked(True)
             else:
-                self.ui.tabWidget_Skill.setTabText(i-1, "+")
+                self.ui.tabWidget_Skill.setTabText(i - 1, "+")
                 getattr(self.ui, self.lineEdit_name).setText('')
                 getattr(self.ui, self.textEdit_Description).setPlainText('')
                 getattr(self.ui, self.checkBox_Visibled).setChecked(False)
                 getattr(self.ui, self.checkBox_Enabled).setChecked(False)
         self.now_id = self.data['id']
-        
+
     def save_data(self, data: dict):
         """保存数据"""
         # print(data)
@@ -151,12 +150,14 @@ class MainWindow(QMainWindow):
                                         # 检测到
                                         for s in skill:
                                             if s != 'enabled':
-                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][
+                                                    s]:
                                                     self.save_tag = True
                                                     self.save_info.append(
                                                         [ExtraF.get_time(), 'C', data['id'], 'skills', s,
-                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
-                                                        )
+                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s],
+                                                         self.saved_data['skills'][skill_num][s]]
+                                                    )
                                         self.ss.remove(skill['name'])
                                     else:
                                         # 未检测到——新增
@@ -166,7 +167,7 @@ class MainWindow(QMainWindow):
                                                 self.save_info.append(
                                                     [ExtraF.get_time(), 'A', data['id'], 'skills', s,
                                                      self.saved_data['skills'][skill_num][s]]
-                                                    )
+                                                )
                         except IndexError:
                             pass
                         for del_skill in self.ss:
@@ -177,10 +178,10 @@ class MainWindow(QMainWindow):
                                     self.save_info.append(
                                         [ExtraF.get_time(), 'D', data['id'], 'skills',
                                          skill['name']]
-                                        )
+                                    )
                                     # print(skill)
                                 else:
-                                    pass            
+                                    pass
                     else:
                         if key in self.gk_character_data[self.id_num]:
                             if self.saved_data[key] != self.gk_character_data[self.id_num][key]:
@@ -188,13 +189,13 @@ class MainWindow(QMainWindow):
                                 self.save_info.append(
                                     [ExtraF.get_time(), 'C', data['id'], key,
                                      self.gk_character_data[self.id_num][key], self.saved_data[key]]
-                                    )
+                                )
             elif self.now_id in self.save_list:
                 # 修改了ID
                 self.save_tag = True
                 self.save_info.append(
                     [ExtraF.get_time(), 'CI', self.now_id, 'id', data['id']]
-                    )
+                )
                 self.id_num = self.cdict_id_to_number[self.now_id]
                 for key in self.saved_data:
                     if key == 'skills':
@@ -211,12 +212,14 @@ class MainWindow(QMainWindow):
                                         # 检测到
                                         for s in skill:
                                             if s != 'enabled':
-                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][s]:
+                                                if skill[s] != self.gk_character_data[self.id_num]['skills'][skill_num][
+                                                    s]:
                                                     self.save_tag = True
                                                     self.save_info.append(
                                                         [ExtraF.get_time(), 'C', data['id'], 'skills', s,
-                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s], self.saved_data['skills'][skill_num][s]]
-                                                        )
+                                                         self.gk_character_data[self.id_num]['skills'][skill_num][s],
+                                                         self.saved_data['skills'][skill_num][s]]
+                                                    )
                                         self.ss.remove(skill['name'])
                                     else:
                                         # 未检测到——新增
@@ -226,7 +229,7 @@ class MainWindow(QMainWindow):
                                                 self.save_info.append(
                                                     [ExtraF.get_time(), 'A', data['id'], 'skills', s,
                                                      self.saved_data['skills'][skill_num][s]]
-                                                    )
+                                                )
                         except IndexError:
                             pass
                         for del_skill in self.ss:
@@ -235,14 +238,14 @@ class MainWindow(QMainWindow):
                                 self.save_info.append(
                                     [ExtraF.get_time(), 'D', data['id'], 'skills',
                                      del_skill]
-                                    )
+                                )
                     elif key != 'id':
                         if key in self.gk_character_data[self.id_num]:
                             if self.saved_data[key] != self.gk_character_data[self.id_num][key]:
                                 self.save_info.append(
                                     [ExtraF.get_time(), 'C', data['id'], key,
                                      self.gk_character_data[self.id_num][key], self.saved_data[key]]
-                                    )
+                                )
             else:
                 # 新增角色
                 self.save_tag = True
@@ -258,15 +261,15 @@ class MainWindow(QMainWindow):
                                             self.save_info.append(
                                                 [ExtraF.get_time(), 'A', data['id'], 'skills', s,
                                                  self.saved_data['skills'][skill_num][s]]
-                                                )
+                                            )
                         except IndexError:
                             pass
                     else:
                         self.save_info.append(
                             [ExtraF.get_time(), 'A', data['id'], key,
                              self.saved_data[key]]
-                            )
-        
+                        )
+
         data['skills'] = [d for d in data['skills'] if d['enabled']]
         for s in data['skills']:
             s.pop('enabled', None)
@@ -294,17 +297,16 @@ class MainWindow(QMainWindow):
             for data in self.character_data:
                 character = [data['id'], data['name']]
                 item = QListWidgetItem(character[1])
-                item.setData(Qt.UserRole, character[0]) #type: ignore
+                item.setData(Qt.UserRole, character[0])  # type: ignore
                 item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
                 self.ui.listWidget_List.addItem(item)
                 self.filter_list.append(character)
             self.save_list = []
             for j in self.filter_list:
                 self.save_list.append(j[0])
-            
+
         self.ui.progressBar.setValue(0)
 
-    
     # ID或名字列表点击 - 角色详情显示与保存
     def on_listWidget_List_itemClicked(self, item):
         """保存上一个角色内容，显示新的角色内容"""
@@ -341,11 +343,11 @@ class MainWindow(QMainWindow):
                     }
                 )
         self.save_data(self.saved_data)
-        
+
         # 显示
-        self.id = item.data(Qt.UserRole) #type: ignore
+        self.id = item.data(Qt.UserRole)  # type: ignore
         self.show_data()
- 
+
     # ID或名字筛选
     def on_filter_button_clicked(self, button):
         """筛选区左下按钮"""
@@ -354,17 +356,16 @@ class MainWindow(QMainWindow):
         elif button == self.ui.radioButton_FilterName:
             self.return_num = 1
         self.ui.listWidget_List.clear()
-        
+
         for character in self.filter_list:
             item = QListWidgetItem(character[self.return_num])
-            item.setData(Qt.UserRole, character[0]) #type: ignore
+            item.setData(Qt.UserRole, character[0])  # type: ignore
             item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
             self.ui.listWidget_List.addItem(item)
-  
-                
+
     # 添加角色
     def on_pushButton_NewCharacter_click(self):
-        
+
         i = 1
         self.newlist = []
         for j in self.filter_list:
@@ -374,7 +375,7 @@ class MainWindow(QMainWindow):
         self.new_id = 'new_character_' + str(i)
 
         self.item = QListWidgetItem(self.new_id)
-        self.item.setData(Qt.UserRole, self.new_id) #type: ignore
+        self.item.setData(Qt.UserRole, self.new_id)  # type: ignore
         self.item.setSizeHint(QSize(self.ui.listWidget_List.sizeHintForColumn(0), 16))
         self.ui.listWidget_List.addItem(self.item)
         self.filter_list.append([self.new_id, self.new_id])
@@ -394,19 +395,18 @@ class MainWindow(QMainWindow):
                 'armor_point': 0,
                 'dlc': 'genshin-standard',
                 'skills': []
-                }
-            )
+            }
+        )
         self.cdict_id_to_name[self.new_id] = self.new_id
         self.cdict_id_to_number[self.new_id] = len(self.cdict_id_to_number)
-        
-        self.ui.listWidget_List.setCurrentRow(len(self.filter_list)-1)
+
+        self.ui.listWidget_List.setCurrentRow(len(self.filter_list) - 1)
         self.on_listWidget_List_itemClicked(self.item)
-        
-        
+
     # 生成图片
     def on_pushButton_ImageBuild_clicked(self):
         """GK-23a 图片生成显示"""
-        
+
         self.cardbuild_data = {
             'id': self.ui.lineEdit_ID.text(),
             'title': self.ui.lineEdit_Title.text(),
@@ -436,24 +436,26 @@ class MainWindow(QMainWindow):
                         'origin': getattr(self.ui, self.checkBox_Visibled).isChecked()
                     }
                 )
-        
-        self.outputimg = character_card.cardbuild(self.cardbuild_data, gk_data['versions'], progress_bar=self.ui.progressBar, ignore_designer=True)
+
+        self.outputimg = character_card.cardbuild(self.cardbuild_data, self.gk_data['versions'],
+                                                  progress_bar=self.ui.progressBar, ignore_designer=True)
         if self.outputimg:
             self.qimg = ImageQt(self.outputimg)
-            self.img_scaled = self.qimg.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation) #type: ignore
+            self.img_scaled = self.qimg.scaled(QSize(200, 320), Qt.KeepAspectRatio,
+                                               Qt.SmoothTransformation)  # type: ignore
             self.pixmap = QPixmap.fromImage(self.img_scaled)
             self.ui.label_Image.setPixmap(self.pixmap)
             self.ui.label_Image.mousePressEvent = self.on_label_Image_clicked
         self.ui.progressBar.setValue(0)
-    
+
     def on_label_Image_clicked(self, ev):
         if self.outputimg:
             self.ui.progressBar.setValue(100)
             self.outputimg.show()
             self.ui.progressBar.setValue(0)
-            
+
     def closeEvent(self, event):
-        
+
         # 保存
         self.saved_data = {
             'id': self.ui.lineEdit_ID.text(),
@@ -487,11 +489,12 @@ class MainWindow(QMainWindow):
                 )
         self.save_data(self.saved_data)
         event.accept()
-    
+
+
 if __name__ == "__main__":
     app = QApplication(sys_argv)
 
     window = MainWindow()
     window.show()
-    
+
     app.exec()

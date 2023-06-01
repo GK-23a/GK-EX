@@ -2,33 +2,34 @@ from PIL import Image, ImageDraw, ImageFont
 from os import path as os_path, makedirs as os_makedirs
 
 from ExtraF import wlog
+import gk_card
 
 if not os_path.exists('out/character_img'):
     os_makedirs('out/character_img')
 
-## 预加载
+# 预加载
 
 # 字体
 font = {
-    'sign'     : ImageFont.truetype('data/font/MiSans-Light.ttf'       ,size=  56, encoding='utf-8'), # 卡底标记
-    'category' : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size=  72, encoding='utf-8'), # 技能类型
-    'text'     : ImageFont.truetype('data/font/MiSans-Regular.ttf'     ,size=  72, encoding='utf-8'), # 技能内容
-    'suit'     : ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf' ,size=  72, encoding='utf-8'), # 花色图标
-    'title'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size=  94, encoding='utf-8'), # 角色称号
-    'HP'       : ImageFont.truetype('data/font/MiSans-Semibold.ttf'    ,size= 100, encoding='utf-8'), # 特殊血条
-    'topic'    : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 120, encoding='utf-8'), # 技能标题
-    'name'     : ImageFont.truetype('data/font/SIMLI.TTF'              ,size= 300, encoding='utf-8')  # 角色名字
-    }
+    'sign': ImageFont.truetype('data/font/MiSans-Light.ttf', size=56, encoding='utf-8'),  # 卡底标记
+    'category': ImageFont.truetype('data/font/MiSans-Semibold.ttf', size=72, encoding='utf-8'),  # 技能类型
+    'text': ImageFont.truetype('data/font/MiSans-Regular.ttf', size=72, encoding='utf-8'),  # 技能内容
+    'suit': ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf', size=72, encoding='utf-8'),  # 花色图标
+    'title': ImageFont.truetype('data/font/SIMLI.TTF', size=94, encoding='utf-8'),  # 角色称号
+    'HP': ImageFont.truetype('data/font/MiSans-Semibold.ttf', size=100, encoding='utf-8'),  # 特殊血条
+    'topic': ImageFont.truetype('data/font/SIMLI.TTF', size=120, encoding='utf-8'),  # 技能标题
+    'name': ImageFont.truetype('data/font/SIMLI.TTF', size=300, encoding='utf-8')  # 角色名字
+}
 # 颜色
 topicyy_color = (126, 126, 126, 192)
 element_color = {
-    'pyro':    [(246, 136, 123), (226,  49,  29)],
-    'hydro':   [(122, 176, 255), ( 28, 114, 253)],
-    'cryo':    [(200, 230, 250), (152, 200, 232)],
+    'pyro': [(246, 136, 123), (226, 49, 29)],
+    'hydro': [(122, 176, 255), (28, 114, 253)],
+    'cryo': [(200, 230, 250), (152, 200, 232)],
     'electro': [(236, 137, 254), (211, 118, 240)],
-    'dendro':  [(182, 217, 133), (123, 180,  45)],
-    'anemo':   [(137, 232, 217), ( 51, 204, 179)],
-    'geo':     [(234, 209, 128), (207, 167,  38)],
+    'dendro': [(182, 217, 133), (123, 180, 45)],
+    'anemo': [(137, 232, 217), (51, 204, 179)],
+    'geo': [(234, 209, 128), (207, 167, 38)],
 }
 # 中文标点习惯修复
 punctuation = ['，', '。', '；', '：', '？', '！', '、']
@@ -43,7 +44,7 @@ def imgcut(img_path, width=2000, height=3240):
     img = Image.open(img_path)
     w, h = img.size
     scale = width / w
-    new_size = (int(w*scale), int(h*scale))
+    new_size = (int(w * scale), int(h * scale))
     new_img = img.resize(new_size)
     if new_size[1] < height:
         bg_img = Image.new('RGB', (width, height), (255, 255, 255))
@@ -54,7 +55,6 @@ def imgcut(img_path, width=2000, height=3240):
         box = (0, 0, width, height)
         bg_img = new_img.crop(box)
     return bg_img
-
 
 
 def imgdraw(bg,
@@ -80,7 +80,7 @@ def imgdraw(bg,
                  language='zh-Hans',
                  stroke_width=side_width,
                  stroke_fill=topicyy_color,
-                 encoding = 'UTF-8')
+                 encoding='UTF-8')
     elif font_style == 'name':
         img.text((position[0] + 4, position[1] + 4),
                  text,
@@ -91,7 +91,7 @@ def imgdraw(bg,
                  language='zh-Hans',
                  stroke_width=side_width + 4,
                  stroke_fill=(126, 126, 126, 160),
-                 encoding = 'UTF-8')
+                 encoding='UTF-8')
     img.text(position,
              text,
              fill=fill_color,
@@ -101,16 +101,16 @@ def imgdraw(bg,
              language='zh-Hans',
              stroke_width=side_width,
              stroke_fill=side_color,
-             encoding = 'UTF-8')
+             encoding='UTF-8')
 
 
 def cardbuild(character_data: dict,
               versions: str,
               wlog_path='out/debug.log',
               img_path='data/img/character/',
-              img_cut = False,
-              progress_bar = None,
-              ignore_designer = False):
+              img_cut=False,
+              progress_bar=None,
+              ignore_designer=False):
     """生成GK-23a卡牌的完整函数，返回PIL.Image对象(或返回空值)"""
     if ignore_designer:
         design_tag = True
@@ -118,11 +118,11 @@ def cardbuild(character_data: dict,
         design_tag = True
     else:
         design_tag = False
-    
+
     if design_tag:
         # 空白卡底
         cardimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-        if progress_bar: progress_bar.setValue(5) # progressBar - Setting
+        if progress_bar: progress_bar.setValue(5)  # progressBar - Setting
 
         # 角色立绘
         try:
@@ -132,8 +132,8 @@ def cardbuild(character_data: dict,
                 character_image = Image.open(img_path + character_data['id'] + '.png')
             cardimg.paste(character_image, (380, 120))
         except Exception as errorinfo:
-            wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo),'Error')
-        if progress_bar: progress_bar.setValue(12) # progressBar - Setting
+            wlog(__file__, wlog_path, character_data['id'] + '在角色立绘阶段发生错误：' + str(errorinfo), 'Error')
+        if progress_bar: progress_bar.setValue(12)  # progressBar - Setting
         # 技能说明
         try:
             skillimg = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
@@ -153,19 +153,18 @@ def cardbuild(character_data: dict,
                 point_sign = []
                 suit_exist = False
                 point = 0
-                
+
                 suit_dict = {'♥': ('heart',), '♠': ('spade',), '♦': ('diamond',), '♣': ('club',)}
                 while point < len(skilltext_origin):
-                    char = skilltext_origin[point:point+1]
+                    char = skilltext_origin[point:point + 1]
                     if char in suit_dict:
-                        skilltext_origin = skilltext_origin[:point] + '　' + skilltext_origin[point+1:]
+                        skilltext_origin = skilltext_origin[:point] + '　' + skilltext_origin[point + 1:]
                         suit_sign.extend(suit_dict[char])
                         suit_exist = True
                     elif char == '':
                         break
                     point += 1
 
-        
                 # 换行计算
                 body_height = height
                 body_skilltext_origin = skilltext_origin
@@ -191,7 +190,7 @@ def cardbuild(character_data: dict,
                                 else:
                                     length += 1
                             elif skilltext_origin[
-                                    length - 1:length] in left_punctuation:
+                                 length - 1:length] in left_punctuation:
                                 length -= 1
                             textline = skilltext_origin[:length]
                             break
@@ -263,9 +262,9 @@ def cardbuild(character_data: dict,
                             if boldtext[length:length + 1] in punctuation:
                                 length += 1
                             elif boldtext[length:length +
-                                          1] in right_punctuation:
+                                                 1] in right_punctuation:
                                 if boldtext[length + 1:length +
-                                            2] in punctuation:
+                                                       2] in punctuation:
                                     length -= 2
                                 else:
                                     length += 1
@@ -289,21 +288,21 @@ def cardbuild(character_data: dict,
                     ' , Artist: miHoYo',
                     'black',
                     font_style='sign')
-            if progress_bar: progress_bar.setValue(55) # progressBar - Setting
+            if progress_bar: progress_bar.setValue(55)  # progressBar - Setting
             # 技能图层剪切
             skillimg = skillimg.crop((0, 0, 2000, height + 100))
             cardimg.alpha_composite(skillimg, (380, 3260 - height))  # 技能层叠加
         except Exception as errorinfo:
             wlog(__file__, wlog_path, character_data['id'] + '在技能生成阶段发生错误：' + str(errorinfo), 'Error')
-        if progress_bar: progress_bar.setValue(60) # progressBar - Setting
-        
+        if progress_bar: progress_bar.setValue(60)  # progressBar - Setting
+
         # 元素外框
         try:
             with Image.open(os_path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
                 cardimg.alpha_composite(frame)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path,character_data['id'] + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
-        if progress_bar: progress_bar.setValue(68) # progressBar - Setting
+            wlog(__file__, wlog_path, character_data['id'] + '在元素外框生成阶段发生错误：' + str(errorinfo), 'Error')
+        if progress_bar: progress_bar.setValue(68)  # progressBar - Setting
 
         # 神之眼
         try:
@@ -315,8 +314,8 @@ def cardbuild(character_data: dict,
             with Image.open(os_path.join('data', 'img', 'szy', tuanimg + '.png')) as tuan:
                 cardimg.alpha_composite(tuan)
         except Exception as errorinfo:
-            wlog(__file__, wlog_path,character_data['id'] + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
-        if progress_bar: progress_bar.setValue(76) # progressBar - Setting
+            wlog(__file__, wlog_path, character_data['id'] + '在神之眼生成阶段发生错误：' + str(errorinfo), 'Error')
+        if progress_bar: progress_bar.setValue(76)  # progressBar - Setting
 
         # 名字、称号
         try:
@@ -339,24 +338,24 @@ def cardbuild(character_data: dict,
             HP_height = 3100
             HP_value = character_data['health_point']
             while HP_value != 0:
-                with Image.open(os_path.join('data', 'img','icon','HPyes.png')) as HP:
+                with Image.open(os_path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
                     HPimg.alpha_composite(HP, (160, HP_height))
                     HP_height -= 200
                     HP_value -= 1
             empty_HP_value = character_data[
-                'max_health_point'] - character_data['health_point']
+                                 'max_health_point'] - character_data['health_point']
             while empty_HP_value != 0:
-                with Image.open(os_path.join('data', 'img','icon','HPno.png')) as HP_empty:
+                with Image.open(os_path.join('data', 'img', 'icon', 'HPno.png')) as HP_empty:
                     HPimg.alpha_composite(HP_empty, (160, HP_height))
                     HP_height -= 200
                     empty_HP_value -= 1
             armor_value = character_data['armor_point']
             if armor_value != 0:
-                with Image.open(os_path.join('data', 'img','icon','Armor.png')) as AP:
+                with Image.open(os_path.join('data', 'img', 'icon', 'Armor.png')) as AP:
                     HPimg.alpha_composite(AP, (160, HP_height))
                     imgdraw(HPimg, (225, HP_height + 55), str(armor_value),
                             'black')
-            if progress_bar: progress_bar.setValue(84) # progressBar - Setting
+            if progress_bar: progress_bar.setValue(84)  # progressBar - Setting
             # 体力值区域后续结算：与称号和名字的防冲突（简单）
             textheight = ImageDraw.Draw(infoimg).textbbox(
                 (245, namehigh),
@@ -368,7 +367,7 @@ def cardbuild(character_data: dict,
                 anchor='mt')[3]
             if HP_height <= textheight:
                 HPimg = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-                with Image.open(os_path.join('data', 'img','icon','HPyes.png')) as HP:
+                with Image.open(os_path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
                     HPimg.alpha_composite(HP, (160, 2700))
                 ImageDraw.Draw(HPimg).text(
                     (215, 2900),
@@ -381,19 +380,20 @@ def cardbuild(character_data: dict,
                     stroke_width=8,
                     stroke_fill=(0, 115, 0))
                 if armor_value != 0:
-                    with Image.open(os_path.join('data', 'img','icon','Armor.png')) as AP:
+                    with Image.open(os_path.join('data', 'img', 'icon', 'Armor.png')) as AP:
                         HPimg.alpha_composite(AP, (160, 2500))
                         imgdraw(HPimg, (225, 2540), str(armor_value), 'black')
             cardimg.alpha_composite(HPimg)
-            if progress_bar: progress_bar.setValue(96) # progressBar - Setting
+            if progress_bar: progress_bar.setValue(96)  # progressBar - Setting
         except Exception as errorinfo:
-            wlog(__file__, wlog_path,character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
-        message = character_data['name'] + ' (' +character_data['id'] + ')' + '已成功完成生成。'
+            wlog(__file__, wlog_path,
+                 character_data['id'] + '在名字、称号、及初始体力与护甲计算阶段发生错误：' + str(errorinfo), 'Error')
+        message = character_data['name'] + ' (' + character_data['id'] + ')' + '已成功完成生成。'
         wlog(__file__, wlog_path, message)
-        if progress_bar: progress_bar.setValue(100) # progressBar - Setting
+        if progress_bar: progress_bar.setValue(100)  # progressBar - Setting
         return cardimg
     else:
-        wlog(__file__, 'out/debug.log',character_data['id'] + ' 未设计完成，已跳过生成。')
+        wlog(__file__, 'out/debug.log', character_data['id'] + ' 未设计完成，已跳过生成。')
         return None
 
 
@@ -409,7 +409,7 @@ def print_build(nine_cards_list: list):
         (0, 7040),
         (2520, 7040),
         (5040, 7040)
-        ]
+    ]
     a4page = Image.new('RGBA', (8168, 11552), (256, 256, 256, 256))
     try:
         i = 0
