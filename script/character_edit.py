@@ -1,11 +1,11 @@
 from json import loads as json_loads, dump as json_dump
-from sys import argv as sys_argv
 from os import path as os_path
+import sys
 
 from PIL.ImageQt import ImageQt
 from PySide6.QtGui import QColor, QPalette, QPixmap, QImage
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import (QApplication, QListWidgetItem, QMainWindow, QButtonGroup)
+from PySide6.QtWidgets import (QListWidgetItem, QMainWindow, QButtonGroup, QApplication)
 from CharacterWindow import Ui_MainWindow
 
 import ExtraF
@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
             with open('data/data.json', 'w', encoding='UTF-8') as jsonfile:
                 json_dump(self.gk_save_data, jsonfile, ensure_ascii=False)
             # 更改记录保存
-            with open('out/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
+            with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
                 for log in self.save_info:
                     gkcl.write(str(log) + '\n')
             # 重载
@@ -492,7 +492,7 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys_argv)
+    app = QApplication(sys.argv)
 
     window = MainWindow()
     window.show()
