@@ -19,7 +19,7 @@ class GKCharacterCard:
         self.skill1: dict = dict(name='', description='', visible=False)
 
     def do_pack(self) -> dict:
-        """将角色信息合成为一个字典，用于写入json文件。"""
+        """将角色信息合成为字典"""
         datas = {
             'id': self.id,
             'title': self.title,
@@ -43,7 +43,34 @@ class GKCharacterCard:
                 datas['skills'].append(getattr(self, skill))
         return datas
 
-    def add_skill(self):
+    def to_number(self, origin_key) -> int | None:
+        if origin_key == 'country':
+            country_numbers = {
+                "Mondstadt": 0,
+                "Liyue": 1,
+                "Inazuma": 2,
+                "Sumeru": 3,
+                "Fontaine": 4,
+                "Natlan": 5,
+                "Snezhnaya": 6,
+                "Khaenri'ah": 7,
+                'others': 8
+            }
+            return country_numbers.get(self.country, 8)
+        elif origin_key == 'element':
+            element_numbers = {
+                'pyro': 0,
+                'hydro': 1,
+                'anemo': 2,
+                'electro': 3,
+                'dendro': 4,
+                'cryo': 5,
+                'geo': 6,
+                'others': 7,
+            }
+            return element_numbers.get(self.element, 8)
+
+    def add_skill(self, skill_name):
         """新增角色技能"""
-        setattr(self, f'skill{self.skill_num}', dict(name='', description='', visible=False))
+        setattr(self, f'skill{self.skill_num}', dict(name=skill_name, description='', visible=False))
         self.skill_num += 1

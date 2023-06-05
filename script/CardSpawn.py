@@ -1,43 +1,48 @@
-from ExtraF import wlog
-import character_card
+import CardBuild
 import json
+import os
 
-# Setting: 是否生成打印张
-printbuild = False
+# build_a4_print: bool | 是否生成A4尺寸的打印版图片
+build_a4_print = False
 
-wlog(__file__, 'out/debug.log', '卡面构建开始。')
+# all_character: bool | 是否生成全部角色卡；若为True，忽略character_list
+all_character = True
 
-# 打印张生成准备
-cards = []
+# character_list: list | 生成角色卡的列表
+character_list = ['']
 
-wlog(__file__, 'out/debug.log', '角色图像构建开始。')
+# 读取json
+with open('data/data.json', encoding='UTF-8') as file:
+    file_data = json.loads(file.read())
+    character_datas = file_data['character_data']
+    card_versions = file_data['versions']
 
-# json读取
-with open('data/data.json', encoding='UTF-8') as jsonfile:
-    filedict = json.loads(jsonfile.read())
-    character_data = filedict['character_data']
-wlog(__file__, 'out/debug.log', '"data.json"读取完成。')
+if not os.path.exists(os.path.join('output', 'character_card')):
+    os.makedirs(os.path.join('output', 'character_card'))
 
-# 循环图像生成
-for ch in character_data:
-    ch_img = character_card.cardbuild(ch, filedict['versions'])
-    if ch_img:
-        ch_img.save('out/character_img/' + ch['id'] + '.png')
-        wlog(
-            __file__, 'out/debug.log', ch['name'] + ' (' + ch['id'] + ')已保存为 "' + ch['id'] + '.png" 。')
-        cards.append(ch_img)
+# 角色卡生成
+if all_character:
+    datas = character_datas
+else:
+    datas = []
+    for data in character_datas:
+        if data['id'] in character_list:
+            datas.append(data)
+for data in datas:
+    if data['design_info']:
+        ch_img = CardBuild.genshin_character_card(data, card_versions)
+        ch_img.save(os.path.join('output', 'character_card', data['id'] + '.png'))
+        character_list.append(ch_img)
+        if not all_character and len(character_list) == 1:
+            ch_img.show()
+        print(data['name'] + '构建结束')
+    else:
+        print(data['name'] + '不构建')
 
-wlog(__file__, 'out/debug.log', '角色图像生成已完成全部构建与保存。\n')
-
-# 打印张生成
-if printbuild:
-    wlog(__file__, 'out/debug.log', '打印张生成开始。')
-    cardss = [cards[i:i + 9] for i in range(0, len(cards), 9)]
+# 生成适用于A4打印的图像
+if build_a4_print:
+    card_group = [character_list[i:i + 9] for i in range(0, len(character_list), 9)]
     i = 1
-    for cards_ in cardss:
-        character_card.print_build(cards_).save('out/print/page-' + str(i) + '.png')
-        wlog(__file__, 'out/debug.log', '打印张' + str(i) + '生成、保存完成。')
+    for cards in card_group:
+        CardBuild.print_build(cards).save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
         i += 1
-    wlog(__file__, 'out/debug.log', '打印张生成结束。')
-
-wlog(__file__, 'out/debug.log', '卡面构建结束。\n')
