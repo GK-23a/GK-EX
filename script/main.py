@@ -1,6 +1,10 @@
+import json
+import os
+
+from PIL import Image, ImageQt
 from PySide6.QtCore import (QRect)
 from PySide6.QtGui import (QPalette)
-from PySide6.QtWidgets import (QApplication, QMainWindow, QScrollArea, QVBoxLayout, QWidget, QGridLayout, QLabel)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QScrollArea, QWidget, QLabel, QTabWidget)
 from sys import argv
 
 
@@ -10,30 +14,46 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('GK-23a 实体卡牌编辑器')
         self.resize(800, 600)
 
-        self.init_character_board()
+        # 数据加载
+        with open(os.path.join('data', 'data.json')) as data_file:
+            gk_data = json.load(data_file)
+        self.gk_character_data = gk_data.get('character_data')
+        self.gk_versions = dict(character_data=gk_data.get('character_data_versions'))
+        self.character_data = []
+        self.refresh_gk_data('character')
 
-    def init_character_board(self):
-        character_board = QWidget(self)
-        character_board.setGeometry(QRect(0, 0, 580, 700))
-        cboard_layout = QVBoxLayout(character_board)
-        cboard_layout.setGeometry(QRect(0, 0, 580, 700))
+        # 角色选择框
+        self.character_board = QWidget(self)
+        self.character_board.setGeometry(QRect(0, 0, 610, 700))
         character_area = QScrollArea(self)
-        character_area.setGeometry(QRect(25, 125, 600, 450))
-        character_area.setWidget(character_board)
-        character_area.setBackgroundRole(QPalette.Dark)
-    #     self.refresh_board()
+        character_area.setGeometry(QRect(25, 125, 620, 450))
+        character_area.setWidget(self.character_board)
+        self.refresh_board()
 
-    # def refresh_board(self):
-        for _ in ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo']:
-            element_widget = QWidget()
-            element_layout = QGridLayout(element_widget)
-            for i in range(8):
-                element_layout.setColumnStretch(i, 120)
+    def refresh_gk_data(self, data_type):
+        if data_type == 'character':
+            for cdata in self.gk_character_data:
+                pass
+            pass
+        pass
 
-            label1 = QLabel("Label 1")
-            element_layout.addWidget(label1, 0, 0)
-
-            cboard_layout.addWidget(element_widget)
+    def refresh_board(self):
+        board_height = 25
+        elt_title = dict()
+        elts = [
+            ['pyro', '火元素'],
+            ['hydro', '水元素'],
+            ['anemo', '风元素'],
+            ['electro', '雷元素'],
+            ['dendro', '草元素'],
+            ['cryo', '冰元素'],
+            ['geo', '岩元素'],
+        ]
+        for elt in elts:
+            elt_title[elt[0]] = QLabel(self.character_board)
+            elt_title[elt[0]].setText(elt[1] + ' | ' + elt[0].title())
+            elt_title[elt[0]].setGeometry(QRect(25, board_height, 450, 24))
+            board_height += 10 + 24
 
 
 if __name__ == "__main__":
