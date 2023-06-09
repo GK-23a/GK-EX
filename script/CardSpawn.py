@@ -1,4 +1,4 @@
-import CardBuild
+from script.GKCard.GenshinImpact import CardBuild
 import json
 import os
 
@@ -12,7 +12,7 @@ all_character = True
 character_list = ['']
 
 # 读取json
-with open('data/data.json', encoding='UTF-8') as file:
+with open(os.path.join('json', 'genshin-impact.json'), encoding='UTF-8') as file:
     file_data = json.loads(file.read())
     character_datas = file_data['character_data']
     card_versions = file_data['versions']

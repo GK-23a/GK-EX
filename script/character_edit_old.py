@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QListWidgetItem, QMainWindow, QButtonGroup, QAppl
 from CharacterWindow import Ui_MainWindow
 
 import ExtraF
-import CardBuild
+from script.GKCard.GenshinImpact import CardBuild
 
 
 class MainWindow(QMainWindow):
@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # 预准备
-        with open('data/data.json', encoding='UTF-8') as jsonfile:
+        with open(os.path.join('script', 'ghenshin-impact.json'), encoding='UTF-8') as jsonfile:
             self.gk_data = json_loads(jsonfile.read())
         self.gk_character_data = self.gk_data['character_data']
         self.ui.label_Text_Verions.setText('软件：v1.0   |   牌库：' + self.gk_data['versions'])
@@ -277,12 +277,12 @@ class MainWindow(QMainWindow):
         if self.save_tag:
             self.ui.progressBar.setValue(30)
             # 读取文件
-            with open('data/data.json', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('script', 'ghenshin-impact.json'), encoding='UTF-8') as jsonfile:
                 self.gk_save_data = json_loads(jsonfile.read())
             # 找到相应条目
             self.gk_save_data['character_data'][self.cdict_id_to_number[data['id']]] = data
             # 保存
-            with open('data/data.json', 'w', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('script', 'ghenshin-impact.json'), 'w', encoding='UTF-8') as jsonfile:
                 json_dump(self.gk_save_data, jsonfile, ensure_ascii=False)
             # 更改记录保存
             with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:

@@ -5,14 +5,14 @@ import os
 
 # 字体
 font = {
-    'sign': ImageFont.truetype(os.path.join('data', 'font', 'MiSans-Light.ttf'), size=56, encoding='utf-8'),  # 卡底标记
-    'category': ImageFont.truetype('data/font/MiSans-Semibold.ttf', size=72, encoding='utf-8'),  # 技能类型
-    'text': ImageFont.truetype('data/font/MiSans-Regular.ttf', size=72, encoding='utf-8'),  # 技能内容
-    'suit': ImageFont.truetype('data/font/有爱新黑CN-Regular.ttf', size=72, encoding='utf-8'),  # 花色图标
-    'title': ImageFont.truetype('data/font/SIMLI.TTF', size=94, encoding='utf-8'),  # 角色称号
-    'HP': ImageFont.truetype('data/font/MiSans-Semibold.ttf', size=100, encoding='utf-8'),  # 特殊血条
-    'topic': ImageFont.truetype('data/font/SIMLI.TTF', size=120, encoding='utf-8'),  # 技能标题
-    'name': ImageFont.truetype('data/font/SIMLI.TTF', size=300, encoding='utf-8')  # 角色名字
+    'sign': ImageFont.truetype(os.path.join('font', 'MiSans-Light.ttf'), size=56, encoding='utf-8'),  # 卡底标记
+    'category': ImageFont.truetype(os.path.join('font', 'MiSans-Semibold.ttf'), size=72, encoding='utf-8'),  # 技能类型
+    'text': ImageFont.truetype(os.path.join('font', 'MiSans-Regular.ttf'), size=72, encoding='utf-8'),  # 技能内容
+    'suit': ImageFont.truetype(os.path.join('font', '有爱新黑CN-Regular.ttf'), size=72, encoding='utf-8'),  # 花色图标
+    'title': ImageFont.truetype(os.path.join('font', 'SIMLI.ttf'), size=94, encoding='utf-8'),  # 角色称号
+    'HP': ImageFont.truetype(os.path.join('font', 'MiSans-Semibold.ttf'), size=100, encoding='utf-8'),  # 特殊血条
+    'topic': ImageFont.truetype(os.path.join('font', 'SIMLI.ttf'), size=120, encoding='utf-8'),  # 技能标题
+    'name': ImageFont.truetype(os.path.join('font', 'SIMLI.ttf'), size=300, encoding='utf-8')  # 角色名字
 }
 # 颜色
 shadow_color = (126, 126, 126, 192)
@@ -139,7 +139,7 @@ def img_draw(bg,
 
 def genshin_character_card(character_data: dict,
                            versions: str,
-                           img_path=os.path.join('data', 'img', 'character'),
+                           img_path=os.path.join('img', 'character'),
                            progress_bar=None) -> Image:
     """生成角色卡，返回Pillow的图像对象。如果进度条为'Qt'，则中途会传递至函数genshin_character_card_with_qt_progress_bar()。"""
 
@@ -310,18 +310,18 @@ def genshin_character_card(character_data: dict,
     card_img.alpha_composite(skill_img, (380, 3260 - skill_text_height))  # 技能层叠加
 
     # 元素外框
-    with Image.open(os.path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
+    with Image.open(os.path.join('img', 'frame', character_data['element'] + '.png')) as frame:
         card_img.alpha_composite(frame)
 
     # 神之眼
-    with Image.open(os.path.join('data', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+    with Image.open(os.path.join('img', 'vision', 'country', character_data['country'] + '.png')) as country:
         card_img.alpha_composite(country)
     icon_img = character_data['element']
     if character_data['country'] == 'liyue':
         icon_img += '_diamond'
     else:
         icon_img += '_circle'
-    with Image.open(os.path.join('data', 'img', 'vision', 'element', icon_img + '.png')) as element:
+    with Image.open(os.path.join('img', 'vision', 'element', icon_img + '.png')) as element:
         card_img.alpha_composite(element, (70, 80))
 
     # 名字、称号
@@ -342,20 +342,20 @@ def genshin_character_card(character_data: dict,
     hp_height = 3100
     hp_value = character_data['health_point']
     while hp_value != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
+        with Image.open(os.path.join('img', 'icon', 'HPyes.png')) as HP:
             hp_img.alpha_composite(HP, (160, hp_height))
             hp_height -= 200
             hp_value -= 1
     hp_value_empty = character_data['max_health_point'] - character_data['health_point']
     while hp_value_empty != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPno.png')) as HP_empty:
+        with Image.open(os.path.join('img', 'icon', 'HPno.png')) as HP_empty:
             hp_img.alpha_composite(HP_empty, (160, hp_height))
             hp_height -= 200
             hp_value_empty -= 1
     hp_height += 200
     armor_value = character_data['armor_point']
     if armor_value != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'Armor.png')) as AP:
+        with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
             hp_img.alpha_composite(AP, (160, hp_height+200))
             img_draw(hp_img, (225, hp_height + 255), str(armor_value), 'black')
     # 体力值区域后续结算：与称号和名字的防冲突（简单）
@@ -369,7 +369,7 @@ def genshin_character_card(character_data: dict,
         anchor='mt')[3]
     if hp_height <= text_height:
         hp_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
+        with Image.open(os.path.join('img', 'icon', 'HPyes.png')) as HP:
             hp_img.alpha_composite(HP, (160, 2700))
         ImageDraw.Draw(hp_img).text(
             (215, 2900),
@@ -381,7 +381,7 @@ def genshin_character_card(character_data: dict,
             stroke_width=8,
             stroke_fill=(0, 115, 0))
         if armor_value != 0:
-            with Image.open(os.path.join('data', 'img', 'icon', 'Armor.png')) as AP:
+            with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
                 hp_img.alpha_composite(AP, (160, 2500))
                 img_draw(hp_img, (225, 2540), str(armor_value), 'black')
     card_img.alpha_composite(hp_img)
@@ -546,18 +546,18 @@ def genshin_character_card_with_qt_progress_bar(
     card_img.alpha_composite(skill_img, (380, 3260 - skill_text_height))  # 技能层叠加
 
     # 元素外框
-    with Image.open(os.path.join('data', 'img', 'frame', character_data['element'] + '.png')) as frame:
+    with Image.open(os.path.join('img', 'frame', character_data['element'] + '.png')) as frame:
         card_img.alpha_composite(frame)
 
     # 神之眼
-    with Image.open(os.path.join('data', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+    with Image.open(os.path.join('img', 'vision', 'country', character_data['country'] + '.png')) as country:
         card_img.alpha_composite(country)
     icon_img = character_data['element']
     if character_data['country'] == 'liyue':
         icon_img += '_diamond'
     else:
         icon_img += '_circle'
-    with Image.open(os.path.join('data', 'img', 'vision', 'element', icon_img + '.png')) as element:
+    with Image.open(os.path.join('img', 'vision', 'element', icon_img + '.png')) as element:
         card_img.alpha_composite(element, (70, 80))
 
     # 名字、称号
@@ -578,20 +578,20 @@ def genshin_character_card_with_qt_progress_bar(
     hp_height = 3100
     hp_value = character_data['health_point']
     while hp_value != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
+        with Image.open(os.path.join('img', 'icon', 'HPyes.png')) as HP:
             hp_img.alpha_composite(HP, (160, hp_height))
             hp_height -= 200
             hp_value -= 1
     hp_value_empty = character_data['max_health_point'] - character_data['health_point']
     while hp_value_empty != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPno.png')) as HP_empty:
+        with Image.open(os.path.join('img', 'icon', 'HPno.png')) as HP_empty:
             hp_img.alpha_composite(HP_empty, (160, hp_height))
             hp_height -= 200
             hp_value_empty -= 1
     hp_height += 200
     armor_value = character_data['armor_point']
     if armor_value != 0:
-        with Image.open(os.path.join('data', 'img', 'icon', 'Armor.png')) as AP:
+        with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
             hp_img.alpha_composite(AP, (160, hp_height+200))
             img_draw(hp_img, (225, hp_height + 255), str(armor_value), 'black')
     # 体力值区域后续结算：与称号和名字的防冲突（简单）
@@ -605,7 +605,7 @@ def genshin_character_card_with_qt_progress_bar(
         anchor='mt')[3]
     if hp_height <= text_height:
         hp_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-        with Image.open(os.path.join('data', 'img', 'icon', 'HPyes.png')) as HP:
+        with Image.open(os.path.join('img', 'icon', 'HPyes.png')) as HP:
             hp_img.alpha_composite(HP, (160, 2700))
         ImageDraw.Draw(hp_img).text(
             (215, 2900),
@@ -617,7 +617,7 @@ def genshin_character_card_with_qt_progress_bar(
             stroke_width=8,
             stroke_fill=(0, 115, 0))
         if armor_value != 0:
-            with Image.open(os.path.join('data', 'img', 'icon', 'Armor.png')) as AP:
+            with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
                 hp_img.alpha_composite(AP, (160, 2500))
                 img_draw(hp_img, (225, 2540), str(armor_value), 'black')
     card_img.alpha_composite(hp_img)
