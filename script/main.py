@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication
 from sys import argv
-import GenshinImpact_MainWindow
+from Genshin import MainWindow
 
 """
  ██████╗ ██╗  ██╗     ██████╗ ██████╗  █████╗     ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗
@@ -13,6 +13,6 @@ import GenshinImpact_MainWindow
 
 if __name__ == "__main__":
     app = QApplication(argv)
-    window = GenshinImpact_MainWindow.MainWindow()
+    window = MainWindow.MainWindow()
     window.show()
     app.exec()

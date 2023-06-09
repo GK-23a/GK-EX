@@ -1,7 +1,7 @@
 
 
 ################################################################################
-## Form generated from reading UI file 'CharacterWindow.ui'
+## Form generated from reading UI file
 ##
 ## Created by: Qt User Interface Compiler version 6.5.0
 ##

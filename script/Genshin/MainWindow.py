@@ -5,7 +5,7 @@ from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap, QCursor)
 from PySide6.QtWidgets import (QMainWindow, QScrollArea, QWidget, QLabel)
 
-import GKCard.GenshinImpact
+from script.Genshin import GKCard
 
 
 class MainWindow(QMainWindow):
@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
                 self.data_list[elt[0] + '_character'] = list()
             for cdata in self.gk_character_data:
                 cid = cdata.get('id')
-                self.character_data[cid] = GKCard.GenshinImpact.GKCharacterCard(cid)
+                self.character_data[cid] = GKCard.GKCharacterCard(cid)
                 self.character_data[cid].unpack(cdata)
                 self.data_list[self.character_data[cid].element + '_character'].append(cid)
             for elt in self.elts:

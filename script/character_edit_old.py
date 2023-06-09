@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QListWidgetItem, QMainWindow, QButtonGroup, QAppl
 from CharacterWindow import Ui_MainWindow
 
 import ExtraF
-from script.GKCard.GenshinImpact import CardBuild
+from script.Genshin.GKCard import CardBuild
 
 
 class MainWindow(QMainWindow):

@@ -1,4 +1,4 @@
-from script.GKCard.GenshinImpact import CardBuild
+from script.Genshin.GKCard import CardBuild
 import json
 import os
 
