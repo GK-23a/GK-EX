@@ -13,6 +13,7 @@ from Genshin import MainWindow, EditCharacter, GKCard
 
 if __name__ == "__main__":
     app = QApplication(argv)
-    window = MainWindow.MainWindow()
+#    window = MainWindow.MainWindow()
+    window = EditCharacter.EditWindow('kokomi')  # debug
     window.show()
     app.exec()
