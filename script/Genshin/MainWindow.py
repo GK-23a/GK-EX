@@ -11,7 +11,7 @@ from script.Genshin import GKCard
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('GK-23a 实体卡牌编辑器 - Genshin Impact')
+        self.setWindowTitle('实体卡牌编辑器 - GK23a/Genshin')
         self.setFixedSize(800, 600)
 
         font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))

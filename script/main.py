@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication
 from sys import argv
-from Genshin import MainWindow
+from Genshin import MainWindow, EditCharacter, GKCard
 
 """
  ██████╗ ██╗  ██╗     ██████╗ ██████╗  █████╗     ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗
