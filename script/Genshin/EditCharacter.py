@@ -2,13 +2,14 @@ import json
 import os
 from time import asctime, localtime, time
 
+from PIL.ImageQt import ImageQt
 from PySide6.QtCore import QRect, QSize, Qt
 from PySide6.QtGui import QFontDatabase, QFont, QImage, QPixmap
 from PySide6.QtWidgets import (QLabel, QLineEdit, QCheckBox, QComboBox, QWidget, QPushButton, QSpinBox, QProgressBar,
                                QGroupBox, QPlainTextEdit, QTabWidget, QMessageBox, QDialogButtonBox, QDialog)
 
+from script.Genshin import CardBuild, GKCard
 from script.NWidgets import TabWidget as NTabWidget
-from script.Genshin.GKCard import GKCharacterCard
 
 
 def get_time(left=0, right=0):
@@ -121,9 +122,9 @@ class EditWindow(QWidget):
         self.data_armor.setGeometry(QRect(365, 118, 40, 20))
 
         # 进度条
-        pg_bar = QProgressBar(self)
-        pg_bar.setGeometry(QRect(510, 30, 160, 18))
-        pg_bar.setFormat('')
+        self.pg_bar = QProgressBar(self)
+        self.pg_bar.setGeometry(QRect(510, 30, 160, 18))
+        self.pg_bar.setFormat('')
         # 图片
         image_box = QGroupBox(self)
         image_box.setGeometry(QRect(415, 60, 214, 350))
@@ -142,21 +143,22 @@ class EditWindow(QWidget):
         with open(os.path.join('json', 'genshin-impact.json'), encoding='UTF-8') as self.data_file:
             self.gk_data = json.load(self.data_file)
             gk_character_data = self.gk_data.get('character_data')
-            gk_versions = dict(character_data=self.gk_data.get('character_self.data_versions'))
-        self.sdata = dict()
+            self.gk_versions = dict(character_data=self.gk_data.get('character_data_versions'))
+        self.sdata = 0
         if isinstance(cid, int):
             d = gk_character_data[cid]
-            self.ch_card = GKCharacterCard(d.get('id'))
+            self.ch_card = GKCard.GKCharacterCard(d.get('id'))
             self.ch_card.unpack(d)
             self.sdata = d
         elif isinstance(cid, str):
-            self.ch_card = GKCharacterCard(cid)
+            self.ch_card = GKCard.GKCharacterCard(cid)
             for d in gk_character_data:
                 if d.get('id') == cid:
                     self.ch_card.unpack(d)
                     self.sdata = d
                     break
-            raise
+            if self.sdata == 0:
+                raise
         else:
             raise
 
@@ -177,7 +179,7 @@ class EditWindow(QWidget):
         build_image = QPushButton(self)
         build_image.setGeometry(QRect(415, 28, 90, 22))
         build_image.setText('生成角色图片')
-        build_image.setEnabled(False)
+        build_image.clicked.connect(self.build_image)
 
     def refresh_data(self):
         self.setWindowTitle(f'编辑角色 {self.ch_card.name} - GK-23a/Genshin')
@@ -206,12 +208,12 @@ class EditWindow(QWidget):
             self.show_image.setText('No Image.')
         # 技能显示
         for i in range(1, self.ch_card.skill_num + 1):
-            sw = f'show_skill{i}_Widget'
-            sn = f'show_skill{i}_Name'
-            dn = f'self.data_skill{i}_Name'
-            sd = f'show_skill{i}_Description'
-            dd = f'self.data_skill{i}_Description'
-            dv = f'self.data_skill{i}_Visible'
+            sw = f'show_skill{i}_widget'
+            sn = f'show_skill{i}_name'
+            dn = f'self.data_skill{i}_name'
+            sd = f'show_skill{i}_description'
+            dd = f'self.data_skill{i}_description'
+            dv = f'self.data_skill{i}_visible'
             self.add_skill(getattr(self.ch_card, f'skill{i}'), sw, sn, dn, sd, dd, dv)
 
             getattr(self, dn).setText(getattr(self.ch_card, f'skill{i}').get('name'))
@@ -237,8 +239,7 @@ class EditWindow(QWidget):
 
         self.data_skill.addTab(getattr(self, sw), data.get('name'))
 
-    def save_data(self, refresh):
-
+    def build_image(self):
         self.ch_card.id = self.data_id.text()
         self.ch_card.name = self.data_name.text()
         self.ch_card.title = self.data_title.text()
@@ -252,10 +253,41 @@ class EditWindow(QWidget):
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
         for i in range(1, self.ch_card.skill_num + 1):
-            tp_n = getattr(self, f'self.data_skill{i}_Name').text()
-            tp_d = getattr(self, f'self.data_skill{i}_Description').toPlainText()
-            tp_v = bool(getattr(self, f'self.data_skill{i}_Visible').isChecked())
-            setattr(self.ch_card, f'skill{i}', [tp_n, tp_d, tp_v])
+            tp_n = getattr(self, f'self.data_skill{i}_name').text()
+            tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
+            tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
+            setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
+        build_data = self.ch_card.pack()
+        try:
+            cimg = CardBuild.genshin_character_card(build_data, self.gk_versions['character_data'],
+                                                    progress_bar=self.pg_bar)
+        except Exception as error_body:
+            self.show_image.setText(str(error_body))
+        else:
+            image = ImageQt(cimg)
+            image_scaled = image.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap.fromImage(image_scaled)
+            self.show_image.setPixmap(pixmap)
+            self.show_image.setText('')
+
+    def save_data(self, refresh):
+        self.ch_card.id = self.data_id.text()
+        self.ch_card.name = self.data_name.text()
+        self.ch_card.title = self.data_title.text()
+        self.ch_card.designer = self.data_designer.text()
+        self.ch_card.design_state = bool(self.data_design_state.isChecked())
+        self.ch_card.sex = self.ch_card.number_to(self.data_sex.currentIndex(), 'sex')
+        self.ch_card.level = self.data_level.value()
+        self.ch_card.country = self.ch_card.number_to(self.data_country.currentIndex(), 'country')
+        self.ch_card.element = self.ch_card.number_to(self.data_element.currentIndex(), 'element')
+        self.ch_card.health_point = self.data_health_def.value()
+        self.ch_card.max_health_point = self.data_health_max.value()
+        self.ch_card.armor_point = self.data_armor.value()
+        for i in range(1, self.ch_card.skill_num + 1):
+            tp_n = getattr(self, f'self.data_skill{i}_name').text()
+            tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
+            tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
+            setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         saved_data = self.ch_card.pack()
         if saved_data != self.sdata:
             # 保存准备
@@ -308,7 +340,7 @@ class EditWindow(QWidget):
                 for log in save_info:
                     gkcl.write(str(log) + '\n')
         if refresh:
-            self.ch_card = GKCharacterCard('')
+            self.ch_card = GKCard.GKCharacterCard('')
             self.ch_card.unpack(saved_data)
             self.refresh_data()
             pass
@@ -342,7 +374,6 @@ class EditWindow(QWidget):
         self.data_id.setText(new_id)
 
     def closeEvent(self, event):
-
         self.ch_card.id = self.data_id.text()
         self.ch_card.name = self.data_name.text()
         self.ch_card.title = self.data_title.text()
@@ -356,12 +387,11 @@ class EditWindow(QWidget):
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
         for i in range(1, self.ch_card.skill_num + 1):
-            tp_n = getattr(self, f'self.data_skill{i}_Name').text()
-            tp_d = getattr(self, f'self.data_skill{i}_Description').toPlainText()
-            tp_v = bool(getattr(self, f'self.data_skill{i}_Visible').isChecked())
-            setattr(self.ch_card, f'skill{i}', [tp_n, tp_d, tp_v])
+            tp_n = getattr(self, f'self.data_skill{i}_name').text()
+            tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
+            tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
+            setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         saved_data = self.ch_card.pack()
-        print(saved_data)
 
         if saved_data != self.sdata:
             exit_tip = QMessageBox()

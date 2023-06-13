@@ -5,7 +5,7 @@ from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap, QCursor)
 from PySide6.QtWidgets import (QMainWindow, QScrollArea, QWidget, QLabel)
 
-from script.Genshin import GKCard
+from script.Genshin import GKCard, EditCharacter
 
 
 class MainWindow(QMainWindow):
@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         font.setStyleStrategy(QFont.PreferAntialias)
         self.setFont(font)
 
+        self.edit_windows = dict()
         self.elts = [
             ['pyro', '火元素'],
             ['hydro', '水元素'],
@@ -105,14 +106,14 @@ class MainWindow(QMainWindow):
             temp_var = 0
             for i, d in enumerate(self.data_list.get(elt[0] + '_character')):
                 setattr(self, d + '_widget', QWidget(self.card_board))
+                getattr(self, d + '_widget').data_id = d
                 getattr(self, d + '_widget').setGeometry(QRect(
                     10 * (i % 7 + 2) - 1 + 72 * (i % 7),
                     board_height + (10 + 96) * (i // 7),
-                    72,
-                    96))
+                    72, 96))
                 getattr(self, d + '_widget').setStyleSheet('border: 1px solid #888888;')
                 getattr(self, d + '_widget').setCursor(Qt.PointingHandCursor)
-                # getattr(self, d + '_widget').mousePressEvent = self.on_img_label_clicked
+                getattr(self, d + '_widget').mousePressEvent = lambda event, cid=d: self.on_img_label_clicked(event, cid)
                 setattr(self, d + '_txt_label', QLabel(getattr(self, d + '_widget')))
                 getattr(self, d + '_txt_label').setGeometry(QRect(0, 72, 72, 24))
                 getattr(self, d + '_txt_label').setText(self.character_data.get(d).name)
@@ -145,5 +146,15 @@ class MainWindow(QMainWindow):
             board_height += (10 + 96) * (temp_var // 7 + 1) + 5
         self.card_board.setGeometry(QRect(0, 0, 610, board_height))
 
-    def on_img_label_clicked(self, a):
-        pass
+    def on_img_label_clicked(self, event, cid):
+        if cid in self.edit_windows:
+            edit_window = self.edit_windows[cid]
+            edit_window.activateWindow()
+            edit_window.show()
+        else:
+            edit_window = EditCharacter.EditWindow(cid)
+            edit_window.show()
+            self.edit_windows[cid] = edit_window
+        self.refresh_gk_data('character')
+        self.refresh_character_board()
+
