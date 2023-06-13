@@ -1,13 +1,13 @@
 number_dict = {
     'country': [
-        'Mondstadt',
-        'Liyue',
-        'Inazuma',
-        'Sumeru',
-        'Fontaine',
-        'Natlan',
-        'Snezhnaya',
-        "Khaenri'ah"
+        'mondstadt',
+        'liyue',
+        'inazuma',
+        'sumeru',
+        'fontaine',
+        'natlan',
+        'snezhnaya',
+        "khaenri'ah"
     ],
     'element': ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'],
     'sex': ['male', 'female']
@@ -77,7 +77,7 @@ class GKCharacterCard:
         self.dlc = pack.get('dlc', 'others')
         self.skill_num = len(pack.get('skills'))
         for i, sdata in enumerate(pack.get('skills')):
-            setattr(self, f'skill{i}', dict(
+            setattr(self, f'skill{i+1}', dict(
                 name=sdata.get('name', ''),
                 description=sdata.get('description', ''),
                 visible=bool(sdata.get('visible', 0))))
@@ -103,5 +103,5 @@ class GKCharacterCard:
 
     def add_skill(self, skill_name, description='', visible=False):
         """新增角色技能"""
-        setattr(self, f'skill{self.skill_num}', dict(name=skill_name, description=description, visible=visible))
         self.skill_num += 1
+        setattr(self, f'skill{self.skill_num}', dict(name=skill_name, description=description, visible=visible))

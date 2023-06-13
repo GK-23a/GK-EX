@@ -1,4 +1,6 @@
-from PySide6 import QtCore, QtGui, QtWidgets
+"""来源：https://www.coder.work/article/2004856"""
+
+from PySide6 import QtCore, QtWidgets
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -13,6 +15,7 @@ class TabBar(QtWidgets.QTabBar):
 
         for i in range(self.count()):
             self.initStyleOption(opt, i)
+            # noinspection PyUnresolvedReferences
             painter.drawControl(QtWidgets.QStyle.CE_TabBarTabShape, opt)
             painter.save()
 
@@ -26,7 +29,8 @@ class TabBar(QtWidgets.QTabBar):
             painter.translate(c)
             painter.rotate(90)
             painter.translate(-c)
-            painter.drawControl(QtWidgets.QStyle.CE_TabBarTabLabel, opt);
+            # noinspection PyUnresolvedReferences
+            painter.drawControl(QtWidgets.QStyle.CE_TabBarTabLabel, opt)
             painter.restore()
 
 
@@ -34,4 +38,5 @@ class TabWidget(QtWidgets.QTabWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QTabWidget.__init__(self, *args, **kwargs)
         self.setTabBar(TabBar(self))
+        # noinspection PyUnresolvedReferences
         self.setTabPosition(QtWidgets.QTabWidget.West)
