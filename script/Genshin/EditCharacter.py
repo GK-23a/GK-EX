@@ -206,12 +206,12 @@ class EditWindow(QWidget):
             self.show_image.setText('No Image.')
         # 技能显示
         for i in range(1, self.ch_card.skill_num + 1):
-            sw = f"show_skill{i}_Widget"
-            sn = f"show_skill{i}_Name"
-            dn = f"self.data_skill{i}_Name"
-            sd = f"show_skill{i}_Description"
-            dd = f"self.data_skill{i}_Description"
-            dv = f"self.data_skill{i}_Visible"
+            sw = f'show_skill{i}_Widget'
+            sn = f'show_skill{i}_Name'
+            dn = f'self.data_skill{i}_Name'
+            sd = f'show_skill{i}_Description'
+            dd = f'self.data_skill{i}_Description'
+            dv = f'self.data_skill{i}_Visible'
             self.add_skill(getattr(self.ch_card, f'skill{i}'), sw, sn, dn, sd, dd, dv)
 
             getattr(self, dn).setText(getattr(self.ch_card, f'skill{i}').get('name'))
@@ -238,6 +238,24 @@ class EditWindow(QWidget):
         self.data_skill.addTab(getattr(self, sw), data.get('name'))
 
     def save_data(self, refresh):
+
+        self.ch_card.id = self.data_id.text()
+        self.ch_card.name = self.data_name.text()
+        self.ch_card.title = self.data_title.text()
+        self.ch_card.designer = self.data_designer.text()
+        self.ch_card.design_state = bool(self.data_design_state.isChecked())
+        self.ch_card.sex = self.ch_card.number_to(self.data_sex.currentIndex(), 'sex')
+        self.ch_card.level = self.data_level.value()
+        self.ch_card.country = self.ch_card.number_to(self.data_country.currentIndex(), 'country')
+        self.ch_card.element = self.ch_card.number_to(self.data_element.currentIndex(), 'element')
+        self.ch_card.health_point = self.data_health_def.value()
+        self.ch_card.max_health_point = self.data_health_max.value()
+        self.ch_card.armor_point = self.data_armor.value()
+        for i in range(1, self.ch_card.skill_num + 1):
+            tp_n = getattr(self, f'self.data_skill{i}_Name').text()
+            tp_d = getattr(self, f'self.data_skill{i}_Description').toPlainText()
+            tp_v = bool(getattr(self, f'self.data_skill{i}_Visible').isChecked())
+            setattr(self.ch_card, f'skill{i}', [tp_n, tp_d, tp_v])
         saved_data = self.ch_card.pack()
         if saved_data != self.sdata:
             # 保存准备
@@ -324,7 +342,26 @@ class EditWindow(QWidget):
         self.data_id.setText(new_id)
 
     def closeEvent(self, event):
+
+        self.ch_card.id = self.data_id.text()
+        self.ch_card.name = self.data_name.text()
+        self.ch_card.title = self.data_title.text()
+        self.ch_card.designer = self.data_designer.text()
+        self.ch_card.design_state = bool(self.data_design_state.isChecked())
+        self.ch_card.sex = self.ch_card.number_to(self.data_sex.currentIndex(), 'sex')
+        self.ch_card.level = self.data_level.value()
+        self.ch_card.country = self.ch_card.number_to(self.data_country.currentIndex(), 'country')
+        self.ch_card.element = self.ch_card.number_to(self.data_element.currentIndex(), 'element')
+        self.ch_card.health_point = self.data_health_def.value()
+        self.ch_card.max_health_point = self.data_health_max.value()
+        self.ch_card.armor_point = self.data_armor.value()
+        for i in range(1, self.ch_card.skill_num + 1):
+            tp_n = getattr(self, f'self.data_skill{i}_Name').text()
+            tp_d = getattr(self, f'self.data_skill{i}_Description').toPlainText()
+            tp_v = bool(getattr(self, f'self.data_skill{i}_Visible').isChecked())
+            setattr(self.ch_card, f'skill{i}', [tp_n, tp_d, tp_v])
         saved_data = self.ch_card.pack()
+        print(saved_data)
 
         if saved_data != self.sdata:
             exit_tip = QMessageBox()
