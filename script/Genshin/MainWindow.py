@@ -2,7 +2,7 @@ import json
 import os
 
 from PySide6.QtCore import (QRect, Qt, QSize)
-from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap, QCursor)
+from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
 from PySide6.QtWidgets import (QMainWindow, QScrollArea, QWidget, QLabel)
 
 from script.Genshin import GKCard, EditCharacter
@@ -11,6 +11,8 @@ from script.Genshin import GKCard, EditCharacter
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.installEventFilter(self)
+        self.debug = 0
         self.setWindowTitle('实体卡牌编辑器 - GK23a/Genshin')
         self.setFixedSize(800, 600)
 
@@ -113,7 +115,8 @@ class MainWindow(QMainWindow):
                     72, 96))
                 getattr(self, d + '_widget').setStyleSheet('border: 1px solid #888888;')
                 getattr(self, d + '_widget').setCursor(Qt.PointingHandCursor)
-                getattr(self, d + '_widget').mousePressEvent = lambda event, cid=d: self.on_img_label_clicked(event, cid)
+                getattr(self, d + '_widget').mousePressEvent = lambda event, cid=d: \
+                    self.on_img_label_clicked(event, cid)
                 setattr(self, d + '_txt_label', QLabel(getattr(self, d + '_widget')))
                 getattr(self, d + '_txt_label').setGeometry(QRect(0, 72, 72, 24))
                 getattr(self, d + '_txt_label').setText(self.character_data.get(d).name)
@@ -155,6 +158,9 @@ class MainWindow(QMainWindow):
             edit_window = EditCharacter.EditWindow(cid)
             edit_window.show()
             self.edit_windows[cid] = edit_window
-        self.refresh_gk_data('character')
-        self.refresh_character_board()
 
+    def eventFilter(self, obj, event):
+        if obj == self and event.type() == 24:
+            self.refresh_gk_data('character')
+            self.refresh_character_board()
+        return super().eventFilter(obj, event)

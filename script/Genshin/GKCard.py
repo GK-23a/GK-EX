@@ -10,7 +10,8 @@ number_dict = {
         "khaenri'ah"
     ],
     'element': ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'],
-    'sex': ['male', 'female']
+    'sex': ['male', 'female'],
+    'dlc': ['standard', 'god', 'designer']
 }
 
 
@@ -102,6 +103,20 @@ class GKCharacterCard:
             return None
 
     def add_skill(self, skill_name, description='', visible=False):
-        """新增角色技能"""
+        """新增一个角色技能"""
         self.skill_num += 1
         setattr(self, f'skill{self.skill_num}', dict(name=skill_name, description=description, visible=visible))
+
+    def del_skill(self, skill_index):
+        """删除某个角色技能"""
+        if skill_index < 1 or skill_index > self.skill_num:
+            raise IndexError("Invalid skill index")
+        # 移除指定索引的技能
+        delattr(self, f'skill{skill_index}')
+        # 更新技能数量
+        self.skill_num -= 1
+        # 重新调整剩余技能的索引
+        for i in range(skill_index, self.skill_num + 1):
+            current_skill = getattr(self, f'skill{i + 1}')
+            setattr(self, f'skill{i}', current_skill)
+            delattr(self, f'skill{i + 1}')

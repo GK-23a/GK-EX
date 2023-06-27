@@ -6,7 +6,8 @@ from PIL.ImageQt import ImageQt
 from PySide6.QtCore import QRect, QSize, Qt
 from PySide6.QtGui import QFontDatabase, QFont, QImage, QPixmap
 from PySide6.QtWidgets import (QLabel, QLineEdit, QCheckBox, QComboBox, QWidget, QPushButton, QSpinBox, QProgressBar,
-                               QGroupBox, QPlainTextEdit, QTabWidget, QMessageBox, QDialogButtonBox, QDialog)
+                               QGroupBox, QPlainTextEdit, QTabWidget, QMessageBox, QDialogButtonBox, QDialog,
+                               QApplication)
 
 from script.Genshin import CardBuild, GKCard
 from script.NWidgets import TabWidget as NTabWidget
@@ -120,6 +121,15 @@ class EditWindow(QWidget):
         show_armor.setGeometry(QRect(320, 120, 60, 16))
         self.data_armor = QSpinBox(self)
         self.data_armor.setGeometry(QRect(365, 118, 40, 20))
+        #    dlc
+        show_dlc = QLabel(self)
+        show_dlc.setText('DLC')
+        show_dlc.setGeometry(QRect(305, 180, 35, 16))
+        self.data_dlc = QComboBox(self)
+        self.data_dlc.addItem('标准包')
+        self.data_dlc.addItem('诸神包')
+        self.data_dlc.addItem('创者包')
+        self.data_dlc.setGeometry(QRect(340, 178, 65, 20))
 
         # 进度条
         self.pg_bar = QProgressBar(self)
@@ -134,7 +144,7 @@ class EditWindow(QWidget):
         self.card_image = None
         # 技能
         self.data_skill = NTabWidget(self)
-        self.data_skill.setGeometry(QRect(25, 200, 380, 210))
+        self.data_skill.setGeometry(QRect(25, 210, 380, 200))
         # noinspection PyUnresolvedReferences
         self.data_skill.setTabPosition(QTabWidget.West)
         self.data_skill.setStyleSheet('QTabBar::tab{ height:50px;width:30px; }')
@@ -171,15 +181,25 @@ class EditWindow(QWidget):
         edit_id.clicked.connect(lambda: self.edit_id(self.ch_card.id))
         # 保存并刷新
         save_and_refresh = QPushButton(self)
-        save_and_refresh.setGeometry(QRect(325, 28, 80, 22))
+        save_and_refresh.setGeometry(QRect(326, 28, 80, 22))
         save_and_refresh.setText('保存并刷新')
-        save_and_refresh.setEnabled(False)
         save_and_refresh.clicked.connect(lambda: self.save_data(True))
         # 生成角色图片
         build_image = QPushButton(self)
         build_image.setGeometry(QRect(415, 28, 90, 22))
         build_image.setText('生成角色图片')
         build_image.clicked.connect(self.build_image)
+
+        # 新增技能
+        skill_add = QPushButton(self)
+        skill_add.setGeometry(QRect(25, 178, 70, 22))
+        skill_add.setText('新增技能')
+        skill_add.clicked.connect(self.skill_change_add)
+        # 删除技能
+        skill_del = QPushButton(self)
+        skill_del.setGeometry(QRect(100, 178, 70, 22))
+        skill_del.setText('删除技能')
+        skill_del.clicked.connect(self.skill_change_del)
 
     def refresh_data(self):
         self.setWindowTitle(f'编辑角色 {self.ch_card.name} - GK-23a/Genshin')
@@ -195,6 +215,7 @@ class EditWindow(QWidget):
         self.data_health_def.setValue(self.ch_card.health_point)
         self.data_health_max.setValue(self.ch_card.max_health_point)
         self.data_armor.setValue(self.ch_card.armor_point)
+        self.data_dlc.setCurrentIndex(self.ch_card.to_number('dlc'))
         image_path = os.path.join('img', 'character', self.ch_card.id + '.png')
         if os.path.exists(image_path):
             with open(image_path, 'rb') as f:
@@ -206,7 +227,11 @@ class EditWindow(QWidget):
             self.show_image.setText('')
         else:
             self.show_image.setText('No Image.')
+        self.refresh_skill()
+
+    def refresh_skill(self):
         # 技能显示
+        self.data_skill.clear()
         for i in range(1, self.ch_card.skill_num + 1):
             sw = f'show_skill{i}_widget'
             sn = f'show_skill{i}_name'
@@ -252,6 +277,7 @@ class EditWindow(QWidget):
         self.ch_card.health_point = self.data_health_def.value()
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
+        self.ch_card.dlc = self.ch_card.number_to(self.data_element.currentIndex(), 'dlc')
         for i in range(1, self.ch_card.skill_num + 1):
             tp_n = getattr(self, f'self.data_skill{i}_name').text()
             tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
@@ -283,6 +309,7 @@ class EditWindow(QWidget):
         self.ch_card.health_point = self.data_health_def.value()
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
+        self.ch_card.dlc = self.ch_card.number_to(self.data_element.currentIndex(), 'dlc')
         for i in range(1, self.ch_card.skill_num + 1):
             tp_n = getattr(self, f'self.data_skill{i}_name').text()
             tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
@@ -311,19 +338,18 @@ class EditWindow(QWidget):
                     a_skill_list = [n for n in saved_data['skill'] if n['name'] not in before_list]
                     for skill in d_skill_list:
                         save_info.append(
-                            [get_time(), 'D', saved_data['id'], 'skill', skill['name']]
+                            [get_time(), 'Ds', saved_data['id'], skill['name']]
                         )
                     for skills in c_skill_list:
                         for k in ['description', 'visible']:
                             if skills[0][k] != skills[1][k]:
                                 save_info.append(
-                                    [get_time(), 'C', saved_data['id'], 'skill', skills[0]['name'],
+                                    [get_time(), 'Cs', saved_data['id'], skills[0]['name'],
                                      k, skills[1][k], skills[0][k]]
                                 )
                     for skill in a_skill_list:
                         save_info.append(
-                            [get_time(), 'A', saved_data['id'], 'skill', skill['name'],
-                             skill['description'], skill['visible']]
+                            [get_time(), 'As', saved_data['id'], skill['name'], skill['description'], skill['visible']]
                         )
                 else:
                     if saved_data[key] != self.sdata[key]:
@@ -331,7 +357,7 @@ class EditWindow(QWidget):
                             [get_time(), 'C', saved_data['id'], key, self.sdata[key], saved_data[key]]
                         )
             # 保存内容
-            with open(os.path.join('script', 'genshin-impact.json'), 'w', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('json', 'genshin-impact.json'), 'w', encoding='UTF-8') as jsonfile:
                 for i, char_dict in enumerate(self.gk_data['character_data']):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
@@ -343,7 +369,6 @@ class EditWindow(QWidget):
             self.ch_card = GKCard.GKCharacterCard('')
             self.ch_card.unpack(saved_data)
             self.refresh_data()
-            pass
 
     def edit_id(self, origin_id):
         id_editor = QDialog()
@@ -369,9 +394,19 @@ class EditWindow(QWidget):
         ide_console['button'].rejected.connect(id_editor.reject)
         id_editor.exec()
 
-    def on_id_edit_accepted(self, new_id, window):
-        window.accept()
+    def on_id_edit_accepted(self, new_id, window_):
+        window_.accept()
         self.data_id.setText(new_id)
+
+    def skill_change_add(self):
+        self.ch_card.add_skill('技能')
+        self.refresh_skill()
+
+    def skill_change_del(self):
+        cidx = self.data_skill.currentIndex()
+        if cidx >= 0:
+            self.ch_card.del_skill(cidx+1)
+            self.refresh_skill()
 
     def closeEvent(self, event):
         self.ch_card.id = self.data_id.text()
@@ -386,6 +421,7 @@ class EditWindow(QWidget):
         self.ch_card.health_point = self.data_health_def.value()
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
+        self.ch_card.dlc = self.ch_card.number_to(self.data_element.currentIndex(), 'dlc')
         for i in range(1, self.ch_card.skill_num + 1):
             tp_n = getattr(self, f'self.data_skill{i}_name').text()
             tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
@@ -415,3 +451,10 @@ class EditWindow(QWidget):
                 event.accept()
         else:
             event.accept()
+
+
+if __name__ == "__main__":
+    app = QApplication([])
+    window = EditWindow(0)
+    window.show()
+    app.exec()
