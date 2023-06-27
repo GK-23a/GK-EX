@@ -2,8 +2,8 @@ import json
 import os
 
 from PySide6.QtCore import (QRect, Qt, QSize)
-from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
-from PySide6.QtWidgets import (QMainWindow, QScrollArea, QWidget, QLabel)
+from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap, QCloseEvent)
+from PySide6.QtWidgets import (QMainWindow, QScrollArea, QWidget, QLabel, QApplication)
 
 from script.Genshin import GKCard, EditCharacter
 
@@ -164,3 +164,15 @@ class MainWindow(QMainWindow):
             self.refresh_gk_data('character')
             self.refresh_character_board()
         return super().eventFilter(obj, event)
+
+    def closeEvent(self, event):
+        """关闭已打开的编辑窗口"""
+        for edit_window in self.edit_windows.values():
+            close_event = QCloseEvent()
+            QApplication.sendEvent(edit_window, close_event)
+            if close_event.isAccepted():
+                edit_window.close()
+            else:
+                event.ignore()
+                return
+        event.accept()
