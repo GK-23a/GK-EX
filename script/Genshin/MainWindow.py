@@ -164,15 +164,3 @@ class MainWindow(QMainWindow):
             self.refresh_gk_data('character')
             self.refresh_character_board()
         return super().eventFilter(obj, event)
-
-    def closeEvent(self, event):
-        """关闭已打开的编辑窗口"""
-        for edit_window in self.edit_windows.values():
-            close_event = QCloseEvent()
-            QApplication.sendEvent(edit_window, close_event)
-            if close_event.isAccepted():
-                edit_window.close()
-            else:
-                event.ignore()
-                return
-        event.accept()

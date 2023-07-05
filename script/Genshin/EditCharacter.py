@@ -324,34 +324,7 @@ class EditWindow(QWidget):
                     [get_time(), 'CI', self.sdata['id'], 'id', saved_data['id']]
                 )
             for key in saved_data:
-                if key == 'id':
-                    pass
-                elif key == 'skill':
-                    before_list = [n['name'] for n in self.sdata['skill']]
-                    after_list = [n['name'] for n in saved_data['skill']]
-                    d_skill_list = [n for n in self.sdata['skill'] if n['name'] not in after_list]
-                    c_skill_list = list()
-                    for n_saved in saved_data['skill']:
-                        for n_self in self.sdata['skill']:
-                            if n_saved['name'] == n_self['name'] and n_saved['name'] in after_list:
-                                c_skill_list.append((n_saved, n_self))
-                    a_skill_list = [n for n in saved_data['skill'] if n['name'] not in before_list]
-                    for skill in d_skill_list:
-                        save_info.append(
-                            [get_time(), 'Ds', saved_data['id'], skill['name']]
-                        )
-                    for skills in c_skill_list:
-                        for k in ['description', 'visible']:
-                            if skills[0][k] != skills[1][k]:
-                                save_info.append(
-                                    [get_time(), 'Cs', saved_data['id'], skills[0]['name'],
-                                     k, skills[1][k], skills[0][k]]
-                                )
-                    for skill in a_skill_list:
-                        save_info.append(
-                            [get_time(), 'As', saved_data['id'], skill['name'], skill['description'], skill['visible']]
-                        )
-                else:
+                if key != 'id':
                     if saved_data[key] != self.sdata[key]:
                         save_info.append(
                             [get_time(), 'C', saved_data['id'], key, self.sdata[key], saved_data[key]]
