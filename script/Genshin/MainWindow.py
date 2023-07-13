@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
                 self.character_widgets[f'{d}_widget'].setStyleSheet('border: 1px solid #888888;')
                 self.character_widgets[f'{d}_widget'].setCursor(Qt.PointingHandCursor)
                 self.character_widgets[f'{d}_widget'].mousePressEvent = lambda event, cid=d: \
-                    self.on_img_label_clicked(event, cid)
+                    self.character_choice_clicked(event, cid)
                 self.character_widgets[f'{d}_txt_label'] = QLabel(self.character_widgets[f'{d}_widget'])
                 self.character_widgets[f'{d}_txt_label'].setGeometry(QRect(0, 72, 72, 24))
                 self.character_widgets[f'{d}_txt_label'].setText(self.character_data.get(d).name)
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
             board_height += (10 + 96) * (temp_var // 7 + 1) + 5
         self.card_board.setGeometry(QRect(0, 0, 610, board_height))
 
-    def on_img_label_clicked(self, event, cid):
+    def character_choice_clicked(self, event, cid):
         event.accept()
         if cid in self.edit_windows:
             edit_window = self.edit_windows[cid]
