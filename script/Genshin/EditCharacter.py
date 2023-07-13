@@ -296,7 +296,7 @@ class EditWindow(QWidget):
             self.show_image.setPixmap(pixmap)
             self.show_image.setText('')
 
-    def save_data(self, refresh):
+    def pack_data(self):
         self.ch_card.id = self.data_id.text()
         self.ch_card.name = self.data_name.text()
         self.ch_card.title = self.data_title.text()
@@ -309,13 +309,17 @@ class EditWindow(QWidget):
         self.ch_card.health_point = self.data_health_def.value()
         self.ch_card.max_health_point = self.data_health_max.value()
         self.ch_card.armor_point = self.data_armor.value()
-        self.ch_card.dlc = self.ch_card.number_to(self.data_element.currentIndex(), 'dlc')
+        self.ch_card.dlc = self.ch_card.number_to(self.data_dlc.currentIndex(), 'dlc')
         for i in range(1, self.ch_card.skill_num + 1):
             tp_n = getattr(self, f'self.data_skill{i}_name').text()
             tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
             tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         saved_data = self.ch_card.pack()
+        return saved_data
+
+    def save_data(self, refresh):
+        saved_data = self.pack_data()
         if saved_data != self.sdata:
             # 保存准备
             save_info = list()
@@ -382,26 +386,7 @@ class EditWindow(QWidget):
             self.refresh_skill()
 
     def closeEvent(self, event):
-        self.ch_card.id = self.data_id.text()
-        self.ch_card.name = self.data_name.text()
-        self.ch_card.title = self.data_title.text()
-        self.ch_card.designer = self.data_designer.text()
-        self.ch_card.design_state = bool(self.data_design_state.isChecked())
-        self.ch_card.sex = self.ch_card.number_to(self.data_sex.currentIndex(), 'sex')
-        self.ch_card.level = self.data_level.value()
-        self.ch_card.country = self.ch_card.number_to(self.data_country.currentIndex(), 'country')
-        self.ch_card.element = self.ch_card.number_to(self.data_element.currentIndex(), 'element')
-        self.ch_card.health_point = self.data_health_def.value()
-        self.ch_card.max_health_point = self.data_health_max.value()
-        self.ch_card.armor_point = self.data_armor.value()
-        self.ch_card.dlc = self.ch_card.number_to(self.data_element.currentIndex(), 'dlc')
-        for i in range(1, self.ch_card.skill_num + 1):
-            tp_n = getattr(self, f'self.data_skill{i}_name').text()
-            tp_d = getattr(self, f'self.data_skill{i}_description').toPlainText()
-            tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
-            setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
-        saved_data = self.ch_card.pack()
-
+        saved_data = self.pack_data()
         if saved_data != self.sdata:
             exit_tip = QMessageBox()
             exit_tip.setWindowTitle('提示')

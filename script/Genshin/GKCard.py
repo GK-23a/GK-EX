@@ -32,8 +32,8 @@ class GKCharacterCard:
         self.max_health_point: int = 3
         self.armor_point: int = 0
         self.dlc: str = 'others'
-        self.skill_num: int = 1
-        self.skill1: dict = dict(name='', description='', visible=False)
+        self.skill_num: int = 0
+        # self.skill1: dict = dict(name='', description='', visible=False)
 
     def pack(self) -> dict:
         """将角色信息合成为字典"""

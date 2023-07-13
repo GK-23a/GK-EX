@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QApplication
-from sys import argv
+from sys import argv, exit
 from Genshin import MainWindow
 
 """
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     app = QApplication(argv)
     window = MainWindow.MainWindow()
     window.show()
-    app.exec()
+    exit(app.exec())
