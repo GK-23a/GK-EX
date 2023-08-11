@@ -1,5 +1,7 @@
-from PySide6.QtWidgets import QApplication
 from sys import argv, exit
+
+from PySide6.QtWidgets import QApplication
+
 from Genshin import MainWindow
 
 """

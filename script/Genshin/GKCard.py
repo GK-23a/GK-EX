@@ -78,7 +78,7 @@ class GKCharacterCard:
         self.dlc = pack.get('dlc', 'others')
         self.skill_num = len(pack.get('skills'))
         for i, sdata in enumerate(pack.get('skills')):
-            setattr(self, f'skill{i+1}', dict(
+            setattr(self, f'skill{i + 1}', dict(
                 name=sdata.get('name', ''),
                 description=sdata.get('description', ''),
                 visible=bool(sdata.get('visible', 0))))

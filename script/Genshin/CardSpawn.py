@@ -1,6 +1,7 @@
-from script.Genshin.GKCard import CardBuild
 import json
 import os
+
+from .CardBuild import *
 
 # build_a4_print: bool | 是否生成A4尺寸的打印版图片
 build_a4_print = False
@@ -30,7 +31,7 @@ else:
             datas.append(data)
 for data in datas:
     if data['design_info']:
-        ch_img = CardBuild.genshin_character_card(data, card_versions)
+        ch_img = genshin_character_card(data, card_versions)
         ch_img.save(os.path.join('output', 'character_card', data['id'] + '.png'))
         character_list.append(ch_img)
         if not all_character and len(character_list) == 1:
@@ -44,5 +45,5 @@ if build_a4_print:
     card_group = [character_list[i:i + 9] for i in range(0, len(character_list), 9)]
     i = 1
     for cards in card_group:
-        CardBuild.print_build(cards).save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
+        print_build(cards).save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
         i += 1

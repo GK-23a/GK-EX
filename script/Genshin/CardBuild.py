@@ -1,5 +1,6 @@
-from PIL import Image, ImageDraw, ImageFont
 import os
+
+from PIL import Image, ImageDraw, ImageFont
 
 # 预加载
 
@@ -225,7 +226,7 @@ def genshin_character_card(character_data: dict,
                         point_sign.append(
                             ImageDraw.Draw(skill_img).textbbox(
                                 (50, skill_text_height + 95),
-                                liner_text[:point-1],
+                                liner_text[:point - 1],
                                 font['text'],
                                 align='left',
                                 direction='ltr',
@@ -282,14 +283,14 @@ def genshin_character_card(character_data: dict,
                     skill_text_length -= 1
                 else:
                     # 中文标点修正
-                    if bold_text[skill_text_length:skill_text_length+1] in punctuation:
+                    if bold_text[skill_text_length:skill_text_length + 1] in punctuation:
                         skill_text_length += 1
-                    elif bold_text[skill_text_length:skill_text_length+1] in right_punctuation:
-                        if bold_text[skill_text_length + 1:skill_text_length+2] in punctuation:
+                    elif bold_text[skill_text_length:skill_text_length + 1] in right_punctuation:
+                        if bold_text[skill_text_length + 1:skill_text_length + 2] in punctuation:
                             skill_text_length -= 2
                         else:
                             skill_text_length += 1
-                    elif bold_text[skill_text_length-1:skill_text_length] in left_punctuation:
+                    elif bold_text[skill_text_length - 1:skill_text_length] in left_punctuation:
                         skill_text_length -= 1
                     liner_text = bold_text[:skill_text_length]
                     break
@@ -356,7 +357,7 @@ def genshin_character_card(character_data: dict,
     armor_value = character_data['armor_point']
     if armor_value != 0:
         with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
-            hp_img.alpha_composite(AP, (160, hp_height+200))
+            hp_img.alpha_composite(AP, (160, hp_height + 200))
             img_draw(hp_img, (225, hp_height + 255), str(armor_value), 'black')
     # 体力值区域后续结算：与称号和名字的防冲突（简单）
     text_height = ImageDraw.Draw(info_img).textbbox(
@@ -393,7 +394,6 @@ def genshin_character_card_with_qt_progress_bar(
         versions: str,
         card_img: Image,
         progress_bar) -> Image:
-
     progress_bar.setValue(15)
     # 图层组：技能说明、卡片信息
     skill_img = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
@@ -460,7 +460,7 @@ def genshin_character_card_with_qt_progress_bar(
                         point_sign.append(
                             ImageDraw.Draw(skill_img).textbbox(
                                 (50, skill_text_height + 95),
-                                liner_text[:point-1],
+                                liner_text[:point - 1],
                                 font['text'],
                                 align='left',
                                 direction='ltr',
@@ -521,12 +521,12 @@ def genshin_character_card_with_qt_progress_bar(
                     # 中文标点修正
                     if bold_text[skill_text_length:skill_text_length + 1] in punctuation:
                         skill_text_length += 1
-                    elif bold_text[skill_text_length:skill_text_length+1] in right_punctuation:
-                        if bold_text[skill_text_length + 1:skill_text_length+2] in punctuation:
+                    elif bold_text[skill_text_length:skill_text_length + 1] in right_punctuation:
+                        if bold_text[skill_text_length + 1:skill_text_length + 2] in punctuation:
                             skill_text_length -= 2
                         else:
                             skill_text_length += 1
-                    elif bold_text[skill_text_length-1:skill_text_length] in left_punctuation:
+                    elif bold_text[skill_text_length - 1:skill_text_length] in left_punctuation:
                         skill_text_length -= 1
                     liner_text = bold_text[:skill_text_length]
                     break
@@ -593,7 +593,7 @@ def genshin_character_card_with_qt_progress_bar(
     armor_value = character_data['armor_point']
     if armor_value != 0:
         with Image.open(os.path.join('img', 'icon', 'Armor.png')) as AP:
-            hp_img.alpha_composite(AP, (160, hp_height+200))
+            hp_img.alpha_composite(AP, (160, hp_height + 200))
             img_draw(hp_img, (225, hp_height + 255), str(armor_value), 'black')
     progress_bar.setValue(95)
     # 体力值区域后续结算：与称号和名字的防冲突（简单）

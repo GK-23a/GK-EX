@@ -1,11 +1,13 @@
+from .CreateCharacter import *
+from .EditCharacter import *
+from .GKCard import *
+
 import json
 import os
 
 from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
 from PySide6.QtWidgets import (QMainWindow, QApplication, QScrollArea, QWidget, QLabel)
-
-from script.Genshin import GKCard, EditCharacter, CreateCharacter
 
 
 class MainWindow(QMainWindow):
@@ -14,14 +16,14 @@ class MainWindow(QMainWindow):
         self.installEventFilter(self)
         self.debug = 0
         self.setWindowTitle('实体卡牌编辑器 - GK23a/Genshin')
-        self.setFixedSize(800, 600)
+        self.setFixedSize(675, 600)
 
         font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        font = QFont(font_family)
-        font.setPointSize(10.5)
-        font.setStyleStrategy(QFont.PreferAntialias)
-        self.setFont(font)
+        self.font = QFont(font_family)
+        self.font.setPointSize(10.5)
+        self.font.setStyleStrategy(QFont.PreferAntialias)
+        self.setFont(self.font)
 
         self.character_widgets = dict()
         self.edit_windows = dict()
@@ -46,11 +48,23 @@ class MainWindow(QMainWindow):
         self.elt_title = dict()
         self.refresh_gk_data('character')
 
+        title_en = QLabel(self)
+        title_en.setGeometry(QRect(35, 25, 625, 75))
+        title_en.setText('GK-23a / Genshin')
+        title_zh = QLabel(self)
+        title_zh.setGeometry(QRect(35, 75, 625, 75))
+        title_zh.setText('原神杀 卡牌构建器')
+        title_zh.setAlignment(Qt.AlignHCenter)
+        version = QLabel(self)
+        version.setGeometry(QRect(35, 100, 625, 75))
+        version.setText(f'软件版本 Beta 2.0  |  数据版本  {self.gk_versions.get("character_data")}')
+        version.setAlignment(Qt.AlignHCenter)
+
         # 选择框
         self.card_board = QWidget(self)
-        self.card_board.setGeometry(QRect(0, 0, 610, 700))
+        self.card_board.setGeometry(QRect(0, 0, 0, 0))
         card_area = QScrollArea(self)
-        card_area.setGeometry(QRect(25, 125, 630, 450))
+        card_area.setGeometry(QRect(25, 125, 625, 450))
         card_area.setWidget(self.card_board)
         self.refresh_character_board()
 
@@ -58,12 +72,21 @@ class MainWindow(QMainWindow):
         menu_bar = self.menuBar()
 
         menu_edit = menu_bar.addMenu('编辑')
+
+        action_buildCard = QAction('卡面构建(未完成)', self)
+        # action_buildCard.triggered.connect(self.create_character_action)
+        menu_edit.addAction(action_buildCard)
+
+        menu_edit.addSeparator()
+
         action_edit = QAction('新增角色', self)
         action_edit.triggered.connect(self.create_character_action)
         menu_edit.addAction(action_edit)
         action_restart = QAction('重启并刷新', self)
         action_restart.triggered.connect(lambda: self.restart_editor())
         menu_edit.addAction(action_restart)
+
+        """
         menu_board_body = menu_edit.addMenu('选项板显示内容...')
         action_board_show_character = QAction('显示角色', self)
         action_board_show_character.triggered.connect(lambda: self.refresh_gk_data('character'))
@@ -75,7 +98,7 @@ class MainWindow(QMainWindow):
         # action_show_editor_honkai_impact_3 = QAction('崩坏3', self)
         # action_show_editor_honkai_impact_3.triggered.connect(lambda: self.refresh_gk_data('game_card'))
         # menu_board.addAction(action_show_editor_honkai_impact_3)
-
+        
         menu_save = menu_bar.addMenu('保存')
         action_save_to_file = QAction('保存数据', self)
         # action_save_to_file.triggered.connect(lambda: self.refresh_gk_data('character'))
@@ -83,11 +106,12 @@ class MainWindow(QMainWindow):
         action_json_manage = QAction('管理Json数据', self)
         # action_json_manage.triggered.connect(lambda: self.refresh_gk_data('character'))
         menu_save.addAction(action_json_manage)
-
+        """"""
         menu_about = menu_bar.addMenu('关于')
         action_about = QAction('关于...', self)
         # action_about.triggered.connect(lambda: self.refresh_gk_data('character'))
         menu_about.addAction(action_about)
+        """
 
     def refresh_gk_data(self, data_type):
         """刷新gk数据"""
@@ -96,7 +120,7 @@ class MainWindow(QMainWindow):
                 self.data_list[elt[0] + '_character'] = list()
             for cdata in self.gk_character_data:
                 cid = cdata.get('id')
-                self.character_data[cid] = GKCard.GKCharacterCard(cid)
+                self.character_data[cid] = GKCharacterCard(cid)
                 self.character_data[cid].unpack(cdata)
                 self.data_list[self.character_data[cid].element + '_character'].append(cid)
             for elt in self.elts:
@@ -139,7 +163,7 @@ class MainWindow(QMainWindow):
                 self.character_widgets[f'{d}_img_widget'] = QWidget(self.character_widgets[f'{d}_widget'])
                 self.character_widgets[f'{d}_img_widget'].setGeometry(QRect(0, 0, 72, 72))
                 qss_code = 'border: 0;'
-                if d == 'aloy':
+                if d in ['aloy']:
                     qss_code += 'background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #DA4F55, stop:1 #AF5155);'
                 elif self.character_data.get(d).level == 5:
                     qss_code += 'background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #de9552, stop:1 #9a6d43);'
@@ -162,7 +186,7 @@ class MainWindow(QMainWindow):
                     self.character_widgets[f'{d}_img_label'].setPixmap(icon_img)
                 temp_var = i
             board_height += (10 + 96) * (temp_var // 7 + 1) + 5
-        self.card_board.setGeometry(QRect(0, 0, 610, board_height))
+        self.card_board.setGeometry(QRect(0, 0, 605, board_height))
 
     def character_choice_clicked(self, event, cid):
         event.accept()
@@ -171,19 +195,19 @@ class MainWindow(QMainWindow):
             edit_window.activateWindow()
             edit_window.show()
         else:
-            edit_window = EditCharacter.EditWindow(cid)
+            edit_window = EditWindow(cid)
             edit_window.show()
             self.edit_windows[cid] = edit_window
 
     def create_character_action(self):
-        self.create_windows.append(CreateCharacter.CreateWindow())
-        self.create_windows[len(self.create_windows)-1].show()
+        self.create_windows.append(CreateWindow())
+        self.create_windows[len(self.create_windows) - 1].show()
 
     def restart_editor(self):
         # 重启
         self.close()
 
-        app = QApplication.instance()
-        window = MainWindow()
-        window.show()
-        app.exec_()
+        app_ = QApplication.instance()
+        window_ = MainWindow()
+        window_.show()
+        app_.exec_()

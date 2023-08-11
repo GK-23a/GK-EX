@@ -1,5 +1,4 @@
 import json
-import os
 from time import asctime, localtime, time
 
 from PIL.ImageQt import ImageQt
@@ -9,8 +8,9 @@ from PySide6.QtWidgets import (QLabel, QLineEdit, QCheckBox, QComboBox, QWidget,
                                QGroupBox, QPlainTextEdit, QTabWidget, QMessageBox, QDialogButtonBox, QDialog,
                                QApplication)
 
-from script.Genshin import CardBuild, GKCard
-from script.NWidgets import TabWidget as NTabWidget
+from .CardBuild import *
+from .GKCard import *
+from .NWidgets import TabWidget as NTabWidget
 
 
 def get_time(left=0, right=0):
@@ -157,11 +157,11 @@ class EditWindow(QWidget):
         self.sdata = 0
         if isinstance(cid, int):
             d = gk_character_data[cid]
-            self.ch_card = GKCard.GKCharacterCard(d.get('id'))
+            self.ch_card = GKCharacterCard(d.get('id'))
             self.ch_card.unpack(d)
             self.sdata = d
         elif isinstance(cid, str):
-            self.ch_card = GKCard.GKCharacterCard(cid)
+            self.ch_card = GKCharacterCard(cid)
             for d in gk_character_data:
                 if d.get('id') == cid:
                     self.ch_card.unpack(d)
@@ -285,7 +285,7 @@ class EditWindow(QWidget):
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         build_data = self.ch_card.pack()
         try:
-            cimg = CardBuild.genshin_character_card(build_data, self.gk_versions['character_data'],
+            cimg = genshin_character_card(build_data, self.gk_versions['character_data'],
                                                     progress_bar=self.pg_bar)
         except Exception as error_body:
             self.show_image.setText(str(error_body))
@@ -343,7 +343,7 @@ class EditWindow(QWidget):
                 for log in save_info:
                     gkcl.write(str(log) + '\n')
         if refresh:
-            self.ch_card = GKCard.GKCharacterCard('')
+            self.ch_card = GKCharacterCard('')
             self.ch_card.unpack(saved_data)
             self.refresh_data()
 
@@ -382,7 +382,7 @@ class EditWindow(QWidget):
     def skill_change_del(self):
         cidx = self.data_skill.currentIndex()
         if cidx >= 0:
-            self.ch_card.del_skill(cidx+1)
+            self.ch_card.del_skill(cidx + 1)
             self.refresh_skill()
 
     def closeEvent(self, event):

@@ -6,7 +6,7 @@ from PySide6.QtCore import QRect
 from PySide6.QtGui import QFontDatabase, QFont
 from PySide6.QtWidgets import (QLabel, QLineEdit, QComboBox, QDialog, QPushButton, QSpinBox, QMessageBox, QApplication)
 
-from script.Genshin import GKCard
+from .GKCard import *
 
 
 def get_time(left=0, right=0):
@@ -128,7 +128,7 @@ class CreateWindow(QDialog):
         self.data_dlc.setGeometry(QRect(340, 148, 65, 20))
 
         # 数据加载与显示
-        self.ch_card = GKCard.GKCharacterCard('new_character')
+        self.ch_card = GKCharacterCard('new_character')
 
         self.setWindowTitle(f'新增角色 - GK-23a/Genshin')
 
@@ -174,6 +174,16 @@ class CreateWindow(QDialog):
         return saved_data
 
     def save_data(self, reason=False):
+        restart_tip = QMessageBox()
+        restart_tip.setWindowTitle('提示')
+        restart_tip.setFont(self.font)
+        restart_tip.setText('创建角色后需要重启窗口。')
+        restart_tip.setInformativeText('您可使用 编辑-保存并重启 来进行重启。')
+        # noinspection PyUnresolvedReferences
+        restart_tip.setStandardButtons(QMessageBox.Save)
+        # noinspection PyUnresolvedReferences
+        restart_tip.setDefaultButton(QMessageBox.Save)
+        restart_tip.exec()
         try:
             with open(os.path.join('json', 'genshin-impact.json'), 'r', encoding='UTF-8') as jsonfile:
                 gk_data = json.load(jsonfile)
