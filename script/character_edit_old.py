@@ -1,5 +1,5 @@
 from json import loads as json_loads, dump as json_dump
-from os import path as os_path
+import os
 import sys
 
 from PIL.ImageQt import ImageQt
@@ -93,8 +93,8 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_StarLevel.setCurrentIndex(ExtraF.star(self.data.get('level', 5)))
         self.ui.comboBox_DLC.setCurrentIndex(ExtraF.dlcs(self.data.get('dlc', 'others')))
 
-        self.imgpath = os_path.join('data', 'img', 'character', self.data['id'] + '.png')
-        if os_path.exists(self.imgpath):
+        self.imgpath = os.path.join('data', 'img', 'character', self.data['id'] + '.png')
+        if os.path.exists(self.imgpath):
             with open(self.imgpath, 'rb') as f:
                 img_data = f.read()
             self.img = QImage.fromData(img_data)
