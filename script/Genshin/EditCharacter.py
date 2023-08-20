@@ -29,6 +29,8 @@ class EditWindow(QWidget):
         self.font.setStyleStrategy(QFont.PreferAntialias)
         self.setFont(self.font)
 
+        self.cimg = None
+
         #     id
         show_id = QLabel(self)
         show_id.setText('ID')
@@ -285,16 +287,26 @@ class EditWindow(QWidget):
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         build_data = self.ch_card.pack()
         try:
-            cimg = genshin_character_card(build_data, self.gk_versions['character_data'],
+            self.cimg = genshin_character_card(build_data, self.gk_versions['character_data'],
                                                     progress_bar=self.pg_bar)
-        except Exception as error_body:
-            self.show_image.setText(str(error_body))
+        except Exception:
+            self.show_image.mousePressEvent = None
+            self.show_image.setText('Error\noutput/error.log')
+            import traceback
+            with open(os.path.join('output', 'error.log'), 'a', encoding='UTF-8') as log_file:
+                log_file.write(traceback.format_exc())
         else:
-            image = ImageQt(cimg)
+            image = ImageQt(self.cimg)
             image_scaled = image.scaled(QSize(200, 320), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             pixmap = QPixmap.fromImage(image_scaled)
             self.show_image.setPixmap(pixmap)
+            self.show_image.mousePressEvent = self.on_label_image_clicked
             self.show_image.setText('')
+
+    def on_label_image_clicked(self, ev):
+        self.pg_bar.setValue(100)
+        self.cimg.show()
+        self.pg_bar.setValue(0)
 
     def pack_data(self):
         self.ch_card.id = self.data_id.text()
