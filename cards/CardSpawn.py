@@ -1,7 +1,7 @@
-from CardBuild import *
-
 import json
 import os
+
+from cards.CardBuild import character_card_build
 
 # build_a4_print: bool | 是否生成A4尺寸的打印版图片
 build_a4_print = False
@@ -10,10 +10,10 @@ build_a4_print = False
 all_character = False
 
 # character_list: list | 生成角色卡的列表
-character_list = ['alhaitham']
+character_list = ['nilou']
 
 # 读取json
-with open(os.path.join('json', 'genshin-impact.json'), encoding='UTF-8') as file:
+with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as file:
     file_data = json.loads(file.read())
     character_datas = file_data['character_data']
     card_versions = file_data['character_data_versions']
@@ -31,7 +31,7 @@ else:
             datas.append(data)
 for data in datas:
     if data['design_state']:
-        ch_img = genshin_character_card(data, card_versions)
+        ch_img = character_card_build(data, card_versions)
         ch_img.save(os.path.join('output', 'character_card', data['id'] + '.png'))
         character_list.append(ch_img)
         if not all_character and len(character_list) == 1:
@@ -41,9 +41,9 @@ for data in datas:
         print(data['name'] + '不构建')
 
 # 生成适用于A4打印的图像
-if build_a4_print:
-    card_group = [character_list[i:i + 9] for i in range(0, len(character_list), 9)]
-    i = 1
-    for cards in card_group:
-        print_build(cards).save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
-        i += 1
+# if build_a4_print:
+#     card_group = [character_list[i:i + 9] for i in range(0, len(character_list), 9)]
+#     i = 1
+#     for cards in card_group:
+#         print_build(cards).save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
+#         i += 1

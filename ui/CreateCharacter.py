@@ -6,7 +6,7 @@ from PySide6.QtCore import QRect
 from PySide6.QtGui import QFontDatabase, QFont
 from PySide6.QtWidgets import (QLabel, QLineEdit, QComboBox, QDialog, QPushButton, QSpinBox, QMessageBox, QApplication)
 
-from .GKCard import *
+from cards.GKCard import GKCharacterCard
 
 
 def get_time(left=0, right=0):
@@ -185,7 +185,7 @@ class CreateWindow(QDialog):
         restart_tip.setDefaultButton(QMessageBox.Save)
         restart_tip.exec()
         try:
-            with open(os.path.join('json', 'genshin-impact.json'), 'r', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('assets', 'card_data.json'), 'r', encoding='UTF-8') as jsonfile:
                 gk_data = json.load(jsonfile)
 
             saved_data = self.pack_data()
@@ -197,7 +197,7 @@ class CreateWindow(QDialog):
             save_info = list()
             save_info.append([get_time(), 'AC', saved_data['id'], saved_data])
 
-            with open(os.path.join('json', 'genshin-impact.json'), 'w', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
                 json.dump(gk_data, jsonfile, ensure_ascii=False)
 
             with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:

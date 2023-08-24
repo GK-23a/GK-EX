@@ -1,13 +1,13 @@
-from .CreateCharacter import *
-from .EditCharacter import *
-from .GKCard import *
-
 import json
 import os
 
 from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
 from PySide6.QtWidgets import (QMainWindow, QApplication, QScrollArea, QWidget, QLabel)
+
+from ui.CreateCharacter import CreateWindow
+from ui.EditCharacter import EditWindow
+from cards.GKCard import GKCharacterCard
 
 
 class MainWindow(QMainWindow):
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         if not os.path.exists('output'):
             os.makedirs('output')
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
             ['others', '其他']
         ]
         # 数据加载
-        with open(os.path.join('json', 'genshin-impact.json'), encoding='UTF-8') as data_file:
+        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
             gk_data = json.load(data_file)
         self.gk_character_data = gk_data.get('character_data')
         self.gk_versions = dict(character_data=gk_data.get('character_data_versions'))
@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
                     dx = d[:8]
                 else:
                     dx = d
-                icon_path = os.path.join('img', 'character_icon', dx + '.png')
+                icon_path = os.path.join('assets', 'img', 'character_icon', dx + '.png')
                 if os.path.exists(icon_path):
                     with open(icon_path, 'rb') as f:
                         img_data = f.read()
@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
                     self.character_widgets[f'{d}_img_label'].setPixmap(icon_img)
                 temp_var = i
             board_height += (10 + 96) * (temp_var // 7 + 1) + 5
-        self.card_board.setGeometry(QRect(0, 0, 605, board_height))
+        self.card_board.setGeometry(QRect(0, 0, 600, board_height))
 
     def character_choice_clicked(self, event, cid):
         event.accept()

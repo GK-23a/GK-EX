@@ -1,3 +1,4 @@
+import os
 import json
 from time import asctime, localtime, time
 
@@ -8,9 +9,9 @@ from PySide6.QtWidgets import (QLabel, QLineEdit, QCheckBox, QComboBox, QWidget,
                                QGroupBox, QPlainTextEdit, QTabWidget, QMessageBox, QDialogButtonBox, QDialog,
                                QApplication)
 
-from .CardBuild import *
-from .GKCard import *
-from .NWidgets import TabWidget as NTabWidget
+from cards.CardBuild import character_card_build
+from cards.GKCard import GKCharacterCard
+from ui.NWidgets import TabWidget as NTabWidget
 
 
 def get_time(left=0, right=0):
@@ -22,7 +23,7 @@ class EditWindow(QWidget):
         super().__init__()
         self.setFixedSize(650, 420)
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -152,7 +153,7 @@ class EditWindow(QWidget):
         self.data_skill.setStyleSheet('QTabBar::tab{ height:50px;width:30px; }')
 
         # 数据加载与显示
-        with open(os.path.join('json', 'genshin-impact.json'), encoding='UTF-8') as self.data_file:
+        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as self.data_file:
             self.gk_data = json.load(self.data_file)
             gk_character_data = self.gk_data.get('character_data')
             self.gk_versions = dict(character_data=self.gk_data.get('character_data_versions'))
@@ -218,7 +219,7 @@ class EditWindow(QWidget):
         self.data_health_max.setValue(self.ch_card.max_health_point)
         self.data_armor.setValue(self.ch_card.armor_point)
         self.data_dlc.setCurrentIndex(self.ch_card.to_number('dlc'))
-        image_path = os.path.join('img', 'character', self.ch_card.id + '.png')
+        image_path = os.path.join('assets', 'img', 'character', self.ch_card.id + '.png')
         if os.path.exists(image_path):
             with open(image_path, 'rb') as f:
                 img_data = f.read()
@@ -287,8 +288,8 @@ class EditWindow(QWidget):
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         build_data = self.ch_card.pack()
         try:
-            self.cimg = genshin_character_card(build_data, self.gk_versions['character_data'],
-                                                    progress_bar=self.pg_bar)
+            self.cimg = character_card_build(build_data, self.gk_versions['character_data'],
+                                             progress_bar=self.pg_bar)
         except Exception:
             self.show_image.mousePressEvent = None
             self.show_image.setText('Error\noutput/error.log')
@@ -346,12 +347,12 @@ class EditWindow(QWidget):
                             [get_time(), 'C', saved_data['id'], key, self.sdata[key], saved_data[key]]
                         )
             # 保存内容
-            with open(os.path.join('json', 'genshin-impact.json'), 'w', encoding='UTF-8') as jsonfile:
+            with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
                 for i, char_dict in enumerate(self.gk_data['character_data']):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False)
-            with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
+            with open(os.path.join('output', 'change_log.gkcl'), 'a', encoding='UTF-8') as gkcl:
                 for log in save_info:
                     gkcl.write(str(log) + '\n')
         if refresh:
