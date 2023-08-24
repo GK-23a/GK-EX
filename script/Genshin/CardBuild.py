@@ -141,13 +141,12 @@ def img_draw(bg,
 def genshin_character_card(character_data: dict,
                            versions: str,
                            img_path=os.path.join('img', 'character'),
-                           progress_bar=None) -> Image:
+                           progress_bar=None,
+                           debug=False) -> Image:
     """生成角色卡，返回Pillow的图像对象。如果进度条为'Qt'，则中途会传递至函数genshin_character_card_with_qt_progress_bar()。"""
 
-    # 图层：背景
+    # 背景与角色图像图层
     card_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
-
-    # 图层：角色图像
     character_image = Image.open(os.path.join(img_path, character_data['id'] + '.png'))
     if character_image.size != (2000, 3240):
         character_image = img_cut(character_image)

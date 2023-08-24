@@ -18,6 +18,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('实体卡牌编辑器 - GK23a/Genshin')
         self.setFixedSize(675, 600)
 
+        if not os.path.exists('output'):
+            os.makedirs('output')
+
         font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)

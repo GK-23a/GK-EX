@@ -7,3 +7,5 @@ dist/
 main.spec
 
 .idea/
+
+*.pyc
