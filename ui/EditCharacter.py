@@ -361,6 +361,7 @@ class EditWindow(QWidget):
             self.refresh_data()
 
     def edit_id(self, origin_id):
+        """修改角色id"""
         id_editor = QDialog()
         id_editor.setFixedSize(200, 100)
         id_editor.setFont(self.font)
@@ -386,7 +387,21 @@ class EditWindow(QWidget):
 
     def on_id_edit_accepted(self, new_id, window_):
         window_.accept()
-        self.data_id.setText(new_id)
+        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
+            gk_character_data = json.load(data_file).get('character_data')
+            cids = {i.get('id', None) for i in gk_character_data}
+        if new_id in cids:
+            error_tip = QMessageBox()
+            error_tip.setWindowTitle('错误')
+            error_tip.setFont(self.font)
+            error_tip.setText('id修改失败：角色id重复。')
+            # noinspection PyUnresolvedReferences
+            error_tip.setStandardButtons(QMessageBox.Cancel)
+            # noinspection PyUnresolvedReferences
+            error_tip.setDefaultButton(QMessageBox.Cancel)
+            error_tip.exec()
+        else:
+            self.data_id.setText(new_id)
 
     def skill_change_add(self):
         self.ch_card.add_skill('技能')

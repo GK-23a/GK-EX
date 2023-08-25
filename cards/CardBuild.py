@@ -34,9 +34,8 @@ right_punctuation = ['）', '】', '”']
 skill_categories = ['锁定技，', '转换技，', '限定技，', '觉醒技，', '使命技，']
 
 
-def img_cut(img_path, width=2000, height=3240):
+def img_cut(img: Image, width=2000, height=3240):
     """裁切立绘图像"""
-    img = Image.open(img_path)
     w, h = img.size
     scale = width / w
     new_size = (int(w * scale), int(h * scale))

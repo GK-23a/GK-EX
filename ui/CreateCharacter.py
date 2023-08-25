@@ -24,7 +24,7 @@ class CreateWindow(QDialog):
         self.save_flag = False
         self.setFixedSize(440, 200)
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -174,51 +174,65 @@ class CreateWindow(QDialog):
         return saved_data
 
     def save_data(self, reason=False):
-        restart_tip = QMessageBox()
-        restart_tip.setWindowTitle('提示')
-        restart_tip.setFont(self.font)
-        restart_tip.setText('创建角色后需要重启窗口。')
-        restart_tip.setInformativeText('您可使用 编辑-保存并重启 来进行重启。')
-        # noinspection PyUnresolvedReferences
-        restart_tip.setStandardButtons(QMessageBox.Save)
-        # noinspection PyUnresolvedReferences
-        restart_tip.setDefaultButton(QMessageBox.Save)
-        restart_tip.exec()
-        try:
-            with open(os.path.join('assets', 'card_data.json'), 'r', encoding='UTF-8') as jsonfile:
-                gk_data = json.load(jsonfile)
-
-            saved_data = self.pack_data()
-            cids = [cdata['id'] for cdata in gk_data['character_data']]
-            if self.ch_card.id in cids:
-                raise IDRepeatError
-            else:
-                gk_data['character_data'].append(saved_data)
-            save_info = list()
-            save_info.append([get_time(), 'AC', saved_data['id'], saved_data])
-
-            with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
-                json.dump(gk_data, jsonfile, ensure_ascii=False)
-
-            with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
-                for log in save_info:
-                    gkcl.write(str(log) + '\n')
-
-            self.save_flag = True
-            self.close()
-        except IDRepeatError:
-            repeat_tip = QMessageBox()
-            repeat_tip.setWindowTitle('错误')
-            repeat_tip.setFont(self.font)
-            repeat_tip.setText('角色ID重复了！无法保存！')
-            repeat_tip.setInformativeText('IDRepeatError')
+        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
+            gk_character_data = json.load(data_file).get('character_data')
+            cids = {i.get('id', None) for i in gk_character_data}
+        if self.data_id.text() in cids:
+            error_tip = QMessageBox()
+            error_tip.setWindowTitle('错误')
+            error_tip.setFont(self.font)
+            error_tip.setText('角色创建失败：角色id重复。')
             # noinspection PyUnresolvedReferences
-            repeat_tip.setStandardButtons(QMessageBox.Cancel)
+            error_tip.setStandardButtons(QMessageBox.Cancel)
             # noinspection PyUnresolvedReferences
-            repeat_tip.setDefaultButton(QMessageBox.Cancel)
-            repeat_tip.exec()
-            if reason:
-                raise
+            error_tip.setDefaultButton(QMessageBox.Cancel)
+            error_tip.exec()
+        else:
+            restart_tip = QMessageBox()
+            restart_tip.setWindowTitle('提示')
+            restart_tip.setFont(self.font)
+            restart_tip.setText('创建角色后需要重启窗口。')
+            restart_tip.setInformativeText('您可使用 编辑-保存并重启 来进行重启。')
+            # noinspection PyUnresolvedReferences
+            restart_tip.setStandardButtons(QMessageBox.Save)
+            # noinspection PyUnresolvedReferences
+            restart_tip.setDefaultButton(QMessageBox.Save)
+            restart_tip.exec()
+            try:
+                with open(os.path.join('assets', 'card_data.json'), 'r', encoding='UTF-8') as jsonfile:
+                    gk_data = json.load(jsonfile)
+
+                saved_data = self.pack_data()
+                cids = [cdata['id'] for cdata in gk_data['character_data']]
+                if self.ch_card.id in cids:
+                    raise IDRepeatError
+                else:
+                    gk_data['character_data'].append(saved_data)
+                save_info = list()
+                save_info.append([get_time(), 'AC', saved_data['id'], saved_data])
+
+                with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
+                    json.dump(gk_data, jsonfile, ensure_ascii=False)
+
+                with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
+                    for log in save_info:
+                        gkcl.write(str(log) + '\n')
+
+                self.save_flag = True
+                self.close()
+            except IDRepeatError:
+                repeat_tip = QMessageBox()
+                repeat_tip.setWindowTitle('错误')
+                repeat_tip.setFont(self.font)
+                repeat_tip.setText('角色ID重复了！无法保存！')
+                repeat_tip.setInformativeText('IDRepeatError')
+                # noinspection PyUnresolvedReferences
+                repeat_tip.setStandardButtons(QMessageBox.Cancel)
+                # noinspection PyUnresolvedReferences
+                repeat_tip.setDefaultButton(QMessageBox.Cancel)
+                repeat_tip.exec()
+                if reason:
+                    raise
 
     def closeEvent(self, event):
         if not self.save_flag:

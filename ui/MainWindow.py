@@ -97,18 +97,6 @@ class MainWindow(QMainWindow):
         action_board_show_game_card = QAction('显示卡牌', self)
         action_board_show_game_card.triggered.connect(lambda: self.refresh_gk_data('game_card'))
         menu_board_body.addAction(action_board_show_game_card)
-        menu_edit.addSeparator()
-        # action_show_editor_honkai_impact_3 = QAction('崩坏3', self)
-        # action_show_editor_honkai_impact_3.triggered.connect(lambda: self.refresh_gk_data('game_card'))
-        # menu_board.addAction(action_show_editor_honkai_impact_3)
-        
-        menu_save = menu_bar.addMenu('保存')
-        action_save_to_file = QAction('保存数据', self)
-        # action_save_to_file.triggered.connect(lambda: self.refresh_gk_data('character'))
-        menu_save.addAction(action_save_to_file)
-        action_json_manage = QAction('管理Json数据', self)
-        # action_json_manage.triggered.connect(lambda: self.refresh_gk_data('character'))
-        menu_save.addAction(action_json_manage)
         """"""
         menu_about = menu_bar.addMenu('关于')
         action_about = QAction('关于...', self)
