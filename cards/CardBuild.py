@@ -313,8 +313,11 @@ def character_card_build(character_data: dict,
         card_img.alpha_composite(frame)
 
     # 神之眼
-    with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
-        card_img.alpha_composite(country)
+    try:
+        with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+            card_img.alpha_composite(country)
+    except FileNotFoundError:
+        pass
     icon_img = character_data['element']
     if character_data['country'] == 'liyue':
         icon_img += '_diamond'
@@ -548,9 +551,13 @@ def character_card_build_with_qt_progress_bar(
     with Image.open(os.path.join('assets', 'img', 'frame', character_data['element'] + '.png')) as frame:
         card_img.alpha_composite(frame)
     progress_bar.setValue(65)
+
     # 神之眼
-    with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
-        card_img.alpha_composite(country)
+    try:
+        with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+            card_img.alpha_composite(country)
+    except FileNotFoundError:
+        pass
     icon_img = character_data['element']
     if character_data['country'] == 'liyue':
         icon_img += '_diamond'
@@ -559,6 +566,7 @@ def character_card_build_with_qt_progress_bar(
     with Image.open(os.path.join('assets', 'img', 'vision', 'element', icon_img + '.png')) as element:
         card_img.alpha_composite(element, (70, 80))
     progress_bar.setValue(75)
+
     # 名字、称号
     info_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
     img_draw(info_img, (245, 470), character_data['name'], 'white', 'name', 8, 'black', 'mt')

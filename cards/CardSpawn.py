@@ -3,7 +3,7 @@ import os
 
 from PIL import Image
 
-from cards.CardBuild import character_card_build
+from CardBuild import character_card_build
 
 # build_a4_print: bool | 是否生成A4尺寸的打印版图片
 build_a4_print = True
@@ -12,8 +12,7 @@ build_a4_print = True
 all_character = False
 
 # character_list: list | 生成角色卡的列表
-character_list = ['nilou']
-
+character_list = ['nilou', 'venti', 'zhongli', 'cyno', 'nahida', 'diluc', 'albedo', 'amber', 'beidou']
 
 # 读取json
 with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as file:
@@ -49,28 +48,24 @@ if build_a4_print:
         os.makedirs(os.path.join('output', 'print_img'))
     card_group = [character_images[i:i + 9] for i in range(0, len(character_images), 9)]
     i = 1
-    for nine_cards_list in card_group:
-        card_point = [
-            (0, 0),
-            (2520, 0),
-            (5040, 0),
-            (0, 3520),
-            (2520, 3520),
-            (5040, 3520),
-            (0, 7040),
-            (2520, 7040),
-            (5040, 7040)
-        ]
+    for j, nine_cards_list in enumerate(card_group):
+        print(f'打印张生成开始: 第 {j} 张')
+        card_size_point = (2560, 3520)
+        card_point = []
+        for y in range(3):
+            for x in range(3):
+                card_point.append((x * card_size_point[0], y * card_size_point[1]))
         a4page = Image.new('RGBA', (8168, 11552), (256, 256, 256, 256))
         try:
             i = 0
             while i < 9:
-                print(nine_cards_list[i].size)
-                character_image = Image.new('RGBA', (2520, 3520), (0, 0, 0, 256))
+                character_image = Image.new('RGBA', (card_size_point[0], card_size_point[1]), (0, 0, 0, 256))
                 character_image.paste(nine_cards_list[i], (20, 20))
                 a4page.paste(character_image, card_point[i])
                 i += 1
+                print(f'打印张生成: 第 {j} 张，第 {i} / 9 个')
         except IndexError:
             pass
         a4page.save(os.path.join('output', 'print_img', 'a4page-' + str(i) + '.png'))
         i += 1
+    print('打印张生成结束')
