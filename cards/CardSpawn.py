@@ -35,12 +35,15 @@ else:
             datas.append(data)
 for data in datas:
     if data['design_state']:
-        ch_img = character_card_build(data, card_versions)
+        try:
+            ch_img = character_card_build(data, card_versions)
+        except Exception:
+            raise
         ch_img.save(os.path.join('output', 'character_card', data['id'] + '.png'))
         character_images.append(ch_img)  # 将生成的图像对象添加到列表中
-        print(data['name'] + '构建结束')
+        print(data['name'] + ' 构建结束。')
     else:
-        print(data['name'] + '不构建')
+        print(data['name'] + ' 不进行构建。你是故意的，还是忘记勾上「设计完成」啦？')
 
 # 生成适用于A4打印的图像
 if build_a4_print:
