@@ -386,7 +386,7 @@ class EditWindow(QWidget):
                 for i, char_dict in enumerate(self.gk_data['character_data']):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
-                json.dump(self.gk_data, jsonfile, ensure_ascii=False)
+                json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
             with open(os.path.join('output', 'change_log.gkcl'), 'a', encoding='UTF-8') as gkcl:
                 for log in save_info:
                     gkcl.write(str(log) + '\n')
