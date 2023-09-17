@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
-        version.setText(f'软件版本 Beta 2.0  |  数据版本  {self.gk_versions.get("character_data")}')
+        version.setText(f'软件版本 Beta 2.2  |  数据版本  {self.gk_versions.get("character_data")}')
         version.setAlignment(Qt.AlignHCenter)
 
         # 选择框

@@ -4,7 +4,8 @@ number_dict = {
         'liyue',
         'inazuma',
         'sumeru',
-        'fontaine',
+        'fontaine_ousia',
+        'fontaine_pneuma',
         'natlan',
         'snezhnaya',
         "khaenri'ah"
@@ -32,6 +33,7 @@ class GKCharacterCard:
         self.max_health_point: int = 3
         self.armor_point: int = 0
         self.dlc: str = 'others'
+        self.tip: str = ''
         self.skill_num: int = 0
         # self.skill1: dict = dict(name='', description='', visible=False)
 
@@ -52,6 +54,7 @@ class GKCharacterCard:
             'max_health_point': self.max_health_point,
             'armor_point': self.armor_point,
             'dlc': self.dlc,
+            'tip': self.tip,
             'skills': []
         }
         for i in range(1, self.skill_num + 1):
@@ -76,6 +79,7 @@ class GKCharacterCard:
         self.max_health_point = int(pack.get('max_health_point', 3))
         self.armor_point = int(pack.get('armor_point', 0))
         self.dlc = pack.get('dlc', 'others')
+        self.tip = pack.get('tip', '')
         self.skill_num = len(pack.get('skills'))
         for i, sdata in enumerate(pack.get('skills')):
             setattr(self, f'skill{i + 1}', dict(
