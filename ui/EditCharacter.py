@@ -19,6 +19,15 @@ def get_time(left=0, right=0):
     return asctime(localtime(time()))[4 + left:19 + right]
 
 
+def copy_text_to_clipboard(text):
+    text_to_copy = text
+    clipboard = QApplication.clipboard()
+    clipboard.setText(text_to_copy)
+    msg_box = QMessageBox()
+    msg_box.setText(f'{text}已复制到剪贴板')
+    msg_box.exec()
+
+
 class EditWindow(QWidget):
     def __init__(self, cid: str | int):
         super().__init__()
@@ -162,9 +171,14 @@ class EditWindow(QWidget):
         self.data_skill.setTabPosition(QTabWidget.West)
         self.data_skill.setStyleSheet('QTabBar::tab{ height:50px;width:30px; }')
 
+        # 复制id
+        edit_id = QPushButton(self)
+        edit_id.setGeometry(QRect(214+224, 28, 50, 22))
+        edit_id.setText('复制ID')
+        edit_id.clicked.connect(lambda: copy_text_to_clipboard(self.ch_card.id))
         # 修改id
         edit_id = QPushButton(self)
-        edit_id.setGeometry(QRect(267+224, 28, 50, 22))
+        edit_id.setGeometry(QRect(270+224, 28, 50, 22))
         edit_id.setText('修改ID')
         edit_id.clicked.connect(lambda: self.edit_id(self.ch_card.id))
         # 保存并刷新
