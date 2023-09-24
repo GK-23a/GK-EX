@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QScrollArea, QWidget, 
 from ui.CreateCharacter import CreateWindow
 from ui.EditCharacter import EditWindow
 from cards.GKCard import GKCharacterCard
+from ui.Export import ExportWindow
 
 
 class MainWindow(QMainWindow):
@@ -56,7 +57,7 @@ class MainWindow(QMainWindow):
         title_en.setText('GK-23a / Genshin')
         title_zh = QLabel(self)
         title_zh.setGeometry(QRect(35, 75, 625, 75))
-        title_zh.setText('原神杀 卡牌构建器')
+        title_zh.setText('原神杀 角色卡牌构建器')
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
@@ -76,9 +77,9 @@ class MainWindow(QMainWindow):
 
         menu_edit = menu_bar.addMenu('编辑')
 
-        action_buildCard = QAction('卡面构建(未完成)', self)
-        # action_buildCard.triggered.connect(self.create_character_action)
-        menu_edit.addAction(action_buildCard)
+        action_export = QAction('导出卡面图片/信息', self)
+        action_export.triggered.connect(self.open_export_window)
+        menu_edit.addAction(action_export)
 
         menu_edit.addSeparator()
 
@@ -193,6 +194,10 @@ class MainWindow(QMainWindow):
     def create_character_action(self):
         self.create_windows.append(CreateWindow())
         self.create_windows[len(self.create_windows) - 1].show()
+
+    def open_export_window(self):
+        self.export_window = ExportWindow()
+        self.export_window.show()
 
     def restart_editor(self):
         # 重启

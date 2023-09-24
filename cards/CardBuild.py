@@ -1,15 +1,18 @@
 import os
 
 from PIL import Image, ImageDraw, ImageFont
+from PySide6.QtWidgets import QProgressBar, QLabel
 
 # 预加载
 
 # 字体
 font = {
     'sign': ImageFont.truetype(os.path.join('assets', 'font', 'MiSans-Light.ttf'), size=56, encoding='utf-8'),  # 卡底标记
-    'category': ImageFont.truetype(os.path.join('assets', 'font', 'MiSans-Semibold.ttf'), size=72, encoding='utf-8'),  # 技能类型
+    'category': ImageFont.truetype(os.path.join('assets', 'font', 'MiSans-Semibold.ttf'), size=72, encoding='utf-8'),
+    # 技能类型
     'text': ImageFont.truetype(os.path.join('assets', 'font', 'MiSans-Regular.ttf'), size=72, encoding='utf-8'),  # 技能内容
-    'suit': ImageFont.truetype(os.path.join('assets', 'font', '有爱新黑CN-Regular.ttf'), size=72, encoding='utf-8'),  # 花色图标
+    'suit': ImageFont.truetype(os.path.join('assets', 'font', '有爱新黑CN-Regular.ttf'), size=72, encoding='utf-8'),
+    # 花色图标
     'title': ImageFont.truetype(os.path.join('assets', 'font', 'SIMLI.ttf'), size=94, encoding='utf-8'),  # 角色称号
     'HP': ImageFont.truetype(os.path.join('assets', 'font', 'MiSans-Semibold.ttf'), size=100, encoding='utf-8'),  # 特殊血条
     'topic': ImageFont.truetype(os.path.join('assets', 'font', 'SIMLI.ttf'), size=120, encoding='utf-8'),  # 技能标题
@@ -139,10 +142,17 @@ def img_draw(bg,
 
 def character_card_build(character_data: dict,
                          versions: str,
-                         img_path=os.path.join('assets', 'img', 'character'),
-                         progress_bar=None,
-                         debug=False) -> Image:
-    """生成角色卡，返回Pillow的图像对象。如果进度条为'Qt'，则中途会传递至函数character_card_build_with_qt_progress_bar()。"""
+                         img_path: str = os.path.join('assets', 'img', 'character'),
+                         progress_bar: QProgressBar | list[QProgressBar | QLabel] | None = None) -> Image:
+    """生成角色卡，返回Pillow的图像对象。如果进度条为'Qt'，则会传递至函数character_card_build_with_qt_progress_bar()。"""
+
+    # 函数传递
+    if progress_bar:
+        return character_card_build_with_qt_progress_bar(
+            character_data=character_data,
+            versions=versions,
+            img_path=img_path,
+            progress_bar=progress_bar)
 
     # 背景与角色图像图层
     card_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
@@ -150,14 +160,6 @@ def character_card_build(character_data: dict,
     if character_image.size != (2000, 3240):
         character_image = img_cut(character_image)
     card_img.paste(character_image, (380, 120))
-
-    # 函数传递
-    if progress_bar:
-        return character_card_build_with_qt_progress_bar(
-            character_data=character_data,
-            versions=versions,
-            card_img=card_img,
-            progress_bar=progress_bar)
 
     # 图层组：技能说明、卡片信息
     skill_img = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
@@ -314,7 +316,8 @@ def character_card_build(character_data: dict,
 
     # 神之眼
     try:
-        with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+        with Image.open(
+                os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
             card_img.alpha_composite(country)
     except FileNotFoundError:
         pass
@@ -393,15 +396,35 @@ def character_card_build(character_data: dict,
 def character_card_build_with_qt_progress_bar(
         character_data: dict,
         versions: str,
-        card_img: Image,
-        progress_bar) -> Image:
-    progress_bar.setValue(15)
+        img_path: str,
+        progress_bar: QProgressBar | list[QProgressBar | QLabel]) -> Image:
+    if type(progress_bar) == list:
+        def progress_run(value, text):
+            progress_bar[0].setValue(value)
+            progress_bar[1].setText(text)
+    else:
+        def progress_run(value, _text):
+            progress_bar.setValue(value)
+    progress_run(1, '正在处理角色图片')
+    # 背景与角色图像图层
+    card_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
+    character_image = Image.open(os.path.join(img_path, character_data['id'] + '.png'))
+    if character_image.size != (2000, 3240):
+        character_image = img_cut(character_image)
+    card_img.paste(character_image, (380, 120))
+    progress_run(15, '正在分析技能')
     # 图层组：技能说明、卡片信息
     skill_img = Image.new('RGBA', (2000, 3240), (253, 253, 253, 138))
     color = element_color[character_data['element']]
     # 技能说明
     skill_text_length, skill_text_height = (45, 50)
+    add_value = 55 / len(character_data['skills'])
+    now_value = 15 - add_value
+    now_num = 0
     for skill_data in character_data['skills']:
+        now_value += add_value
+        now_num += 1
+        progress_run(now_value, f'生成技能{now_num} / {len(character_data["skills"])}')
         if skill_data['visible']:
             fill_color = color[0]
         else:
@@ -424,7 +447,6 @@ def character_card_build_with_qt_progress_bar(
             elif char == '':
                 break
             point += 1
-        progress_bar.setValue(20)
         # 换行计算
         body_height = skill_text_height
         skill_text_body = skill_text
@@ -474,7 +496,6 @@ def character_card_build_with_qt_progress_bar(
                 break
             else:
                 skill_text_length = 45
-        progress_bar.setValue(30)
         # 花色覆盖绘制
         if suit_exist:
             point = 0
@@ -498,7 +519,6 @@ def character_card_build_with_qt_progress_bar(
                     (point_sign[point][2], point_sign[point][3] - 84),
                     suit_text, suit_color, 'suit')
                 point += 1
-        progress_bar.setValue(40)
         # 技能类别粗体覆盖
         bold_text = ''
         while True:
@@ -542,22 +562,24 @@ def character_card_build_with_qt_progress_bar(
     sign_text = 'GenshinKill ' + versions + ' | Designer: ' + character_data.get('designer', 'None') \
                 + ' , Artist: ' + character_data.get('Artist', 'miHoYo')
     img_draw(skill_img, (50, skill_text_height + 10), sign_text, 'black', font_style='sign')
-    progress_bar.setValue(55)
     # 技能图层剪切
     skill_img = skill_img.crop((0, 0, 2000, skill_text_height + 100))
     card_img.alpha_composite(skill_img, (380, 3260 - skill_text_height))  # 技能层叠加
+    progress_run(70, '正在处理角色外框')
 
     # 元素外框
     with Image.open(os.path.join('assets', 'img', 'frame', character_data['element'] + '.png')) as frame:
         card_img.alpha_composite(frame)
-    progress_bar.setValue(65)
+    progress_run(74, '正在处理神之眼(底座)')
 
     # 神之眼
     try:
-        with Image.open(os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
+        with Image.open(
+                os.path.join('assets', 'img', 'vision', 'country', character_data['country'] + '.png')) as country:
             card_img.alpha_composite(country)
     except FileNotFoundError:
         pass
+    progress_run(78, '正在处理神之眼(元素图标)')
     icon_img = character_data['element']
     if character_data['country'] == 'liyue':
         icon_img += '_diamond'
@@ -565,7 +587,7 @@ def character_card_build_with_qt_progress_bar(
         icon_img += '_circle'
     with Image.open(os.path.join('assets', 'img', 'vision', 'element', icon_img + '.png')) as element:
         card_img.alpha_composite(element, (70, 80))
-    progress_bar.setValue(75)
+    progress_run(82, '正在处理名字、称号')
 
     # 名字、称号
     info_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
@@ -579,7 +601,7 @@ def character_card_build_with_qt_progress_bar(
         anchor='mt')[3]
     img_draw(info_img, (245, name_height), character_data['title'], (255, 192, 0, 255), 'title', 4, 'black', 'mt')
     card_img.alpha_composite(info_img)
-    progress_bar.setValue(80)
+    progress_run(90, '正在处理体力值与护甲点数(1 / 2)')
     # 体力值、初始护甲
     hp_img = Image.new('RGBA', (2480, 3480), (255, 255, 255, 0))
     hp_height = 3100
@@ -601,7 +623,7 @@ def character_card_build_with_qt_progress_bar(
         with Image.open(os.path.join('assets', 'img', 'icon', 'Armor.png')) as AP:
             hp_img.alpha_composite(AP, (160, hp_height - 200))
             img_draw(hp_img, (225, hp_height - 150), str(armor_value), 'black')
-    progress_bar.setValue(95)
+    progress_run(94, '正在处理体力值与护甲点数(2 / 2)')
     # 体力值区域后续结算：与称号和名字的防冲突（简单）
     text_height = ImageDraw.Draw(info_img).textbbox(
         (245, name_height),
@@ -628,9 +650,9 @@ def character_card_build_with_qt_progress_bar(
             with Image.open(os.path.join('assets', 'img', 'icon', 'Armor.png')) as AP:
                 hp_img.alpha_composite(AP, (160, 2500))
                 img_draw(hp_img, (225, 2540), str(armor_value), 'black')
-    progress_bar.setValue(99)
+    progress_run(97, '正在形成图片')
     card_img.alpha_composite(hp_img)
-    progress_bar.setValue(0)
+    progress_run(0, '完成生成')
     return card_img
 
 

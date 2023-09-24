@@ -327,6 +327,7 @@ class EditWindow(QWidget):
             tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         build_data = self.ch_card.pack()
+        # noinspection PyBroadException
         try:
             self.cimg = character_card_build(build_data, self.gk_versions['character_data'],
                                              progress_bar=self.pg_bar)
@@ -344,7 +345,7 @@ class EditWindow(QWidget):
             self.show_image.mousePressEvent = self.on_label_image_clicked
             self.show_image.setText('')
 
-    def on_label_image_clicked(self, ev):
+    def on_label_image_clicked(self, _ev):
         self.pg_bar.setValue(100)
         self.cimg.show()
         self.pg_bar.setValue(0)
@@ -401,9 +402,9 @@ class EditWindow(QWidget):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
-            with open(os.path.join('output', 'change_log.gkcl'), 'a', encoding='UTF-8') as gkcl:
+            with open(os.path.join('assets', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
                 for log in save_info:
-                    gkcl.write(str(log) + '\n')
+                    gkch.write(str(log) + '\n')
         self.sdata = deepcopy(saved_data)
         if refresh:
             self.ch_card = GKCharacterCard('')
