@@ -1,5 +1,9 @@
 */__pycache__
-output/
+
+output/character_card
+output/print_img
+output/error.log
+
 beta/
 
 build/
@@ -7,3 +11,5 @@ dist/
 main.spec
 
 .idea/
+
+*.pyc
