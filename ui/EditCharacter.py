@@ -19,6 +19,15 @@ def get_time(left=0, right=0):
     return asctime(localtime(time()))[4 + left:19 + right]
 
 
+def copy_text_to_clipboard(text):
+    text_to_copy = text
+    clipboard = QApplication.clipboard()
+    clipboard.setText(text_to_copy)
+    msg_box = QMessageBox()
+    msg_box.setText(f'{text}已复制到剪贴板')
+    msg_box.exec()
+
+
 class EditWindow(QWidget):
     def __init__(self, cid: str | int):
         super().__init__()
@@ -162,9 +171,14 @@ class EditWindow(QWidget):
         self.data_skill.setTabPosition(QTabWidget.West)
         self.data_skill.setStyleSheet('QTabBar::tab{ height:50px;width:30px; }')
 
+        # 复制id
+        edit_id = QPushButton(self)
+        edit_id.setGeometry(QRect(214+224, 28, 50, 22))
+        edit_id.setText('复制ID')
+        edit_id.clicked.connect(lambda: copy_text_to_clipboard(self.ch_card.id))
         # 修改id
         edit_id = QPushButton(self)
-        edit_id.setGeometry(QRect(267+224, 28, 50, 22))
+        edit_id.setGeometry(QRect(270+224, 28, 50, 22))
         edit_id.setText('修改ID')
         edit_id.clicked.connect(lambda: self.edit_id(self.ch_card.id))
         # 保存并刷新
@@ -313,6 +327,7 @@ class EditWindow(QWidget):
             tp_v = bool(getattr(self, f'self.data_skill{i}_visible').isChecked())
             setattr(self.ch_card, f'skill{i}', dict(name=tp_n, description=tp_d, visible=tp_v))
         build_data = self.ch_card.pack()
+        # noinspection PyBroadException
         try:
             self.cimg = character_card_build(build_data, self.gk_versions['character_data'],
                                              progress_bar=self.pg_bar)
@@ -330,7 +345,7 @@ class EditWindow(QWidget):
             self.show_image.mousePressEvent = self.on_label_image_clicked
             self.show_image.setText('')
 
-    def on_label_image_clicked(self, ev):
+    def on_label_image_clicked(self, _ev):
         self.pg_bar.setValue(100)
         self.cimg.show()
         self.pg_bar.setValue(0)
@@ -387,9 +402,9 @@ class EditWindow(QWidget):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
-            with open(os.path.join('output', 'change_log.gkcl'), 'a', encoding='UTF-8') as gkcl:
+            with open(os.path.join('assets', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
                 for log in save_info:
-                    gkcl.write(str(log) + '\n')
+                    gkch.write(str(log) + '\n')
         self.sdata = deepcopy(saved_data)
         if refresh:
             self.ch_card = GKCharacterCard('')
