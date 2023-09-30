@@ -6,5 +6,5 @@ def copy_text_to_clipboard(text):
     clipboard = QApplication.clipboard()
     clipboard.setText(text_to_copy)
     msg_box = QMessageBox()
-    msg_box.setText(f'{text}ÒÑ¸´ÖÆµ½¼ôÌù°å')
+    msg_box.setText(f'{text}å·²å¤åˆ¶åˆ°å‰ªè´´æ¿')
     msg_box.exec()
