@@ -12,20 +12,8 @@ from PySide6.QtWidgets import (QLabel, QLineEdit, QCheckBox, QComboBox, QWidget,
 
 from cards.CardBuild import character_card_build
 from cards.GKCard import GKCharacterCard
-from ui.NWidgets import TabWidget as NTabWidget
-
-
-def get_time(left=0, right=0):
-    return asctime(localtime(time()))[4 + left:19 + right]
-
-
-def copy_text_to_clipboard(text):
-    text_to_copy = text
-    clipboard = QApplication.clipboard()
-    clipboard.setText(text_to_copy)
-    msg_box = QMessageBox()
-    msg_box.setText(f'{text}已复制到剪贴板')
-    msg_box.exec()
+from .NWidgets import TabWidget as NTabWidget
+from .UILib import copy_text_to_clipboard
 
 
 class EditWindow(QWidget):
@@ -374,6 +362,10 @@ class EditWindow(QWidget):
         return saved_data
 
     def save_data(self, refresh):
+
+        def get_time(left=0, right=0):
+            return asctime(localtime(time()))[4 + left:19 + right]
+
         saved_data = self.pack_data()
         if saved_data != self.sdata:
             # 保存准备
