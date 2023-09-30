@@ -2,6 +2,7 @@ import os
 import json
 from copy import deepcopy
 from time import asctime, localtime, time
+from typing import Literal
 
 from PIL.ImageQt import ImageQt
 from PySide6.QtCore import QRect, QSize, Qt
@@ -184,12 +185,12 @@ class EditWindow(QWidget):
         skill_add = QPushButton(self)
         skill_add.setGeometry(QRect(156+224, 178, 70, 22))
         skill_add.setText('新增技能')
-        skill_add.clicked.connect(self.skill_change_add)
+        skill_add.clicked.connect(lambda: self.skill_change('add'))
         # 删除技能
         skill_del = QPushButton(self)
         skill_del.setGeometry(QRect(231+224, 178, 70, 22))
         skill_del.setText('删除技能')
-        skill_del.clicked.connect(self.skill_change_del)
+        skill_del.clicked.connect(lambda: self.skill_change('del'))
 
         # 显示注释
         save_and_refresh = QPushButton(self)
@@ -446,15 +447,14 @@ class EditWindow(QWidget):
         else:
             self.data_id.setText(new_id)
 
-    def skill_change_add(self):
-        self.ch_card.add_skill('技能')
+    def skill_change(self, function: Literal['add', 'del']):
+        if function == 'add':
+            self.ch_card.add_skill('技能')
+        elif function == 'del':
+            if cix := self.data_skill.currentIndex() >= 0:
+                self.ch_card.del_skill(cix + 1)
+        self.save_data(1)
         self.refresh_skill()
-
-    def skill_change_del(self):
-        cidx = self.data_skill.currentIndex()
-        if cidx >= 0:
-            self.ch_card.del_skill(cidx + 1)
-            self.refresh_skill()
 
     def show_or_hide_tip(self):
         if self.show_tip_now:
