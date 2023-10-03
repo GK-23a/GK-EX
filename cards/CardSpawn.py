@@ -15,7 +15,7 @@ except ImportError:
 ### 生成默认配置文件
 
 # spawn_a4_print_image: bool / 是否生成A4尺寸的打印版图片
-build_a4_print = False
+build_a4_print = True
 
 # all_character: bool / 是否生成全部角色卡；若为True，忽略character_list
 all_character = True
@@ -82,11 +82,11 @@ def spawn_card_image(
         if all_progress_bar:
             all_progress_bar[0].setValue(value)
             all_progress_bar[1].setText(text)
-            return value
+        return value
 
     max_value = 100
-    if len(all_progress_bar) == 3:
-        if all_progress_bar[2]:
+    if all_progress_bar:
+        if len(all_progress_bar) == 3 and all_progress_bar[2]:
             max_value = 70
     add_value = max_value / (len(character_datas) + 1)
     now_value = progress_run(0, '准备导出') + add_value
@@ -129,7 +129,7 @@ def spawn_a4_image(
         if all_progress_bar:
             all_progress_bar[0].setValue(value)
             all_progress_bar[1].setText(text)
-            return value
+        return value
     now_value = progress_run(72, '正在生成打印版图片')
     formatted_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))[:]
     folder_dir = os.path.join('output', 'print_image', formatted_time)

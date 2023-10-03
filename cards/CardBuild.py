@@ -194,7 +194,15 @@ def character_card_build(character_data: dict,
         body_height = skill_text_height
         skill_text_body = skill_text
         while True:
+            liner_text = skill_text
             while True:
+                newline_index = liner_text.find('\n')
+                if 0 < newline_index:
+                    skill_text_length = newline_index
+                elif newline_index == 0:
+                    skill_text = skill_text[1:]
+                    liner_text = skill_text[:skill_text_length]
+                    continue
                 liner_text = skill_text[:skill_text_length]
                 line_len = ImageDraw.Draw(skill_img).textbbox(
                     (50, skill_text_height + 95),
@@ -451,7 +459,15 @@ def character_card_build_with_qt_progress_bar(
         body_height = skill_text_height
         skill_text_body = skill_text
         while True:
+            liner_text = skill_text
             while True:
+                newline_index = liner_text.find('\n')
+                if 0 < newline_index:
+                    skill_text_length = newline_index
+                elif newline_index == 0:
+                    skill_text = skill_text[1:]
+                    liner_text = skill_text[:skill_text_length]
+                    continue
                 liner_text = skill_text[:skill_text_length]
                 line_len = ImageDraw.Draw(skill_img).textbbox(
                     (50, skill_text_height + 95),
