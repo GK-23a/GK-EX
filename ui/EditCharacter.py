@@ -395,7 +395,7 @@ class EditWindow(QWidget):
                     if char_dict['name'] == saved_data['name']:
                         self.gk_data['character_data'][i] = saved_data
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
-            with open(os.path.join('assets', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
+            with open(os.path.join('output', 'log', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
                 for log in save_info:
                     gkch.write(str(log) + '\n')
         self.sdata = deepcopy(saved_data)

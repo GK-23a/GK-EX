@@ -141,7 +141,7 @@ def spawn_a4_image(
     for j, nine_cards_list in enumerate(card_group):
         now_value = progress_run(now_value, f'正在生成打印版图片({j+1} / {len(card_group)})') + 30 / len(card_group)
         logging.info(f'打印张生成开始: 第 {j+1} 张')
-        card_size_point = (2560, 3520)
+        card_size_point = (2560, 3560)
         card_point = []
         for y in range(3):
             for x in range(3):

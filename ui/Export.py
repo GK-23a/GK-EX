@@ -203,22 +203,27 @@ class ExportWindow(QWidget):
 
         if self.export_category == 'image':
             datas = [d for d in self.gk_character_data if d['id'] in selected_character_ids]
-            if self.image_export_way.currentIndex() == 1:
-                pillow_images = CardSpawn.spawn_card_image(
-                    datas, self.version_data, 'low', [self.export_bar[1]['bar'], self.export_bar[1]['text']],
-                    [self.export_bar[0]['bar'], self.export_bar[0]['text']])
-            else:
-                pillow_images = CardSpawn.spawn_card_image(
+            export_flag = self.image_export_way.currentIndex()
+            if export_flag == 0:
+                CardSpawn.spawn_card_image(
                     datas, self.version_data, 'high', [self.export_bar[1]['bar'], self.export_bar[1]['text']],
                     [self.export_bar[0]['bar'], self.export_bar[0]['text']])
-            if self.image_export_way.currentIndex() == 2:
-                CardSpawn.spawn_a4_image(pillow_images)
+            elif export_flag == 1:
+                CardSpawn.spawn_card_image(
+                    datas, self.version_data, 'low', [self.export_bar[1]['bar'], self.export_bar[1]['text']],
+                    [self.export_bar[0]['bar'], self.export_bar[0]['text']])
+            elif export_flag == 2:
+                pillow_images = CardSpawn.spawn_card_image(
+                    datas, self.version_data, 'high', [self.export_bar[1]['bar'], self.export_bar[1]['text']],
+                    [self.export_bar[0]['bar'], self.export_bar[0]['text'], True])
+                CardSpawn.spawn_a4_image(pillow_images, [self.export_bar[0]['bar'], self.export_bar[0]['text']])
             self.export_bar[0]['bar'].setValue(100)
             self.export_bar[0]['text'].setText('已完成导出任务')
         else:
             file_category = self.export_category
             # if file_category == 'md':
             # if file_category == 'plaintext':
+            raise
 
         self.select_pushbutton['select_all'].setDisabled(False)
         self.select_pushbutton['deselect_all'].setDisabled(False)
