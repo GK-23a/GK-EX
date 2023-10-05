@@ -177,7 +177,7 @@
       "country": "mondstadt",
       "level": 4,
       "designer": "洛莫兮辰",
-      "design_state": true,
+      "design_state": false,
       "artist": "miHoYo",
       "health_point": 4,
       "max_health_point": 4,
@@ -187,12 +187,12 @@
       "skills": [
         {
           "name": "冒险",
-          "description": "出牌阶段，你可以弃置一张红色牌，令一名角色回复一点体力；若如此做，你摸一张牌。",
+          "description": "",
           "visible": true
         },
         {
           "name": "好运",
-          "description": "准备阶段，你可以进行判定，若结果为红色，你获得此牌，然后你可以重复此流程。你的判定牌，♥视为♠。",
+          "description": "",
           "visible": true
         },
         {
@@ -279,7 +279,7 @@
       "country": "mondstadt",
       "level": 4,
       "designer": "mzerh",
-      "design_state": true,
+      "design_state": false,
       "artist": "miHoYo",
       "health_point": 3,
       "max_health_point": 3,
@@ -686,7 +686,7 @@
       "country": "sumeru",
       "level": 4,
       "designer": "洛莫兮辰",
-      "design_state": true,
+      "design_state": false,
       "artist": "miHoYo",
       "health_point": 3,
       "max_health_point": 3,
@@ -894,7 +894,7 @@
       "country": "sumeru",
       "level": 5,
       "designer": "mzerh",
-      "design_state": true,
+      "design_state": false,
       "artist": "miHoYo",
       "health_point": 4,
       "max_health_point": 4,
@@ -1111,7 +1111,7 @@
       "skills": [
         {
           "name": "天权",
-          "description": "锁定技，每当你于回合内不因此技能获得牌时，你可以令至多X名角色摸一张牌；每当你于回合外获得牌时你选择一项：1.弃置这些牌；2.流失一点体力。（X为你获得的牌数）",
+          "description": "锁定技，每当你不因此技能获得牌时，你可以令至多X名角色摸一张牌。",
           "visible": true
         },
         {
@@ -1145,12 +1145,12 @@
         },
         {
           "name": "支援",
-          "description": "出牌阶段限一次，你可以令一名角色获得一点护甲，之后执行一项：1.弃置一张牌；2.失去一点体力。",
+          "description": "出牌阶段限一次，你可以令一名角色获得一点护甲，然后执行一项：1.弃置一张牌；2.失去一点体力。",
           "visible": true
         },
         {
           "name": "扫除",
-          "description": "出牌阶段，你可以失去一点护甲，之后你本回合使用【杀】的次数+1，攻击范围+1。",
+          "description": "出牌阶段，你可以失去一点护甲，然后你本回合使用【杀】的次数+1，攻击范围+1。",
           "visible": true
         }
       ]
@@ -1269,7 +1269,7 @@
       "country": "mondstadt",
       "level": 4,
       "designer": "mzerh",
-      "design_state": true,
+      "design_state": false,
       "artist": "miHoYo",
       "health_point": 3,
       "max_health_point": 3,
@@ -1623,7 +1623,7 @@
         },
         {
           "name": "傩舞",
-          "description": "锁定技，你每击杀一名角色，回复三点体力并摸（X+2）张牌，之后流失X点体力（X为此效果发动次数）。",
+          "description": "锁定技，你每击杀一名角色，回复三点体力并摸（X+3）张牌，之后流失X点体力（X为此效果发动次数）。",
           "visible": true
         }
       ]
@@ -1778,12 +1778,12 @@
       "skills": [
         {
           "name": "玄掷",
-          "description": "每名角色回合限一次，其他角色使用非装备牌时，你可以与其拼点，其拼点牌的点数+X（X为该牌指定的目标数），若你赢，则此牌失效，若你没赢，则你成为此牌的目标。",
+          "description": "每名角色回合限一次，其他角色使用非装备牌时，你可以与其拼点，其拼点牌的点数+X（X为该牌指定的目标数），若你赢，则此牌失效，否则你成为此牌的目标。",
           "visible": true
         },
         {
           "name": "猜先",
-          "description": "锁定技，你的黑桃牌的点数视为K，且你拼点时使用牌堆顶或牌堆底的牌拼点。",
+          "description": "锁定技，你的黑桃牌的点数视为K；你没有手牌时也可以发动拼点，你拼点时使用牌堆顶或牌堆底的牌拼点。",
           "visible": true
         },
         {
