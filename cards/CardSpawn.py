@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from typing import Literal
 
-from PIL import Image
+from PIL import Image, ImageDraw
 from PySide6.QtWidgets import QProgressBar, QLabel
 
 try:
@@ -141,22 +141,30 @@ def spawn_a4_image(
     for j, nine_cards_list in enumerate(card_group):
         now_value = progress_run(now_value, f'正在生成打印版图片({j+1} / {len(card_group)})') + 30 / len(card_group)
         logging.info(f'打印张生成开始: 第 {j+1} 张')
-        card_size_point = (2560, 3560)
+        card_size_point = (2561, 3641)
         card_point = []
         for y in range(3):
             for x in range(3):
-                card_point.append((x * card_size_point[0], y * card_size_point[1]))
+                card_point.append((x * card_size_point[0] + 19, y * card_size_point[1] + 19))
         a4page = Image.new('RGBA', (8168, 11552), (256, 256, 256, 256))
         try:
             i = 0
             while i < 9:
                 character_image = Image.new('RGBA', (card_size_point[0], card_size_point[1]), (0, 0, 0, 256))
-                character_image.paste(nine_cards_list[i], (20, 20))
+                character_image.paste(nine_cards_list[i], (41, 81))
                 a4page.paste(character_image, card_point[i])
                 i += 1
                 logging.info(f'打印张生成: 第 {j+1} 张，第 {i} / 9 个')
         except IndexError:
             pass
+        # 剪切辅助线
+        cut_page = Image.new('RGBA', (8168, 11552), (0, 0, 0, 0))
+        cpdd = ImageDraw.Draw(cut_page)
+        for b in [19, 3660, 7301, 10942]:
+            cpdd.line((7768, b, 8168, b), 'red', 5)
+        for b in [19, 2580, 5141, 7702]:
+            cpdd.line((b, 11052, b, 11552), 'red', 5)
+        a4page.alpha_composite(cut_page)
         a4page.save(os.path.join('output', 'print_image', formatted_time, f'a4page-{str(j+1)}.png'))
         i += 1
     logging.info('打印张生成结束')

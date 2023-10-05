@@ -2,7 +2,6 @@ import os
 import json
 from copy import deepcopy
 from time import asctime, localtime, time
-from typing import Literal
 
 from PIL.ImageQt import ImageQt
 from PySide6.QtCore import QRect, QSize, Qt
@@ -185,12 +184,12 @@ class EditWindow(QWidget):
         skill_add = QPushButton(self)
         skill_add.setGeometry(QRect(156+224, 178, 70, 22))
         skill_add.setText('新增技能')
-        skill_add.clicked.connect(lambda: self.skill_change('add'))
+        skill_add.clicked.connect(self.skill_change_add)
         # 删除技能
         skill_del = QPushButton(self)
         skill_del.setGeometry(QRect(231+224, 178, 70, 22))
         skill_del.setText('删除技能')
-        skill_del.clicked.connect(lambda: self.skill_change('del'))
+        skill_del.clicked.connect(self.skill_change_del)
 
         # 显示注释
         save_and_refresh = QPushButton(self)
@@ -259,22 +258,6 @@ class EditWindow(QWidget):
             self.show_image.setText('No Image.')
         self.refresh_skill()
 
-    def refresh_skill(self):
-        # 技能显示
-        self.data_skill.clear()
-        for i in range(1, self.ch_card.skill_num + 1):
-            sw = f'show_skill{i}_widget'
-            sn = f'show_skill{i}_name'
-            dn = f'self.data_skill{i}_name'
-            sd = f'show_skill{i}_description'
-            dd = f'self.data_skill{i}_description'
-            dv = f'self.data_skill{i}_visible'
-            self.add_skill(getattr(self.ch_card, f'skill{i}'), sw, sn, dn, sd, dd, dv)
-
-            getattr(self, dn).setText(getattr(self.ch_card, f'skill{i}').get('name'))
-            getattr(self, dd).setPlainText(getattr(self.ch_card, f'skill{i}').get('description'))
-            getattr(self, dv).setChecked(getattr(self.ch_card, f'skill{i}').get('visible'))
-
     def add_skill(self, data, sw, sn, dn, sd, dd, dv):
         setattr(self, sw, QWidget())
         getattr(self, sw).setFont(self.font)
@@ -295,6 +278,36 @@ class EditWindow(QWidget):
         getattr(self, dd).setGeometry(QRect(70-24, 40, 240+24, 150))
 
         self.data_skill.addTab(getattr(self, sw), data.get('name'))
+
+    def add_skill_widget(self, num):
+        sw = f'show_skill{num}_widget'
+        sn = f'show_skill{num}_name'
+        dn = f'self.data_skill{num}_name'
+        sd = f'show_skill{num}_description'
+        dd = f'self.data_skill{num}_description'
+        dv = f'self.data_skill{num}_visible'
+        self.add_skill(getattr(self.ch_card, f'skill{num}'), sw, sn, dn, sd, dd, dv)
+
+        getattr(self, dn).setText(getattr(self.ch_card, f'skill{num}').get('name'))
+        getattr(self, dd).setPlainText(getattr(self.ch_card, f'skill{num}').get('description'))
+        getattr(self, dv).setChecked(getattr(self.ch_card, f'skill{num}').get('visible'))
+
+    def refresh_skill(self):
+        # 技能显示
+        self.data_skill.clear()
+        for i in range(1, self.ch_card.skill_num + 1):
+            self.add_skill_widget(i)
+
+    def skill_change_add(self):
+        self.ch_card.add_skill('技能')
+        self.add_skill_widget(self.ch_card.skill_num)
+        self.data_skill.setCurrentIndex(self.ch_card.skill_num)
+
+    def skill_change_del(self):
+        cixp = self.data_skill.currentIndex()
+        if cixp > -1:
+            self.ch_card.del_skill(cixp+1)
+            getattr(self, f'show_skill{cixp+1}_widget').deleteLater()
 
     def build_image(self):
         self.ch_card.id = self.data_id.text()
@@ -367,6 +380,7 @@ class EditWindow(QWidget):
         def get_time(left=0, right=0):
             return asctime(localtime(time()))[4 + left:19 + right]
 
+        current_index = self.data_skill.currentIndex()
         saved_data = self.pack_data()
         if saved_data != self.sdata:
             # 保存准备
@@ -403,6 +417,7 @@ class EditWindow(QWidget):
             self.ch_card = GKCharacterCard('')
             self.ch_card.unpack(saved_data)
             self.refresh_data()
+            self.data_skill.setCurrentIndex(current_index)
 
     def edit_id(self, origin_id):
         """修改角色id"""
@@ -446,15 +461,6 @@ class EditWindow(QWidget):
             error_tip.exec()
         else:
             self.data_id.setText(new_id)
-
-    def skill_change(self, function: Literal['add', 'del']):
-        if function == 'add':
-            self.ch_card.add_skill('技能')
-        elif function == 'del':
-            if cix := self.data_skill.currentIndex() >= 0:
-                self.ch_card.del_skill(cix + 1)
-        self.save_data(1)
-        self.refresh_skill()
 
     def show_or_hide_tip(self):
         if self.show_tip_now:

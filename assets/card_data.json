@@ -1489,6 +1489,11 @@
           "name": "天歌",
           "description": "出牌阶段限一次，你可以横置或重置任意名角色。结束阶段，你可以令至多两名处于横置状态的角色执行一项：1.流失一点体力；2.摸两张牌；3.回复一点体力。",
           "visible": true
+        },
+        {
+          "name": "风诗",
+          "description": "结束阶段，你的上个回合结束后至你本回合出牌阶段结束期间，若有角色造成过元素伤害，则你可以对一名与你距离小于2的角色造成一点相同元素的元素伤害；若造成过多种元素伤害，则你在其中选择一种。",
+          "visible": true
         }
       ]
     },
@@ -2078,7 +2083,7 @@
       "country": "others",
       "level": 5,
       "designer": "mzerh",
-      "design_state": false,
+      "design_state": true,
       "artist": "miHoYo",
       "health_point": 4,
       "max_health_point": 4,
@@ -2107,7 +2112,7 @@
       "country": "others",
       "level": 4,
       "designer": "mzerh",
-      "design_state": false,
+      "design_state": true,
       "artist": "miHoYo",
       "health_point": 3,
       "max_health_point": 3,
@@ -2118,17 +2123,17 @@
         {
           "name": "谜影",
           "description": "当你于一个回合内使用第X张牌时，若你手中有X种花色的牌，则你可以摸X张牌。",
-          "visible": false
+          "visible": true
         },
         {
           "name": "运变",
           "description": "出牌阶段每名角色限一次，你可以展示自己和一名角色的全部手牌，然后弃置你与其区域内一种花色的牌；在这之后，弃置牌较多的角色对弃置牌较少的角色造成一点伤害。",
-          "visible": false
+          "visible": true
         },
         {
           "name": "巧施",
           "description": "你的手牌被展示时，你可以令其中一张牌在离开你的手牌区之前视为无色。",
-          "visible": false
+          "visible": true
         }
       ]
     },
@@ -2237,5 +2242,5 @@
       ]
     }
   ],
-  "character_data_versions": "Beta-0418"
+  "character_data_versions": "Beta-1005"
 }

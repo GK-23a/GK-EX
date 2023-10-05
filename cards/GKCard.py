@@ -57,6 +57,7 @@ class GKCharacterCard:
             'tip': self.tip,
             'skills': []
         }
+        self.rsort_skill()
         for i in range(1, self.skill_num + 1):
             skill = f'skill{i}'
             if getattr(self, skill).get('name', None):
@@ -86,6 +87,11 @@ class GKCharacterCard:
                 name=sdata.get('name', ''),
                 description=sdata.get('description', ''),
                 visible=bool(sdata.get('visible', 0))))
+        j = self.skill_num + 1
+        while hasattr(self, f'skill{j}'):
+            delattr(self, f'skill{j}')
+            j += 1
+        pass
 
     def to_number(self, origin_key) -> int | None:
         """将属性字符串转换为数字"""
@@ -106,12 +112,12 @@ class GKCharacterCard:
         else:
             return None
 
-    def add_skill(self, skill_name, description='', visible=False):
+    def add_skill(self, skill_name, description='', visible=True):
         """新增一个角色技能"""
         self.skill_num += 1
         setattr(self, f'skill{self.skill_num}', dict(name=skill_name, description=description, visible=visible))
 
-    def del_skill(self, skill_index):
+    def del_skill(self, skill_index, rsort: bool = False):
         """删除某个角色技能"""
         if skill_index < 1 or skill_index > self.skill_num:
             raise IndexError("Invalid skill index")
@@ -119,8 +125,19 @@ class GKCharacterCard:
         delattr(self, f'skill{skill_index}')
         # 更新技能数量
         self.skill_num -= 1
-        # 重新调整剩余技能的索引
-        for i in range(skill_index, self.skill_num + 1):
-            current_skill = getattr(self, f'skill{i + 1}')
-            setattr(self, f'skill{i}', current_skill)
-            delattr(self, f'skill{i + 1}')
+        if rsort:
+            self.rsort_skill()
+
+    def rsort_skill(self):
+        skill_list = list()
+        for i in range(1, self.skill_num + 1):
+            try:
+                skill_list.append(getattr(self, f'skill{i}'))
+            except AttributeError:
+                pass
+        i = 1
+        while hasattr(self, f'skill{i}'):
+            delattr(self, f'skill{i}')
+        self.skill_num = len(skill_list)
+        for i, j in enumerate(skill_list):
+            setattr(self, f'skill{i+1}', j)
