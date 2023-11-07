@@ -123,7 +123,7 @@ def spawn_card_image(
 # 生成适用于A4打印的图像
 def spawn_a4_image(
         character_images: list,
-        all_progress_bar: list[QProgressBar | QLabel] = None
+        all_progress_bar: list[QProgressBar | QLabel] | None = None
 ) -> None:
     def progress_run(value, text):
         if all_progress_bar:
