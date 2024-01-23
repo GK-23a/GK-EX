@@ -1,0 +1,668 @@
+[
+  {
+    "id": "albedo",
+    "title": "白垩之子",
+    "name": "阿贝多",
+    "sex": "male",
+    "element": "geo",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "aloy",
+    "title": "异界的救世主",
+    "name": "埃洛伊",
+    "sex": "female",
+    "element": "cryo",
+    "country": "others",
+    "level": 5
+  },
+  {
+    "id": "alhaitham",
+    "title": "诲韬诤言",
+    "name": "艾尔海森",
+    "sex": "male",
+    "element": "dendro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "amber",
+    "title": "飞行冠军",
+    "name": "安柏",
+    "sex": "female",
+    "element": "pyro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "yae_miko",
+    "title": "浮世笑百姿",
+    "name": "八重神子",
+    "sex": "female",
+    "element": "electro",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "barbara",
+    "title": "闪耀偶像",
+    "name": "芭芭拉",
+    "sex": "female",
+    "element": "hydro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "bennett",
+    "title": "命运试金石",
+    "name": "班尼特",
+    "sex": "male",
+    "element": "pyro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "beidou",
+    "title": "无冕的龙王",
+    "name": "北斗",
+    "sex": "female",
+    "element": "electro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "tartaglia",
+    "title": "「公子」",
+    "name": "达达利亚",
+    "sex": "male",
+    "element": "hydro",
+    "country": "snezhnaya",
+    "level": 5
+  },
+  {
+    "id": "diona",
+    "title": "猫尾特调",
+    "name": "迪奥娜",
+    "sex": "female",
+    "element": "cryo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "diluc",
+    "title": "晨曦的暗面",
+    "name": "迪卢克",
+    "sex": "male",
+    "element": "pyro",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "dori",
+    "title": "梦园藏金",
+    "name": "多莉",
+    "sex": "female",
+    "element": "electro",
+    "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "faruzan",
+    "title": "机逐封秘",
+    "name": "珐露珊",
+    "sex": "female",
+    "element": "anemo",
+    "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "fischl",
+    "title": "断罪皇女！！",
+    "name": "菲谢尔",
+    "sex": "female",
+    "element": "electro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "kaedehara_kazuha",
+    "title": "红叶逐荒波",
+    "name": "枫原万叶",
+    "sex": "male",
+    "element": "anemo",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "ganyu",
+    "title": "循循守月",
+    "name": "甘雨",
+    "sex": "female",
+    "element": "cryo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "hu_tao",
+    "title": "雪霁梅香",
+    "name": "胡桃",
+    "sex": "female",
+    "element": "pyro",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "arataki_itto",
+    "title": "花坂豪快",
+    "name": "荒泷一斗",
+    "sex": "male",
+    "element": "geo",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "kujou_sara",
+    "title": "黑羽鸣镝",
+    "name": "九条裟罗",
+    "sex": "female",
+    "element": "electro",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "kuki_shinobu",
+    "title": "烦恼刈除",
+    "name": "久岐忍",
+    "sex": "female",
+    "element": "electro",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "kaeya",
+    "title": "寒风剑士",
+    "name": "凯亚",
+    "sex": "male",
+    "element": "cryo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "candace",
+    "title": "浮金的誓愿",
+    "name": "坎蒂丝",
+    "sex": "female",
+    "element": "hydro",
+    "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "collei",
+    "title": "萃念初蘖",
+    "name": "柯莱",
+    "sex": "female",
+    "element": "dendro",
+    "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "klee",
+    "title": "逃跑的太阳",
+    "name": "可莉",
+    "sex": "female",
+    "element": "pyro",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "keqing",
+    "title": "霆霓快雨",
+    "name": "刻晴",
+    "sex": "female",
+    "element": "electro",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "layla",
+    "title": "绮思晚星",
+    "name": "莱依拉",
+    "sex": "female",
+    "element": "cryo",
+    "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "raiden_shogun",
+    "title": "一心净土",
+    "name": "雷电将军",
+    "sex": "female",
+    "element": "electro",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "razor",
+    "title": "狼少年",
+    "name": "雷泽",
+    "sex": "male",
+    "element": "electro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "lisa",
+    "title": "蔷薇魔女",
+    "name": "丽莎",
+    "sex": "female",
+    "element": "electro",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "wanderer",
+    "title": "久世浮倾",
+    "name": "流浪者",
+    "sex": "male",
+    "element": "anemo",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "shikanoin_heizou",
+    "title": "心朝乂安",
+    "name": "鹿野院平藏",
+    "sex": "male",
+    "element": "anemo",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "rosaria",
+    "title": "棘冠恩典",
+    "name": "罗莎莉亚",
+    "sex": "female",
+    "element": "cryo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "traveler",
+    "title": "",
+    "name": "旅行者",
+    "sex": "others",
+    "element": "others",
+    "country": "others",
+    "level": 5
+  },
+  {
+    "id": "mona",
+    "title": "星天水镜",
+    "name": "莫娜",
+    "sex": "female",
+    "element": "hydro",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "nahida",
+    "title": "白草净华0",
+    "name": "纳西妲",
+    "sex": "female",
+    "element": "dendro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "nilou",
+    "title": "莲光落舞筵",
+    "name": "妮露",
+    "sex": "female",
+    "element": "hydro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "ningguang",
+    "title": "掩月天权",
+    "name": "凝光",
+    "sex": "female",
+    "element": "geo",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "noelle",
+    "title": "未授勋之花",
+    "name": "诺艾尔",
+    "sex": "female",
+    "element": "geo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "paimon",
+    "title": "",
+    "name": "派蒙",
+    "sex": "female",
+    "element": "others",
+    "country": "others",
+    "level": 0
+  },
+  {
+    "id": "qiqi",
+    "title": "冻冻回魂夜",
+    "name": "七七",
+    "sex": "female",
+    "element": "cryo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "jean",
+    "title": "蒲公英骑士",
+    "name": "琴",
+    "sex": "female",
+    "element": "anemo",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "cyno",
+    "title": "缄秘的裁遣",
+    "name": "赛诺",
+    "sex": "male",
+    "element": "electro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "sucrose",
+    "title": "无害甜度",
+    "name": "砂糖",
+    "sex": "female",
+    "element": "anemo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "sangonomiya_kokomi",
+    "title": "真珠之智",
+    "name": "珊瑚宫心海",
+    "sex": "female",
+    "element": "hydro",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "shenhe",
+    "title": "孤辰茕怀",
+    "name": "申鹤",
+    "sex": "female",
+    "element": "cryo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "kamisato_ayaka",
+    "title": "白鹭霜华",
+    "name": "神里绫华",
+    "sex": "female",
+    "element": "cryo",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "kamisato_ayato",
+    "title": "磐祭叶守",
+    "name": "神里绫人",
+    "sex": "male",
+    "element": "hydro",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "tighnari",
+    "title": "浅蔚轻行",
+    "name": "提纳里",
+    "sex": "male",
+    "element": "dendro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "thoma",
+    "title": "渡来介者",
+    "name": "托马",
+    "sex": "male",
+    "element": "pyro",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "venti",
+    "title": "风色诗人",
+    "name": "温迪",
+    "sex": "male",
+    "element": "anemo",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "gorou",
+    "title": "戎犬锵锵",
+    "name": "五郎",
+    "sex": "male",
+    "element": "geo",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "xiangling",
+    "title": "万民百味",
+    "name": "香菱",
+    "sex": "female",
+    "element": "pyro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "yoimiya",
+    "title": "琉焰华舞",
+    "name": "宵宫",
+    "sex": "female",
+    "element": "pyro",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "xiao",
+    "title": "护法夜叉",
+    "name": "魈",
+    "sex": "male",
+    "element": "anemo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "xinyan",
+    "title": "燥热旋律",
+    "name": "辛焱",
+    "sex": "female",
+    "element": "pyro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "xingqiu",
+    "title": "少年春衫薄",
+    "name": "行秋",
+    "sex": "male",
+    "element": "hydro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "yanfei",
+    "title": "智明无邪",
+    "name": "烟绯",
+    "sex": "female",
+    "element": "pyro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "yaoyao",
+    "title": "仙蕊玲珑",
+    "name": "瑶瑶",
+    "sex": "female",
+    "element": "dendro",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "yelan",
+    "title": "兰生幽谷",
+    "name": "夜兰",
+    "sex": "female",
+    "element": "hydro",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "eula",
+    "title": "浪沫的旋舞",
+    "name": "优菈",
+    "sex": "female",
+    "element": "cryo",
+    "country": "mondstadt",
+    "level": 5
+  },
+  {
+    "id": "yun_jin",
+    "title": "红毹婵娟",
+    "name": "云堇",
+    "sex": "female",
+    "element": "geo",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "sayu",
+    "title": "忍里之貉",
+    "name": "早柚",
+    "sex": "female",
+    "element": "anemo",
+    "country": "inazuma",
+    "level": 4
+  },
+  {
+    "id": "zhongli",
+    "title": "尘世闲游",
+    "name": "钟离",
+    "sex": "male",
+    "element": "geo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "chongyun",
+    "title": "雪融有踪",
+    "name": "重云",
+    "sex": "male",
+    "element": "cryo",
+    "country": "liyue",
+    "level": 4
+  },
+  {
+    "id": "mika",
+    "title": "晴霜的标绘",
+    "name": "米卡",
+    "sex": "male",
+    "element": "cryo",
+    "country": "mondstadt",
+    "level": 4
+  },
+  {
+    "id": "dehya",
+    "title": "炽鬃之狮",
+    "name": "迪希雅",
+    "sex": "female",
+    "element": "pyro",
+    "country": "sumeru",
+    "level": 5
+  },
+  {
+    "id": "dainsleif",
+    "title": "拾枝者",
+    "name": "戴因斯雷布",
+    "sex": "male",
+    "element": "others",
+    "country": "others",
+    "level": 0
+  },
+  {
+    "id": "baizhu",
+    "title": "遵生合和",
+    "name": "白术",
+    "sex": "male",
+    "element": "dendro",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "lyney",
+    "title": "惑光幻戏",
+    "name": "林尼",
+    "sex": "male",
+    "element": "pyro",
+    "country": "others",
+    "level": 5
+  },
+  {
+    "id": "lynette",
+    "title": "丽影绮行",
+    "name": "琳妮特",
+    "sex": "female",
+    "element": "anemo",
+    "country": "others",
+    "level": 4
+  },
+  {
+    "id": "freminet",
+    "title": "潜怀遐梦",
+    "name": "菲米尼",
+    "sex": "male",
+    "element": "cryo",
+    "country": "fontaine",
+    "level": 4
+  },
+  {
+    "id": "neuvillette",
+    "title": "谕告的潮音·",
+    "name": "那维莱特",
+    "sex": "male",
+    "element": "hydro",
+    "country": "others",
+    "level": 5
+  },
+  {
+    "id": "wriothesley",
+    "title": "寂罪的密使",
+    "name": "莱欧斯利",
+    "sex": "male",
+    "element": "cryo",
+    "country": "fontaine",
+    "level": 5
+  },
+  {
+    "id": "kaveh",
+    "title": "天穹之镜",
+    "name": "卡维",
+    "sex": "male",
+    "element": "dendro",
+    "country": "sumeru",
+    "level": 4
+  }
+]

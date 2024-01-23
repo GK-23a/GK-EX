@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
@@ -43,10 +44,44 @@ class MainWindow(QMainWindow):
             ['others', '其他']
         ]
         # 数据加载
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
-            gk_data = json.load(data_file)
-        self.gk_character_data = gk_data.get('character_data')
-        self.gk_versions = dict(character_data=gk_data.get('character_data_versions'))
+        with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
+            with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
+                info = json.load(data_file)
+                data = json.load(data_file2)
+        self.gk_character_data = []
+        x = False
+        default_dict = {
+            "id": "",
+            "designer": "None",
+            "design_state": False,
+            "artist": "",
+            "health_point": 0,
+            "max_health_point": 0,
+            "armor_point": 0,
+            "dlc": "standard",
+            "tip": "",
+            "skills": []}
+        merged_dict = dict()
+        for dict1 in info:
+            for dict2 in data:
+                dict2 = {key: dict2.get(key, default_dict[key]) for key in default_dict.keys()}
+                x = False
+                if dict1["id"] == dict2["id"]:
+                    # 合并字典
+                    merged_dict = {**dict1, **dict2}
+                    # 添加到合并列表
+                    self.gk_character_data.append(merged_dict)
+                    x = True
+                    break
+            if not x:
+                default_dict["id"] = dict1['id']
+                merged_dict = {**dict1, **default_dict}
+                self.gk_character_data.append(merged_dict)
+            if merged_dict['id'] == '':
+                raise
+        file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
+        self.gk_versions = datetime.fromtimestamp(file_stat.st_mtime)
+
         self.character_data = dict()
         self.data_list = dict()
         self.elt_title = dict()
@@ -61,7 +96,7 @@ class MainWindow(QMainWindow):
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
-        version.setText(f'软件版本 Beta 2.2  |  数据版本  {self.gk_versions.get("character_data")}')
+        version.setText(f'软件版本 Beta 2.2  |  数据版本  [{self.gk_versions}]')
         version.setAlignment(Qt.AlignHCenter)
 
         # 选择框
@@ -85,6 +120,7 @@ class MainWindow(QMainWindow):
 
         action_edit = QAction('新增角色', self)
         action_edit.triggered.connect(self.create_character_action)
+        action_edit.setDisabled(True)
         menu_edit.addAction(action_edit)
         action_restart = QAction('重启并刷新', self)
         action_restart.triggered.connect(lambda: self.restart_editor())

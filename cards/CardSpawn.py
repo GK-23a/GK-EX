@@ -43,7 +43,8 @@ def spawn_card(
         progress_bar: QProgressBar | None = None
 ) -> None:
     # 读取json
-    with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as file:
+    # Debug.20240124
+    with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as file:
         gk_data = json.loads(file.read())
     character_datas = gk_data['character_data']
     version_data = gk_data['character_data_versions']

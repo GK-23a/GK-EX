@@ -1,6 +1,7 @@
 import os
 import json
 from copy import deepcopy
+from datetime import datetime
 from time import asctime, localtime, time
 
 from PIL.ImageQt import ImageQt
@@ -169,6 +170,7 @@ class EditWindow(QWidget):
         edit_id.setGeometry(QRect(270+224, 28, 50, 22))
         edit_id.setText('修改ID')
         edit_id.clicked.connect(lambda: self.edit_id(self.ch_card.id))
+        edit_id.setDisabled(True)
         # 保存并刷新
         save_and_refresh = QPushButton(self)
         save_and_refresh.setGeometry(QRect(326+224, 28, 80, 22))
@@ -198,10 +200,22 @@ class EditWindow(QWidget):
         save_and_refresh.clicked.connect(lambda: self.show_or_hide_tip())
 
         # 数据加载与显示
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as self.data_file:
-            self.gk_data = json.load(self.data_file)
-            gk_character_data = self.gk_data.get('character_data')
-            self.gk_versions = dict(character_data=self.gk_data.get('character_data_versions'))
+        with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
+            with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
+                info = json.load(data_file)
+                data = json.load(data_file2)
+        gk_character_data = []
+        for dict1 in data:
+            for dict2 in info:
+                if dict1["id"] == dict2["id"]:
+                    # 合并字典
+                    merged_dict = {**dict1, **dict2}
+                    # 添加到合并列表
+                    gk_character_data.append(merged_dict)
+        self.gk_data = gk_character_data
+        file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
+        self.gk_versions = str(datetime.fromtimestamp(file_stat.st_mtime))
+
         self.sdata = 0
         if isinstance(cid, int):
             d = gk_character_data[cid]
@@ -331,7 +345,7 @@ class EditWindow(QWidget):
         build_data = self.ch_card.pack()
         # noinspection PyBroadException
         try:
-            self.cimg = character_card_build(build_data, self.gk_versions['character_data'],
+            self.cimg = character_card_build(build_data, self.gk_versions,
                                              progress_bar=self.pg_bar)
         except Exception:
             self.show_image.mousePressEvent = None
@@ -404,10 +418,21 @@ class EditWindow(QWidget):
                         else:
                             raise
             # 保存内容
-            with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
-                for i, char_dict in enumerate(self.gk_data['character_data']):
-                    if char_dict['name'] == saved_data['name']:
-                        self.gk_data['character_data'][i] = saved_data
+            default_dict = {
+                "id": "",
+                "designer": "None",
+                "design_state": False,
+                "artist": "",
+                "health_point": 0,
+                "max_health_point": 0,
+                "armor_point": 0,
+                "dlc": "standard",
+                "tip": "",
+                "skills": []}
+            with open(os.path.join('assets', 'json', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
+                for i, char_dict in enumerate(self.gk_data):
+                    if char_dict['id'] == saved_data['id']:
+                        self.gk_data[i] = {key: saved_data.get(key, default_dict[key]) for key in default_dict.keys()}
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
             with open(os.path.join('output', 'log', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
                 for log in save_info:
@@ -446,7 +471,7 @@ class EditWindow(QWidget):
 
     def on_id_edit_accepted(self, new_id, window_):
         window_.accept()
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
+        with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file:
             gk_character_data = json.load(data_file).get('character_data')
             cids = {i.get('id', None) for i in gk_character_data}
         if new_id in cids:

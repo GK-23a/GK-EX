@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from datetime import datetime
 
 from PySide6.QtCore import QRect
 from PySide6.QtGui import QFontDatabase, QFont
@@ -35,10 +36,20 @@ class ExportWindow(QWidget):
         self.setFixedSize(650, 420)
         self.setWindowTitle('导出……')
 
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
-            gk_data = json.load(data_file)
-        self.gk_character_data = gk_data.get('character_data')
-        self.version_data = gk_data.get('character_data_versions', '0')
+        with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
+            with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
+                info = json.load(data_file)
+                data = json.load(data_file2)
+        self.gk_character_data = []
+        for dict1 in data:
+            for dict2 in info:
+                if dict1["id"] == dict2["id"]:
+                    # 合并字典
+                    merged_dict = {**dict1, **dict2}
+                    # 添加到合并列表
+                    self.gk_character_data.append(merged_dict)
+        file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
+        self.version_data = str(datetime.fromtimestamp(file_stat.st_mtime))
 
         self.character_board = QWidget(self)
         self.character_board.setGeometry(QRect(0, 0, 300, 370))
