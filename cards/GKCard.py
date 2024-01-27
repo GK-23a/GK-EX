@@ -4,8 +4,8 @@ number_dict = {
         'liyue',
         'inazuma',
         'sumeru',
-        'fontaine_ousia',
-        'fontaine_pneuma',
+        'fontaine-ousia',
+        'fontaine-pneuma',
         'natlan',
         'snezhnaya',
         "khaenri'ah"

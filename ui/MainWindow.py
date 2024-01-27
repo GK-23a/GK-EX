@@ -10,6 +10,7 @@ from ui.CreateCharacter import CreateWindow
 from ui.EditCharacter import EditWindow
 from cards.GKCard import GKCharacterCard
 from ui.Export import ExportWindow
+from ui.get import website_get
 
 
 class MainWindow(QMainWindow):
@@ -96,7 +97,7 @@ class MainWindow(QMainWindow):
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
-        version.setText(f'软件版本 Beta 2.2  |  数据版本  [{self.gk_versions}]')
+        version.setText(f'软件版本 Beta3  |  数据版本  [{self.gk_versions}]')
         version.setAlignment(Qt.AlignHCenter)
 
         # 选择框
@@ -122,6 +123,9 @@ class MainWindow(QMainWindow):
         action_edit.triggered.connect(self.create_character_action)
         action_edit.setDisabled(True)
         menu_edit.addAction(action_edit)
+        action_refresh = QAction('更新角色', self)
+        action_refresh.triggered.connect(website_get)
+        menu_edit.addAction(action_refresh)
         action_restart = QAction('重启并刷新', self)
         action_restart.triggered.connect(lambda: self.restart_editor())
         menu_edit.addAction(action_restart)

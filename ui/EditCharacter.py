@@ -42,12 +42,14 @@ class EditWindow(QWidget):
         show_title.setGeometry(QRect(25+224, 60, 38, 16))
         self.data_title = QLineEdit(self)
         self.data_title.setGeometry(QRect(60+224, 58, 120, 20))
+        self.data_title.setDisabled(True)
         #    name
         show_name = QLabel(self)
         show_name.setText('名字')
         show_name.setGeometry(QRect(25+224, 90, 38, 16))
         self.data_name = QLineEdit(self)
         self.data_name.setGeometry(QRect(60+224, 88, 120, 20))
+        self.data_name.setDisabled(True)
         #    designer
         show_designer = QLabel(self)
         show_designer.setText('设计')
@@ -70,12 +72,14 @@ class EditWindow(QWidget):
         self.data_sex.addItem('女')
         self.data_sex.addItem('其他')
         self.data_sex.setGeometry(QRect(225+224, 58, 55, 20))
+        self.data_sex.setDisabled(True)
         #    level
         show_level = QLabel(self)
         show_level.setText('星级')
         show_level.setGeometry(QRect(190+224, 90, 35, 16))
         self.data_level = QSpinBox(self)
         self.data_level.setGeometry(QRect(225+224, 88, 55, 20))
+        self.data_level.setDisabled(True)
         #    country
         show_country = QLabel(self)
         show_country.setText('所属')
@@ -92,6 +96,7 @@ class EditWindow(QWidget):
         self.data_country.addItem('坎瑞亚')
         self.data_country.addItem('其他')
         self.data_country.setGeometry(QRect(325+224, 58, 80, 20))
+        self.data_country.setDisabled(True)
         #    element
         show_element = QLabel(self)
         show_element.setText('元素')
@@ -106,6 +111,7 @@ class EditWindow(QWidget):
         self.data_element.addItem('岩元素')
         self.data_element.addItem('其他')
         self.data_element.setGeometry(QRect(325+224, 88, 80, 20))
+        self.data_element.setDisabled(True)
         #    health
         show_health = QLabel(self)
         show_health.setText('体力')
@@ -199,22 +205,45 @@ class EditWindow(QWidget):
         save_and_refresh.setText('显示/隐藏注释')
         save_and_refresh.clicked.connect(lambda: self.show_or_hide_tip())
 
-        # 数据加载与显示
+        # 数据加载
         with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
             with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
                 info = json.load(data_file)
                 data = json.load(data_file2)
         gk_character_data = []
-        for dict1 in data:
-            for dict2 in info:
+        x = False
+        default_dict = {
+            "id": "",
+            "designer": "None",
+            "design_state": False,
+            "artist": "",
+            "health_point": 0,
+            "max_health_point": 0,
+            "armor_point": 0,
+            "dlc": "standard",
+            "tip": "",
+            "skills": []}
+        merged_dict = dict()
+        for dict1 in info:
+            for dict2 in data:
+                dict2 = {key: dict2.get(key, default_dict[key]) for key in default_dict.keys()}
+                x = False
                 if dict1["id"] == dict2["id"]:
                     # 合并字典
                     merged_dict = {**dict1, **dict2}
                     # 添加到合并列表
                     gk_character_data.append(merged_dict)
-        self.gk_data = gk_character_data
+                    x = True
+                    break
+            if not x:
+                default_dict["id"] = dict1['id']
+                merged_dict = {**dict1, **default_dict}
+                gk_character_data.append(merged_dict)
+            if merged_dict['id'] == '':
+                raise
         file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
-        self.gk_versions = str(datetime.fromtimestamp(file_stat.st_mtime))
+        self.gk_versions = datetime.fromtimestamp(file_stat.st_mtime)
+        self.gk_data = gk_character_data
 
         self.sdata = 0
         if isinstance(cid, int):
@@ -345,7 +374,7 @@ class EditWindow(QWidget):
         build_data = self.ch_card.pack()
         # noinspection PyBroadException
         try:
-            self.cimg = character_card_build(build_data, self.gk_versions,
+            self.cimg = character_card_build(build_data, str(self.gk_versions),
                                              progress_bar=self.pg_bar)
         except Exception:
             self.show_image.mousePressEvent = None
@@ -472,7 +501,7 @@ class EditWindow(QWidget):
     def on_id_edit_accepted(self, new_id, window_):
         window_.accept()
         with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file:
-            gk_character_data = json.load(data_file).get('character_data')
+            gk_character_data = json.load(data_file)
             cids = {i.get('id', None) for i in gk_character_data}
         if new_id in cids:
             error_tip = QMessageBox()

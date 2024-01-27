@@ -617,7 +617,7 @@
     "name": "林尼",
     "sex": "male",
     "element": "pyro",
-    "country": "others",
+    "country": "fontaine--pneuma",
     "level": 5
   },
   {
@@ -626,7 +626,7 @@
     "name": "琳妮特",
     "sex": "female",
     "element": "anemo",
-    "country": "others",
+    "country": "fontaine-ousia",
     "level": 4
   },
   {
@@ -635,16 +635,16 @@
     "name": "菲米尼",
     "sex": "male",
     "element": "cryo",
-    "country": "fontaine",
+    "country": "fontaine-pneuma",
     "level": 4
   },
   {
     "id": "neuvillette",
-    "title": "谕告的潮音·",
+    "title": "谕告的潮音",
     "name": "那维莱特",
     "sex": "male",
     "element": "hydro",
-    "country": "others",
+    "country": "fontaine-pneuma",
     "level": 5
   },
   {
@@ -653,7 +653,7 @@
     "name": "莱欧斯利",
     "sex": "male",
     "element": "cryo",
-    "country": "fontaine",
+    "country": "fontaine-ousia",
     "level": 5
   },
   {
@@ -663,6 +663,51 @@
     "sex": "male",
     "element": "dendro",
     "country": "sumeru",
+    "level": 4
+  },
+  {
+    "id": "chevreuse",
+    "title": "明律决罚",
+    "name": "夏沃蕾",
+    "sex": "female",
+    "element": "pyro",
+    "country": "fontaine-ousia",
+    "level": 4
+  },
+  {
+    "id": "navia",
+    "title": "明花蔓舵",
+    "name": "娜维娅",
+    "sex": "female",
+    "element": "geo",
+    "country": "fontaine-ousia",
+    "level": 5
+  },
+  {
+    "id": "furina",
+    "title": "不休独舞",
+    "name": "芙宁娜",
+    "sex": "female",
+    "element": "hydro",
+    "country": "fontaine-furina",
+    "level": 5
+  },
+  {
+    "id": "charlotte",
+    "title": "朗镜索真",
+    "name": "夏洛蒂",
+    "sex": "female",
+    "element": "cryo",
+    "country": "fontaine-pneuma",
+    "level": 4
+  },
+  {
+    "id": "kirara",
+    "title": "檐宇猫游",
+    "name": "绮良良",
+    "sex": "female",
+    "element": "dendro",
+    "country": "Inazuma",
     "level": 4
   }
 ]
