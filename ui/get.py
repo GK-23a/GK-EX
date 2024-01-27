@@ -242,7 +242,7 @@ def website_get(front=''):
             else:
                 raise
         elif table_dict.get('Region', None):
-            table_dict['country'] = table_dict['Region']
+            table_dict['country'] = format_string(table_dict['Region'])
         else:
             table_dict['country'] = 'None'
 

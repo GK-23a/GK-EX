@@ -617,7 +617,7 @@
     "name": "林尼",
     "sex": "male",
     "element": "pyro",
-    "country": "fontaine--pneuma",
+    "country": "fontaine-pneuma",
     "level": 5
   },
   {
@@ -707,7 +707,7 @@
     "name": "绮良良",
     "sex": "female",
     "element": "dendro",
-    "country": "Inazuma",
+    "country": "inazuma",
     "level": 4
   }
 ]
