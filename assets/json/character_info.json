@@ -709,5 +709,41 @@
     "element": "dendro",
     "country": "inazuma",
     "level": 4
+  },
+  {
+    "id": "arlecchino",
+    "title": "孤暝厄月",
+    "name": "阿蕾奇诺",
+    "sex": "female",
+    "element": "pyro",
+    "country": "snezhnaya",
+    "level": 5
+  },
+  {
+    "id": "chiori",
+    "title": "鸣雷的裁锦师",
+    "name": "千织",
+    "sex": "female",
+    "element": "geo",
+    "country": "inazuma",
+    "level": 5
+  },
+  {
+    "id": "xianyun",
+    "title": "鸾音鹤信",
+    "name": "闲云",
+    "sex": "female",
+    "element": "anemo",
+    "country": "liyue",
+    "level": 5
+  },
+  {
+    "id": "gaming",
+    "title": "骏猊頕首",
+    "name": "嘉明",
+    "sex": "female",
+    "element": "pyro",
+    "country": "liyue",
+    "level": 4
   }
 ]

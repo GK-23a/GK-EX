@@ -9,8 +9,10 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QScrollArea, QWidget, 
 from ui.CreateCharacter import CreateWindow
 from ui.EditCharacter import EditWindow
 from cards.GKCard import GKCharacterCard
+from cards.get import website_get
 from ui.Export import ExportWindow
-from ui.get import website_get
+
+from ui.UILib import MsgBox
 
 
 class MainWindow(QMainWindow):
@@ -24,7 +26,7 @@ class MainWindow(QMainWindow):
         if not os.path.exists('output'):
             os.makedirs('output')
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'SDK_SC_85W.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -80,8 +82,9 @@ class MainWindow(QMainWindow):
                 self.gk_character_data.append(merged_dict)
             if merged_dict['id'] == '':
                 raise
-        file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
-        self.gk_versions = datetime.fromtimestamp(file_stat.st_mtime)
+        temp_time_build = lambda file_link: datetime.fromtimestamp(os.stat(file_link).st_mtime)
+        self.gkinfo_time = temp_time_build(os.path.join('assets', 'json', 'card_data.json'))
+        self.gkdata_time = temp_time_build(os.path.join('assets', 'json', 'character_info.json'))
 
         self.character_data = dict()
         self.data_list = dict()
@@ -97,7 +100,8 @@ class MainWindow(QMainWindow):
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
-        version.setText(f'软件版本 Beta3  |  数据版本  [{self.gk_versions}]')
+        version.setText(
+            f'软件版本 Beta3 | 编辑内容版本 [{str(self.gkinfo_time)[:-10]}] | 源数据更新版本 [{str(self.gkdata_time)[:-16]}]')
         version.setAlignment(Qt.AlignHCenter)
 
         # 选择框
@@ -124,7 +128,7 @@ class MainWindow(QMainWindow):
         action_edit.setDisabled(True)
         menu_edit.addAction(action_edit)
         action_refresh = QAction('更新角色', self)
-        action_refresh.triggered.connect(website_get)
+        action_refresh.triggered.connect(self.update_character)
         menu_edit.addAction(action_refresh)
         action_restart = QAction('重启并刷新', self)
         action_restart.triggered.connect(lambda: self.restart_editor())
@@ -234,6 +238,14 @@ class MainWindow(QMainWindow):
     def create_character_action(self):
         self.create_windows.append(CreateWindow())
         self.create_windows[len(self.create_windows) - 1].show()
+
+    @staticmethod
+    def update_character():
+        update_number = website_get('')
+        if update_number > 0:
+            MsgBox(f'更新完成，请重启程序。\n本次更新了{update_number}个角色。')
+        else:
+            MsgBox(f'更新结束，可能已经是最新版本。')
 
     def open_export_window(self):
         self.export_window = ExportWindow()
