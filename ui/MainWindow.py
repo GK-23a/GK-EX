@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from PySide6.QtCore import (QRect, Qt, QSize)
 from PySide6.QtGui import (QAction, QFont, QFontDatabase, QImage, QPixmap)
@@ -8,7 +9,10 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QScrollArea, QWidget, 
 from ui.CreateCharacter import CreateWindow
 from ui.EditCharacter import EditWindow
 from cards.GKCard import GKCharacterCard
+from cards.get import website_get
 from ui.Export import ExportWindow
+
+from ui.UILib import MsgBox
 
 
 class MainWindow(QMainWindow):
@@ -22,7 +26,7 @@ class MainWindow(QMainWindow):
         if not os.path.exists('output'):
             os.makedirs('output')
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'SDK_SC_85W.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -43,10 +47,45 @@ class MainWindow(QMainWindow):
             ['others', '其他']
         ]
         # 数据加载
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
-            gk_data = json.load(data_file)
-        self.gk_character_data = gk_data.get('character_data')
-        self.gk_versions = dict(character_data=gk_data.get('character_data_versions'))
+        with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
+            with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
+                info = json.load(data_file)
+                data = json.load(data_file2)
+        self.gk_character_data = []
+        x = False
+        default_dict = {
+            "id": "",
+            "designer": "None",
+            "design_state": False,
+            "artist": "",
+            "health_point": 0,
+            "max_health_point": 0,
+            "armor_point": 0,
+            "dlc": "standard",
+            "tip": "",
+            "skills": []}
+        merged_dict = dict()
+        for dict1 in info:
+            for dict2 in data:
+                dict2 = {key: dict2.get(key, default_dict[key]) for key in default_dict.keys()}
+                x = False
+                if dict1["id"] == dict2["id"]:
+                    # 合并字典
+                    merged_dict = {**dict1, **dict2}
+                    # 添加到合并列表
+                    self.gk_character_data.append(merged_dict)
+                    x = True
+                    break
+            if not x:
+                default_dict["id"] = dict1['id']
+                merged_dict = {**dict1, **default_dict}
+                self.gk_character_data.append(merged_dict)
+            if merged_dict['id'] == '':
+                raise
+        temp_time_build = lambda file_link: datetime.fromtimestamp(os.stat(file_link).st_mtime)
+        self.gkinfo_time = temp_time_build(os.path.join('assets', 'json', 'card_data.json'))
+        self.gkdata_time = temp_time_build(os.path.join('assets', 'json', 'character_info.json'))
+
         self.character_data = dict()
         self.data_list = dict()
         self.elt_title = dict()
@@ -61,7 +100,8 @@ class MainWindow(QMainWindow):
         title_zh.setAlignment(Qt.AlignHCenter)
         version = QLabel(self)
         version.setGeometry(QRect(35, 100, 625, 75))
-        version.setText(f'软件版本 Beta 2.2  |  数据版本  {self.gk_versions.get("character_data")}')
+        version.setText(
+            f'软件版本 Beta3 | 编辑内容版本 [{str(self.gkinfo_time)[:-10]}] | 源数据更新版本 [{str(self.gkdata_time)[:-16]}]')
         version.setAlignment(Qt.AlignHCenter)
 
         # 选择框
@@ -85,7 +125,11 @@ class MainWindow(QMainWindow):
 
         action_edit = QAction('新增角色', self)
         action_edit.triggered.connect(self.create_character_action)
+        action_edit.setDisabled(True)
         menu_edit.addAction(action_edit)
+        action_refresh = QAction('更新角色', self)
+        action_refresh.triggered.connect(self.update_character)
+        menu_edit.addAction(action_refresh)
         action_restart = QAction('重启并刷新', self)
         action_restart.triggered.connect(lambda: self.restart_editor())
         menu_edit.addAction(action_restart)
@@ -194,6 +238,14 @@ class MainWindow(QMainWindow):
     def create_character_action(self):
         self.create_windows.append(CreateWindow())
         self.create_windows[len(self.create_windows) - 1].show()
+
+    @staticmethod
+    def update_character():
+        update_number = website_get('')
+        if update_number > 0:
+            MsgBox(f'更新完成，请重启程序。\n本次更新了{update_number}个角色。')
+        else:
+            MsgBox(f'更新结束，可能已经是最新版本。')
 
     def open_export_window(self):
         self.export_window = ExportWindow()

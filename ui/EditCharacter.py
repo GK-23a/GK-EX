@@ -1,6 +1,7 @@
 import os
 import json
 from copy import deepcopy
+from datetime import datetime
 from time import asctime, localtime, time
 
 from PIL.ImageQt import ImageQt
@@ -20,7 +21,7 @@ class EditWindow(QWidget):
     def __init__(self, cid: str | int):
         super().__init__()
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'SDK_SC_85W.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -41,12 +42,14 @@ class EditWindow(QWidget):
         show_title.setGeometry(QRect(25+224, 60, 38, 16))
         self.data_title = QLineEdit(self)
         self.data_title.setGeometry(QRect(60+224, 58, 120, 20))
+        self.data_title.setDisabled(True)
         #    name
         show_name = QLabel(self)
         show_name.setText('名字')
         show_name.setGeometry(QRect(25+224, 90, 38, 16))
         self.data_name = QLineEdit(self)
         self.data_name.setGeometry(QRect(60+224, 88, 120, 20))
+        self.data_name.setDisabled(True)
         #    designer
         show_designer = QLabel(self)
         show_designer.setText('设计')
@@ -69,12 +72,14 @@ class EditWindow(QWidget):
         self.data_sex.addItem('女')
         self.data_sex.addItem('其他')
         self.data_sex.setGeometry(QRect(225+224, 58, 55, 20))
+        self.data_sex.setDisabled(True)
         #    level
         show_level = QLabel(self)
         show_level.setText('星级')
         show_level.setGeometry(QRect(190+224, 90, 35, 16))
         self.data_level = QSpinBox(self)
         self.data_level.setGeometry(QRect(225+224, 88, 55, 20))
+        self.data_level.setDisabled(True)
         #    country
         show_country = QLabel(self)
         show_country.setText('所属')
@@ -91,6 +96,7 @@ class EditWindow(QWidget):
         self.data_country.addItem('坎瑞亚')
         self.data_country.addItem('其他')
         self.data_country.setGeometry(QRect(325+224, 58, 80, 20))
+        self.data_country.setDisabled(True)
         #    element
         show_element = QLabel(self)
         show_element.setText('元素')
@@ -105,6 +111,7 @@ class EditWindow(QWidget):
         self.data_element.addItem('岩元素')
         self.data_element.addItem('其他')
         self.data_element.setGeometry(QRect(325+224, 88, 80, 20))
+        self.data_element.setDisabled(True)
         #    health
         show_health = QLabel(self)
         show_health.setText('体力')
@@ -169,6 +176,7 @@ class EditWindow(QWidget):
         edit_id.setGeometry(QRect(270+224, 28, 50, 22))
         edit_id.setText('修改ID')
         edit_id.clicked.connect(lambda: self.edit_id(self.ch_card.id))
+        edit_id.setDisabled(True)
         # 保存并刷新
         save_and_refresh = QPushButton(self)
         save_and_refresh.setGeometry(QRect(326+224, 28, 80, 22))
@@ -197,11 +205,46 @@ class EditWindow(QWidget):
         save_and_refresh.setText('显示/隐藏注释')
         save_and_refresh.clicked.connect(lambda: self.show_or_hide_tip())
 
-        # 数据加载与显示
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as self.data_file:
-            self.gk_data = json.load(self.data_file)
-            gk_character_data = self.gk_data.get('character_data')
-            self.gk_versions = dict(character_data=self.gk_data.get('character_data_versions'))
+        # 数据加载
+        with open(os.path.join('assets', 'json', 'character_info.json'), encoding='UTF-8') as data_file:
+            with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file2:
+                info = json.load(data_file)
+                data = json.load(data_file2)
+        gk_character_data = []
+        x = False
+        default_dict = {
+            "id": "",
+            "designer": "None",
+            "design_state": False,
+            "artist": "",
+            "health_point": 0,
+            "max_health_point": 0,
+            "armor_point": 0,
+            "dlc": "standard",
+            "tip": "",
+            "skills": []}
+        merged_dict = dict()
+        for dict1 in info:
+            for dict2 in data:
+                dict2 = {key: dict2.get(key, default_dict[key]) for key in default_dict.keys()}
+                x = False
+                if dict1["id"] == dict2["id"]:
+                    # 合并字典
+                    merged_dict = {**dict1, **dict2}
+                    # 添加到合并列表
+                    gk_character_data.append(merged_dict)
+                    x = True
+                    break
+            if not x:
+                default_dict["id"] = dict1['id']
+                merged_dict = {**dict1, **default_dict}
+                gk_character_data.append(merged_dict)
+            if merged_dict['id'] == '':
+                raise
+        file_stat = os.stat(os.path.join('assets', 'json', 'card_data.json'))
+        self.gk_versions = datetime.fromtimestamp(file_stat.st_mtime)
+        self.gk_data = gk_character_data
+
         self.sdata = 0
         if isinstance(cid, int):
             d = gk_character_data[cid]
@@ -331,7 +374,7 @@ class EditWindow(QWidget):
         build_data = self.ch_card.pack()
         # noinspection PyBroadException
         try:
-            self.cimg = character_card_build(build_data, self.gk_versions['character_data'],
+            self.cimg = character_card_build(build_data, str(self.gk_versions),
                                              progress_bar=self.pg_bar)
         except Exception:
             self.show_image.mousePressEvent = None
@@ -404,10 +447,21 @@ class EditWindow(QWidget):
                         else:
                             raise
             # 保存内容
-            with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
-                for i, char_dict in enumerate(self.gk_data['character_data']):
-                    if char_dict['name'] == saved_data['name']:
-                        self.gk_data['character_data'][i] = saved_data
+            default_dict = {
+                "id": "",
+                "designer": "None",
+                "design_state": False,
+                "artist": "",
+                "health_point": 0,
+                "max_health_point": 0,
+                "armor_point": 0,
+                "dlc": "standard",
+                "tip": "",
+                "skills": []}
+            with open(os.path.join('assets', 'json', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
+                for i, char_dict in enumerate(self.gk_data):
+                    if char_dict['id'] == saved_data['id']:
+                        self.gk_data[i] = {key: saved_data.get(key, default_dict[key]) for key in default_dict.keys()}
                 json.dump(self.gk_data, jsonfile, ensure_ascii=False, indent=2)
             with open(os.path.join('output', 'log', 'change_log.gkch'), 'a', encoding='UTF-8') as gkch:
                 for log in save_info:
@@ -446,8 +500,8 @@ class EditWindow(QWidget):
 
     def on_id_edit_accepted(self, new_id, window_):
         window_.accept()
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
-            gk_character_data = json.load(data_file).get('character_data')
+        with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file:
+            gk_character_data = json.load(data_file)
             cids = {i.get('id', None) for i in gk_character_data}
         if new_id in cids:
             error_tip = QMessageBox()

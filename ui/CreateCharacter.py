@@ -24,7 +24,7 @@ class CreateWindow(QDialog):
         self.save_flag = False
         self.setFixedSize(440, 200)
 
-        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'MiSans-Demibold.ttf'))
+        font_id = QFontDatabase.addApplicationFont(os.path.join('assets', 'font', 'SDK_SC_85W.ttf'))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.font.setPointSize(10.5)
@@ -174,7 +174,7 @@ class CreateWindow(QDialog):
         return saved_data
 
     def save_data(self, reason=False):
-        with open(os.path.join('assets', 'card_data.json'), encoding='UTF-8') as data_file:
+        with open(os.path.join('assets', 'json', 'card_data.json'), encoding='UTF-8') as data_file:
             gk_character_data = json.load(data_file).get('character_data')
             cids = {i.get('id', None) for i in gk_character_data}
         if self.data_id.text() in cids:
@@ -199,7 +199,7 @@ class CreateWindow(QDialog):
             restart_tip.setDefaultButton(QMessageBox.Save)
             restart_tip.exec()
             try:
-                with open(os.path.join('assets', 'card_data.json'), 'r', encoding='UTF-8') as jsonfile:
+                with open(os.path.join('assets', 'json', 'card_data.json'), 'r', encoding='UTF-8') as jsonfile:
                     gk_data = json.load(jsonfile)
 
                 saved_data = self.pack_data()
@@ -211,7 +211,7 @@ class CreateWindow(QDialog):
                 save_info = list()
                 save_info.append([get_time(), 'AC', saved_data['id'], saved_data])
 
-                with open(os.path.join('assets', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
+                with open(os.path.join('assets', 'json', 'card_data.json'), 'w', encoding='UTF-8') as jsonfile:
                     json.dump(gk_data, jsonfile, ensure_ascii=False)
 
                 with open('output/change_log.gkcl', 'a', encoding='UTF-8') as gkcl:
